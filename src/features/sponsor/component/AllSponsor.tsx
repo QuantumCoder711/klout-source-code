@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store';
 
 const AllSponsor: React.FC = () => {
-  const attendeesData = Array.from({ length: 100 }, (_, index) => ({
-    id: index + 1,
-    name: `Attendee ${index + 1}`,
-    job: `Job Title ${index + 1}`,
-    company: `Company ${index + 1}`,
-    location: `Location ${index + 1}`,
-    lastLogin: `${Math.floor(Math.random() * 12 + 1)}/${Math.floor(Math.random() * 28 + 1)}/2023`,
-    favoriteColor: ['Blue', 'Green', 'Red', 'Purple', 'Yellow', 'Pink', 'Orange', 'Teal', 'Navy', 'Brown'][Math.floor(Math.random() * 10)],
-  }));
+
+  type sponsorType =  {
+    uuid: string;
+    title: string;
+    first_name: string;
+    job_title: string;
+    company_name: string;
+    email_id: string;
+    phone_number: string;
+    status: string;
+    last_name: string;
+  }
+
+  const { allSponsors } = useSelector((state: RootState) => state.sponsor);
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(attendeesData.length / itemsPerPage);
+  const totalPages = Math.ceil(allSponsors.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  const currentAttendees = attendeesData.slice(startIndex, endIndex);
+  const currentSponsors: sponsorType[] = allSponsors.slice(startIndex, endIndex);
+  console.log(currentSponsors);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -27,11 +35,10 @@ const AllSponsor: React.FC = () => {
 
   const renderPaginationNumbers = () => {
     const paginationNumbers = [];
-    const maxVisiblePages = 5; // Maximum number of visible page numbers
+    const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-    // Adjust start and end page if at the beginning or end
     if (endPage - startPage < maxVisiblePages - 1) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -64,7 +71,7 @@ const AllSponsor: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="mb-2">
           <span className="text-gray-800 font-semibold">
-            Showing {currentAttendees.length} entries out of {attendeesData.length}
+            Showing {currentSponsors.length} entries out of {allSponsors.length}
           </span>
         </div>
         <div className="mb-2">
@@ -82,37 +89,38 @@ const AllSponsor: React.FC = () => {
           </select>
         </div>
 
-
         {/* Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-w-full">
           <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
             <thead>
               <tr className="bg-klt_primary-500 text-white">
-                <th className="py-3 px-4 text-start">#</th>
-                <th className="py-3 px-4 text-start">Name</th>
-                <th className="py-3 px-4 text-start">Job</th>
-                <th className="py-3 px-4 text-start">Company</th>
-                <th className="py-3 px-4 text-start">Location</th>
-                <th className="py-3 px-4 text-start">Last Login</th>
-                <th className="py-3 px-4 text-start">Favorite Color</th>
+                <th className="py-3 px-4 text-start text-nowrap">#</th>
+                <th className="py-3 px-4 text-start text-nowrap">Event</th>
+                <th className="py-3 px-4 text-start text-nowrap">Name</th>
+                <th className="py-3 px-4 text-start text-nowrap">Designation</th>
+                <th className="py-3 px-4 text-start text-nowrap">Company</th>
+                <th className="py-3 px-4 text-start text-nowrap">Email</th>
+                <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
+                <th className="py-3 px-4 text-start text-nowrap">Status</th>
               </tr>
             </thead>
             <tbody>
-              {currentAttendees.length > 0 ? (
-                currentAttendees.map((attendee, index) => (
-                  <tr key={attendee.id} className="bg-white border-b border-gray-400 hover:bg-gray-50">
-                    <td className="py-3 px-4 text-gray-800">{startIndex + index + 1}</td>
-                    <td className="py-3 px-4 text-gray-800">{attendee.name}</td>
-                    <td className="py-3 px-4 text-gray-800">{attendee.job}</td>
-                    <td className="py-3 px-4 text-gray-800">{attendee.company}</td>
-                    <td className="py-3 px-4 text-gray-800">{attendee.location}</td>
-                    <td className="py-3 px-4 text-gray-800">{attendee.lastLogin}</td>
-                    <td className="py-3 px-4 text-gray-800">{attendee.favoriteColor}</td>
+              {currentSponsors.length > 0 ? (
+                currentSponsors.map((attendee, index) => (
+                  <tr key={attendee.uuid} className="bg-white border-b border-gray-400 hover:bg-gray-50">
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.title}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.first_name + ' ' + attendee.last_name}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-2 px-4 text-center text-gray-600">No attendees found.</td>
+                  <td colSpan={8} className="py-2 px-4 text-center text-gray-600">No attendees found.</td>
                 </tr>
               )}
             </tbody>

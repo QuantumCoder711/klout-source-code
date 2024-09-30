@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa"; // Importing chevron icons
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { heading } from "../features/heading/headingSlice";
 
 const Sidebar: React.FC = () => {
+  const dispatch = useDispatch();
   const [showEvents, setShowEvents] = useState(false);
 
   const toggleEventsMenu = () => {
     setShowEvents(!showEvents);
   };
+
+  const handlePageTitle = (e: React.MouseEvent<HTMLElement>) => {
+    dispatch(heading(e.currentTarget.innerText))
+  }
 
   return (
     <div className="h-screen w-56 flex-shrink-0 bg-klt_primary-900 text-white">
@@ -19,7 +26,7 @@ const Sidebar: React.FC = () => {
       </div>
       <ul className="my-5 space-y-2">
         <li>
-          <Link to="/" className="py-3 px-5 block rounded font-semibold">
+          <Link to="/" onClick={handlePageTitle} className="py-3 px-5 block rounded font-semibold">
             Dashboard
           </Link>
         </li>
@@ -36,6 +43,7 @@ const Sidebar: React.FC = () => {
               <li>
                 <Link
                   to="/events"
+                  onClick={handlePageTitle}
                   className="hover:bg-klt_primary-400 pl-4 py-2 block rounded"
                 >
                   All Events
@@ -44,6 +52,7 @@ const Sidebar: React.FC = () => {
               <li>
                 <Link
                   to="/events/add-event"
+                  onClick={handlePageTitle}
                   className="hover:bg-klt_primary-400 pl-4 py-2 block rounded"
                 >
                   Add Event
@@ -55,6 +64,7 @@ const Sidebar: React.FC = () => {
         <li>
           <Link
             to="/all-attendees"
+            onClick={handlePageTitle}
             className="py-3 px-5 block rounded font-semibold"
           >
             All Attendees
@@ -63,6 +73,7 @@ const Sidebar: React.FC = () => {
         <li>
           <Link
             to="/all-sponsors"
+            onClick={handlePageTitle}
             className="py-3 px-5 block rounded font-semibold"
           >
             All Sponsors
@@ -71,6 +82,7 @@ const Sidebar: React.FC = () => {
         <li>
           <Link
             to="/settings"
+            onClick={handlePageTitle}
             className="py-3 px-5 block rounded font-semibold"
           >
             Settings
@@ -79,6 +91,7 @@ const Sidebar: React.FC = () => {
         <li>
           <Link
             to="/profile"
+            onClick={handlePageTitle}
             className="py-3 px-5 block rounded font-semibold"
           >
             Profile

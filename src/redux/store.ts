@@ -5,23 +5,29 @@ import { combineReducers } from "redux"; // Import combineReducers
 import eventReducer from '../features/event/eventSlice';
 import authReducer from '../features/auth/authSlice';
 import attendeeReducer from '../features/attendee/attendeeSlice';
+import sponsorReducer from '../features/sponsor/sponsorSlice';
+import pageHeadingReducer from '../features/heading/headingSlice';
 import { useDispatch } from 'react-redux';
 
-
-const authPersistConfig = {
-    key: 'auth',
+// Persist config for the entire store
+const persistConfig = {
+    key: 'root',
     storage,
-    whitelist: ['token']
 };
 
 const rootReducer = combineReducers({
     events: eventReducer,
-    auth: persistReducer(authPersistConfig, authReducer),
+    auth: authReducer,
     attendee: attendeeReducer,
+    sponsor: sponsorReducer,
+    pageHeading: pageHeadingReducer
 });
 
+// Apply persistReducer to the combined rootReducer
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 const store = configureStore({
-    reducer: rootReducer,
+    reducer: persistedReducer,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

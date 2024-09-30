@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../redux/store';
 import { fetchEvents } from "../features/event/eventSlice";
 import { fetchAllAttendees } from "../features/attendee/attendeeSlice";
+import { fetchSponsor } from "../features/sponsor/sponsorSlice";
 import { logout } from '../features/auth/authSlice';
 import { Navigate } from "react-router-dom";
 
@@ -11,10 +12,12 @@ const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const { token } = useSelector((state: RootState) => state.auth);
+  const { pageHeading } = useSelector((state: RootState) => state.pageHeading)
 
   useEffect(() => {
     dispatch(fetchEvents(token));
     dispatch(fetchAllAttendees(token));
+    dispatch(fetchSponsor(token));
   }, [dispatch]);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +39,7 @@ const Navbar: React.FC = () => {
     <nav className="bg-klt_primary-900 p-4 text-white" style={{borderLeft: '1px solid #fff'}}>
       <div className="container mx-auto flex justify-between items-center">
         {/* Left side - Branding or Logo */}
-        <div className="text-xl font-bold ml-6">Dashboard</div>
+        <div className="text-xl font-bold ml-6">{pageHeading}</div>
 
         {/* Right side - User profile with dropdown */}
         <div

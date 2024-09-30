@@ -1,31 +1,45 @@
-// Dashboard.tsx
 import React from 'react';
 import ScoreCard from '../../../component/ScoreCard';
 import HeadingH2 from '../../../component/HeadingH2';
 import EventCard from '../../../component/EventCard';
 import Button from '../../../component/Button';
 import { useSelector } from 'react-redux';
-// import { fetchEvents } from '../../event/eventSlice';
-// import { fetchAllAttendees } from '../../attendee/attendeeSlice';
 import { RootState } from '../../../redux/store';
 
 
 const Dashboard: React.FC = () => {
+  const imageBaseUrl:string = import.meta.env.VITE_API_BASE_URL;
+  
+  type eventType = {
+    title: string,
+    image: string,
+    event_start_date: string,
+    uuid: string,
+    event_venue_name: string
+  }
 
-  // const dispatch = useAppDispatch();
-
-  const { totalEvents, loading, error } = useSelector((state: RootState) => state.events);
-  // const { token } = useSelector((state: RootState) => state.auth);
+  const { events, loading, error } = useSelector((state: RootState) => state.events);
   const { allAttendees } = useSelector((state: RootState) => state.attendee);
+  const { totalSponsors } = useSelector((state: RootState) => state.sponsor);
 
+  // filter past events from all events
+  const today:Date = new Date();
+  const pastEvents = events.filter((event:eventType) => {
+    const eventDate:Date = new Date(event.event_start_date);
+    return eventDate < today; 
+  });
 
-  // useEffect(() => {
-  //   dispatch(fetchEvents(token));
-  //   dispatch(fetchAllAttendees(token));
-  // }, [dispatch]);
+  const upcomingEvents = events.filter((event: eventType) => {
+    const eventDate: Date = new Date(event.event_start_date);
+    return eventDate > today;
+});
+
+  console.log(pastEvents);
 
   if(loading) return <p>loading...</p>;
   if(error) return <p>Errror:  {error}</p>
+
+  
 
 
 
@@ -34,7 +48,7 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <ScoreCard
           title="Total Events"
-          content={totalEvents}
+          content={events.length}
           cardColor='#347928'
         />
         <ScoreCard
@@ -44,14 +58,43 @@ const Dashboard: React.FC = () => {
         />
         <ScoreCard
           title="Total Sponsors"
-          content={6}
+          content={totalSponsors}
           cardColor='#ED3EF7'
         />
         <ScoreCard
           title="Upcoming Events"
-          content={7}
+          content={upcomingEvents.length}
           cardColor='#FF9100'
         />
+      </div>
+
+      {/* PAST EVENTS */}
+
+      <div className="mt-10 mb-6 flex justify-between items-center">
+          <HeadingH2
+            title='Past Events'
+          />
+          <Button 
+            buttonTitle='View All' 
+          />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {
+          pastEvents.length > 0 ?
+          pastEvents.map((pastEvent: eventType) => {
+            return <EventCard
+            key={pastEvent.uuid}
+            title={pastEvent.title}
+            imageUrl={`${imageBaseUrl}/${pastEvent.image}`}
+            imageAlt={pastEvent.title}
+            date={pastEvent.event_start_date}
+            venue={pastEvent.event_venue_name}
+            buttonTitle='View Detail'
+            eventuuid={pastEvent.uuid}
+            />
+          }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Past Event</h3>
+        }
       </div>
 
       {/* UPCOMING EVENTS */}
@@ -65,93 +108,22 @@ const Dashboard: React.FC = () => {
           />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes one'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='1'
-        />
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes two'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='2'
-        />
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes three'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='3'
-        />
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes four'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='4'
-        />
-      </div>
-
-      {/* ALL EVENTS */}
-
-      <div className="mt-10 mb-6 flex justify-between items-center">
-          <HeadingH2
-            title='All Events'
-          />
-          <Button 
-            buttonTitle='View All' 
-          />
-      </div>
-
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes one'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='5'
-        />
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes two'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='6'
-        />
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes three'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='7'
-        />
-        <EventCard
-          title='CFO Ignite 2024'
-          imageUrl='https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp'
-          imageAlt='Shoes four'
-          date='2024-10-31'
-          venue='Holiday Inn, Asset Area 12 Hospitality District,'
-          buttonTitle='View Detail'
-          eventuuid='8'
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {
+          upcomingEvents.length > 0 ?
+          upcomingEvents.map((upcomingEvent: eventType) => {
+            return <EventCard
+            key={upcomingEvent.uuid}
+            title={upcomingEvent.title}
+            imageUrl={`https://api.klout.club/${upcomingEvent.image}`}
+            imageAlt={upcomingEvent.title}
+            date={upcomingEvent.event_start_date}
+            venue={upcomingEvent.event_venue_name}
+            buttonTitle='View Detail'
+            eventuuid={upcomingEvent.uuid}
+            />
+          }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Upcoming Event</h3>
+        }
       </div>
 
 

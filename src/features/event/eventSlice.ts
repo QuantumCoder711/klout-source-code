@@ -1,61 +1,109 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { fetchTotalEvents } from './eventApi';
+import { fetchTotalEvents, fetchCurrentEvent } from './eventApi';
 
 
 type eventState = {
     events: [],
-    totalEvents: number,
+    currentEvent: {},
+    currentEventUUID: string | null,
     loading: boolean,
     error: string | null;
 }
 
 const initialState: eventState = {
     events : [],
-    totalEvents: 0,
-    loading: false  ,
+    currentEvent: {},
+    currentEventUUID: null,
+    loading: false,
     error: null
 };
 
 export const fetchEvents = createAsyncThunk(
-    'events/fetchEvents',
-    async(token: string | null, { rejectWithValue }) => {
+    'events/fetchEvents', async(token: string | null, { rejectWithValue }) => {
         try{
             const response = await fetchTotalEvents(token);
             return response;
 
         }catch(error){
-            return rejectWithValue('Failed to fetch event')
+            return rejectWithValue('Failed to fetch events')
         }
     }
-)
+);
+
+// export const fetchAllUpcomingEvents = createAsyncThunk(
+//     'events/fetchAllUpcomingEvents', async(token: string | null, { rejectWithValue }) => {
+//         try{
+//             const response = await fetchUpcomingEvents(token);
+//             return response;
+
+//         }catch(error){
+//             return rejectWithValue('Failed to fetch upcoming events')
+//         }
+//     }
+// );
+
+export const fetchExistingEvent = createAsyncThunk(
+    'events/fetchExistingEvent', async({token, eventuuid}: {token: string | null, eventuuid: string | null}, { rejectWithValue }) => {
+        try{
+            const response = await fetchCurrentEvent(token, eventuuid);
+            return response
+        }catch(error){
+            return rejectWithValue('Failed to fetch Current Event');
+        }
+    }
+) 
 
 
 const eventSlice = createSlice({
     name: 'events',
     initialState,
-    reducers: {},
+    reducers: {
+        // handles the current event uuid
+        eventUUID(state, action: PayloadAction<string>){
+            state.currentEventUUID = action.payload;
+        }
+    },
     extraReducers: (builder) => {
-        // pending state
+        // ------------------ for fetchEvents ---------------------
+        // fetchEvents pending state
         builder.addCase(fetchEvents.pending, (state) => {
             state.loading = true;
             state.error = null;
         });
-
-        // fullfilled state
+        // fetchEvents fullfilled state
         builder.addCase(fetchEvents.fulfilled, (state, action: PayloadAction<{data: [], total_events: number}>) => {
             state.loading = false;
             state.events = action.payload.data;
-            state.totalEvents = action.payload.total_events;
             state.error = null;
         });
-
-        // rejected state
+        // fetchEvents rejected state
         builder.addCase(fetchEvents.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload as string;
         });
 
+        
+        // -------------------- for fetchExistingEvent -------------------------
+        // fetchExistingEvent pending state
+        builder.addCase(fetchExistingEvent.pending, (state) =>{
+            state.loading = true;
+            state.error = null;
+        });
+        // fetchExistingEvent fulfilled
+        builder.addCase(fetchExistingEvent.fulfilled, (state, action: PayloadAction<{data: {}}>) =>{
+            state.loading = false;
+            state.currentEvent = action.payload.data;
+            state.error = null;
+        });
+        // currentEvent rejected
+        builder.addCase(fetchExistingEvent.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload as string;
+        })
+
     }
 });
+
+export const { eventUUID } = eventSlice.actions;
 
 export default eventSlice.reducer;
