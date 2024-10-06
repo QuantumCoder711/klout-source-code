@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../redux/store';
+import { MdAdd } from "react-icons/md";
+import { Link } from 'react-router-dom';
+import { heading } from '../../../features/heading/headingSlice';
 
 const Event: React.FC = () => {
+    const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
-    // const [itemsPerPage, setItemsPerPage] = useState(10);
     const itemsPerPage: number = 10;
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -46,6 +49,10 @@ const Event: React.FC = () => {
         setActiveTab(tab);
         setCurrentPage(1); // Reset page to 1 when switching tabs
     };
+
+    const handleHeading = () => {
+        dispatch(heading('Add Event'))
+    }
 
     const eventType = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
 
@@ -93,106 +100,114 @@ const Event: React.FC = () => {
     };
 
     return (
-        <div className="p-6">
-            {/* Heading */}
-            <HeadingH2 title="All Events" />
+        <>
+            
+            <div className="p-6">
 
-            {/* Tab Buttons */}
-            <div className="flex gap-4 mt-4 mb-6">
-                <button
-                    onClick={() => handleTabChange('upcoming')}
-                    className={`px-4 py-2 rounded ${activeTab === 'upcoming' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
-                >
-                    Upcoming Events
-                </button>
-                <button
-                    onClick={() => handleTabChange('past')}
-                    className={`px-4 py-2 rounded ${activeTab === 'past' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
-                >
-                    Past Events
-                </button>
-            </div>
+                {/* Heading */}
+                <div className="flex justify-between items-center">
+                    <HeadingH2 title="All Events" />
+                    <Link to='/events/add-event' onClick={handleHeading} className="btn btn-secondary text-white btn-sm"><MdAdd /> Create New Event</Link>
+                </div>
+                
 
-            {/* Event Table */}
-            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-                <table className="min-w-full text-left text-sm">
-                    <thead>
-                        <tr className="bg-gray-200 text-gray-700" style={{fontSize: '17px'}}>
-                            <th className="py-4 px-6">Image</th>
-                            <th className="py-4 px-6">Title</th>
-                            <th className="py-4 px-6">Event Details</th>
-                            <th className="py-4 px-6">Attendees Details</th>
-                            <th className="py-4 px-6">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            currentEvents.length > 0 ? (
-                                currentEvents.map((event: eventType) => (
-                                    <tr key={event.uuid} className="border-b text-gray-700 text-md font-normal" style={{
-                                        fontSize: '15px'
-                                    }}>
-                                        <td className="py-3 px-6">
-                                            <img
-                                                src={`${imageBaseUrl}/${event.image}`}
-                                                alt={event.title}
-                                                className="w-16 h-16 rounded-lg object-cover"
-                                            />
-                                        </td>
-                                        <td className="py-3 px-6">{event.title}</td>
-                                        <td className="py-3 px-6">
-                                            <span className="font-semibold text-black">Date</span> - {event.event_start_date} <br />
-                                            <span className="font-semibold text-black">Time</span> - {event.start_time + ':' + event.start_minute_time + ' ' + event.start_time_type} <br />
-                                            <span className="font-semibold text-black">Venue</span> - {event.event_venue_name}
-                                        </td>
-                                        <td className="py-3 px-6">
-                                            <span className="font-semibold text-black">Total Registration</span> - {event.total_attendee} <br />
-                                            <span className="font-semibold text-black">Total Attendees </span> - {event.total_checkedin}<br />
-                                            <span className="font-semibold text-black">Checked In Speakers </span> - {event.total_checkedin_speaker} <br />
-                                            <span className="font-semibold text-black">Checked In Sponsors </span> - {event.total_checkedin_sponsor} <br />
-                                            <span className="font-semibold text-black">Pending Delegates </span> - {event.total_pending_delegate}
-                                        </td>
-                                        <td className="py-3 px-6 space-y-2">
-                                            <button className="text-blue-500 hover:underline">View Attendees</button> <br />
-                                            <button className="text-green-500 hover:underline">View Sponsors</button> <br />
-                                            <button className="text-yellow-500 hover:underline">View Agendas</button> <br />
-                                            <button className="text-red-500 hover:underline">Delete Event</button>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={6} className="text-center text-gray-500 py-4">
-                                        No events found.
-                                    </td>
-                                </tr>
-                            )
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-end items-center mt-4">
-                <div className="flex items-center space-x-1">
+                {/* Tab Buttons */}
+                <div className="flex gap-4 mt-4 mb-6">
                     <button
-                        className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
-                        disabled={currentPage === 1}
-                        onClick={() => handlePageChange(currentPage - 1)}
+                        onClick={() => handleTabChange('upcoming')}
+                        className={`px-4 py-2 rounded ${activeTab === 'upcoming' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
                     >
-                        <TiChevronLeft />
+                        Upcoming Events
                     </button>
-                    {renderPaginationNumbers()}
                     <button
-                        className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
-                        disabled={currentPage === totalPages}
-                        onClick={() => handlePageChange(currentPage + 1)}
+                        onClick={() => handleTabChange('past')}
+                        className={`px-4 py-2 rounded ${activeTab === 'past' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
                     >
-                        <TiChevronRight />
+                        Past Events
                     </button>
                 </div>
+
+                {/* Event Table */}
+                <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+                    <table className="min-w-full text-left text-sm">
+                        <thead>
+                            <tr className="bg-gray-200 text-gray-700" style={{ fontSize: '17px' }}>
+                                <th className="py-4 px-6">Image</th>
+                                <th className="py-4 px-6">Title</th>
+                                <th className="py-4 px-6">Event Details</th>
+                                <th className="py-4 px-6">Attendees Details</th>
+                                <th className="py-4 px-6">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                currentEvents.length > 0 ? (
+                                    currentEvents.map((event: eventType) => (
+                                        <tr key={event.uuid} className="border-b text-gray-700 text-md font-normal" style={{
+                                            fontSize: '15px'
+                                        }}>
+                                            <td className="py-3 px-6">
+                                                <img
+                                                    src={`${imageBaseUrl}/${event.image}`}
+                                                    alt={event.title}
+                                                    className="w-16 h-16 rounded-lg object-cover"
+                                                />
+                                            </td>
+                                            <td className="py-3 px-6 font-semibold">{event.title}</td>
+                                            <td className="py-3 px-6">
+                                                <span className="font-semibold text-black">Date</span> - {event.event_start_date} <br />
+                                                <span className="font-semibold text-black">Time</span> - {event.start_time + ':' + event.start_minute_time + ' ' + event.start_time_type} <br />
+                                                <span className="font-semibold text-black">Venue</span> - {event.event_venue_name}
+                                            </td>
+                                            <td className="py-3 px-6">
+                                                <span className="font-semibold text-black">Total Registration</span> - {event.total_attendee} <br />
+                                                <span className="font-semibold text-black">Total Attendees </span> - {event.total_checkedin}<br />
+                                                <span className="font-semibold text-black">Checked In Speakers </span> - {event.total_checkedin_speaker} <br />
+                                                <span className="font-semibold text-black">Checked In Sponsors </span> - {event.total_checkedin_sponsor} <br />
+                                                <span className="font-semibold text-black">Pending Delegates </span> - {event.total_pending_delegate}
+                                            </td>
+                                            <td className="py-3 px-6 space-y-2">
+                                                <button className="text-blue-500 hover:underline">View Attendees</button> <br />
+                                                <button className="text-green-500 hover:underline">View Sponsors</button> <br />
+                                                <button className="text-yellow-500 hover:underline">View Agendas</button> <br />
+                                                <button className="text-red-500 hover:underline">Delete Event</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={6} className="text-center text-gray-500 py-4">
+                                            No events found.
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Pagination */}
+                <div className="flex justify-end items-center mt-4">
+                    <div className="flex items-center space-x-1">
+                        <button
+                            className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
+                            disabled={currentPage === 1}
+                            onClick={() => handlePageChange(currentPage - 1)}
+                        >
+                            <TiChevronLeft />
+                        </button>
+                        {renderPaginationNumbers()}
+                        <button
+                            className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
+                            disabled={currentPage === totalPages}
+                            onClick={() => handlePageChange(currentPage + 1)}
+                        >
+                            <TiChevronRight />
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
