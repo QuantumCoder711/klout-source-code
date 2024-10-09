@@ -3,13 +3,17 @@ import ScoreCard from '../../../component/ScoreCard';
 import HeadingH2 from '../../../component/HeadingH2';
 import EventCard from '../../../component/EventCard';
 import Button from '../../../component/Button';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../redux/store';
+import { Link } from 'react-router-dom';
+import { MdAdd } from "react-icons/md";
+import { heading } from '../../heading/headingSlice';
 
 
 const Dashboard: React.FC = () => {
-  const imageBaseUrl:string = import.meta.env.VITE_API_BASE_URL;
-  
+  const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+  const dispatch = useDispatch();
+
   type eventType = {
     title: string,
     image: string,
@@ -23,28 +27,34 @@ const Dashboard: React.FC = () => {
   const { totalSponsors } = useSelector((state: RootState) => state.sponsor);
 
   // filter past events from all events
-  const today:Date = new Date();
-  const pastEvents = events.filter((event:eventType) => {
-    const eventDate:Date = new Date(event.event_start_date);
-    return eventDate < today; 
+  const today: Date = new Date();
+  const pastEvents = events.filter((event: eventType) => {
+    const eventDate: Date = new Date(event.event_start_date);
+    return eventDate < today;
   });
 
   const upcomingEvents = events.filter((event: eventType) => {
     const eventDate: Date = new Date(event.event_start_date);
-    return eventDate > today;
-});
+    return eventDate >= today;
+  });
 
   console.log(pastEvents);
 
-  if(loading) return <p>loading...</p>;
-  if(error) return <p>Errror:  {error}</p>
+  if (loading) return <p>loading...</p>;
+  if (error) return <p>Errror:  {error}</p>
 
-  
-
+  const handleHeading = () => {
+    dispatch(heading('Add Event'))
+  }
 
 
   return (
     <>
+      {/* Heading */}
+      <div className="flex justify-end items-end">
+        <Link to='/events/add-event' onClick={handleHeading} className="btn btn-secondary text-white btn-sm"><MdAdd /> Create New Event</Link>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <ScoreCard
           title="Total Events"
@@ -71,58 +81,60 @@ const Dashboard: React.FC = () => {
       {/* PAST EVENTS */}
 
       <div className="mt-10 mb-6 flex justify-between items-center">
-          <HeadingH2
-            title='Past Events'
-          />
-          <Button 
-            buttonTitle='View All' 
-          />
+        <HeadingH2
+          title='Past Events'
+        />
+        <Link to='/events' onClick={() => dispatch(heading('All Events'))}><Button
+          buttonTitle='View All'
+        /></Link>
+        
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {
           pastEvents.length > 0 ?
-          pastEvents.map((pastEvent: eventType) => {
-            return <EventCard
-            key={pastEvent.uuid}
-            title={pastEvent.title}
-            imageUrl={`${imageBaseUrl}/${pastEvent.image}`}
-            imageAlt={pastEvent.title}
-            date={pastEvent.event_start_date}
-            venue={pastEvent.event_venue_name}
-            buttonTitle='View Detail'
-            eventuuid={pastEvent.uuid}
-            />
-          }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Past Event</h3>
+            pastEvents.map((pastEvent: eventType) => {
+              return <EventCard
+                key={pastEvent.uuid}
+                title={pastEvent.title}
+                imageUrl={`${imageBaseUrl}/${pastEvent.image}`}
+                imageAlt={pastEvent.title}
+                date={pastEvent.event_start_date}
+                venue={pastEvent.event_venue_name}
+                buttonTitle='View Detail'
+                eventuuid={pastEvent.uuid}
+              />
+            }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Past Event</h3>
         }
       </div>
 
       {/* UPCOMING EVENTS */}
 
       <div className="mt-4 mb-6 flex justify-between items-center">
-          <HeadingH2
-            title='Upcoming Events'
-          />
-          <Button 
-            buttonTitle='View All' 
-          />
+        <HeadingH2
+          title='Upcoming Events'
+        />
+        <Link to='/events' onClick={() => dispatch(heading('All Events'))}><Button
+          buttonTitle='View All'
+        /></Link>
+        
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {
           upcomingEvents.length > 0 ?
-          upcomingEvents.map((upcomingEvent: eventType) => {
-            return <EventCard
-            key={upcomingEvent.uuid}
-            title={upcomingEvent.title}
-            imageUrl={`https://api.klout.club/${upcomingEvent.image}`}
-            imageAlt={upcomingEvent.title}
-            date={upcomingEvent.event_start_date}
-            venue={upcomingEvent.event_venue_name}
-            buttonTitle='View Detail'
-            eventuuid={upcomingEvent.uuid}
-            />
-          }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Upcoming Event</h3>
+            upcomingEvents.map((upcomingEvent: eventType) => {
+              return <EventCard
+                key={upcomingEvent.uuid}
+                title={upcomingEvent.title}
+                imageUrl={`https://api.klout.club/${upcomingEvent.image}`}
+                imageAlt={upcomingEvent.title}
+                date={upcomingEvent.event_start_date}
+                venue={upcomingEvent.event_venue_name}
+                buttonTitle='View Detail'
+                eventuuid={upcomingEvent.uuid}
+              />
+            }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Upcoming Event</h3>
         }
       </div>
 

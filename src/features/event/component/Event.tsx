@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../../redux/store';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../../redux/store';
 import { MdAdd } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { heading } from '../../../features/heading/headingSlice';
+import { eventUUID, fetchEvents } from '../eventSlice';
+import Swal from "sweetalert2";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 const Event: React.FC = () => {
-    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { token } = useSelector((state: RootState) => state.auth);
+    const dispatch = useAppDispatch();
     const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
     const itemsPerPage: number = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -28,7 +35,8 @@ const Event: React.FC = () => {
         total_pending_delegate: number,
         start_time: string,
         start_minute_time: string,
-        start_time_type: string
+        start_time_type: string,
+        id: number
     }
 
     // Get events data from the store
@@ -48,6 +56,49 @@ const Event: React.FC = () => {
     const handleTabChange = (tab: 'upcoming' | 'past') => {
         setActiveTab(tab);
         setCurrentPage(1); // Reset page to 1 when switching tabs
+    };
+
+
+    const deleteEvent = (e: any, id: number) => {
+        e.preventDefault();
+
+        // const thisClicked = e.currentTarget;
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete(`/api/events/${id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                    .then(function (res) {
+                        Swal.fire({
+                            icon: "success",
+                            title: res.data.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                        dispatch(fetchEvents(token));
+                    })
+                    .catch(function () {
+                        Swal.fire({
+                            icon: "error",
+                            title: "An Error Occured!",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    });
+            }
+        });
     };
 
     const handleHeading = () => {
@@ -101,7 +152,7 @@ const Event: React.FC = () => {
 
     return (
         <>
-            
+
             <div className="p-6">
 
                 {/* Heading */}
@@ -109,7 +160,7 @@ const Event: React.FC = () => {
                     <HeadingH2 title="All Events" />
                     <Link to='/events/add-event' onClick={handleHeading} className="btn btn-secondary text-white btn-sm"><MdAdd /> Create New Event</Link>
                 </div>
-                
+
 
                 {/* Tab Buttons */}
                 <div className="flex gap-4 mt-4 mb-6">
@@ -167,10 +218,18 @@ const Event: React.FC = () => {
                                                 <span className="font-semibold text-black">Pending Delegates </span> - {event.total_pending_delegate}
                                             </td>
                                             <td className="py-3 px-6 space-y-2">
-                                                <button className="text-blue-500 hover:underline">View Attendees</button> <br />
-                                                <button className="text-green-500 hover:underline">View Sponsors</button> <br />
-                                                <button className="text-yellow-500 hover:underline">View Agendas</button> <br />
-                                                <button className="text-red-500 hover:underline">Delete Event</button>
+                                                <Link to='/events/view-event/' className="bg-pink-500 hover:underline text-white px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => { dispatch(eventUUID(event.uuid)); dispatch(heading('Events')); dispatch(heading('Edit Event')); setTimeout(() => {
+                                                    }, 500); }}>View Event</Link> <br />
+                                                <button className="bg-sky-500 hover:underline text-white px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
+                                                    dispatch(eventUUID(event.uuid)); dispatch(heading('Edit Event')); setTimeout(() => {
+                                                        navigate('/events/edit-event')
+                                                    }, 500);
+                                                }} >Edit Event</button> <br />
+                                                <Link to='/events/all-attendee' className="bg-blue-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => { dispatch(eventUUID(event.uuid)); dispatch(heading('All Attendee')); setTimeout(() => {
+                                                    }, 500); }}>All Attendees</Link> <br />
+                                                <button className="bg-green-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Sponsors</button> <br />
+                                                <button className="bg-yellow-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Agendas</button> <br />
+                                                <button className="bg-red-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={(e) => deleteEvent(e, event.id)}>Delete Event</button>
                                             </td>
                                         </tr>
                                     ))

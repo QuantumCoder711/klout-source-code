@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { ToastContainer } from 'react-toastify'; 
 import Layout from "./web-structure/Layout";
 import DashboardPage from "./pages/DashboardPage";
 import SettingPage from "./pages/SettingPage";
@@ -9,8 +10,12 @@ import AddEventPage from "./pages/AddEventPage";
 import AllAttendeePage from "./pages/AllAttendeePage";
 import AllSponsorPage from "./pages/AllSponsorPage";
 import ViewEventPage from "./pages/ViewEventPage";
+import EditEventPage from "./pages/EditEventPage"
 import LoginPage from "./pages/LoginPage";
 import axios from 'axios';
+import 'react-toastify/dist/ReactToastify.css';
+import AllEventAttendeePage from "./pages/AllEventAttendeePage";
+import AddEventAttendeePage from './pages/AddEventAttendeePage';
 
 axios.defaults.withCredentials = false; 
 const App: React.FC = () => {
@@ -30,10 +35,25 @@ const App: React.FC = () => {
           <Route path="/events" element={<EventPage />} />
           <Route path="/events/add-event" element={<AddEventPage />} />
           <Route path="/events/view-event" element={<ViewEventPage />} />
+          <Route path="/events/edit-event" element={<EditEventPage />} />
+          <Route path="/events/all-attendee" element={<AllEventAttendeePage />} />
+          <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />
           <Route path="/all-sponsors" element={<AllSponsorPage />} />
         </Route>
       </Routes>
+
+      <ToastContainer 
+        position="top-right" // Adjust position as needed
+        autoClose={5000} // Duration for which toast is visible
+        hideProgressBar={false} // Show progress bar
+        newestOnTop={false} // Newest toast on top
+        closeOnClick // Close toast on click
+        rtl={false} // Right to left
+        pauseOnFocusLoss // Pause on focus loss
+        draggable // Draggable
+        pauseOnHover // Pause on hover
+      />
     </Router>
   );
 };

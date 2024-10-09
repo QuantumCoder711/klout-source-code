@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../redux/store';
-import { fetchEvents } from "../features/event/eventSlice";
+import { fetchEvents, fetchExistingEvent } from "../features/event/eventSlice";
 import { fetchAllAttendees } from "../features/attendee/attendeeSlice";
 import { fetchSponsor } from "../features/sponsor/sponsorSlice";
 import { logout } from '../features/auth/authSlice';
@@ -12,13 +12,15 @@ const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const { token } = useSelector((state: RootState) => state.auth);
-  const { pageHeading } = useSelector((state: RootState) => state.pageHeading)
+  const { pageHeading } = useSelector((state: RootState) => state.pageHeading);
+  const { currentEventUUID } = useSelector((state: RootState) => state.events)
 
   useEffect(() => {
     dispatch(fetchEvents(token));
     dispatch(fetchAllAttendees(token));
     dispatch(fetchSponsor(token));
-  }, [dispatch]);
+    dispatch(fetchExistingEvent({eventuuid:currentEventUUID, token}));
+  }, [dispatch, currentEventUUID]);
 
   const [isOpen, setIsOpen] = useState(false);
 
