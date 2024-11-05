@@ -1,6 +1,12 @@
 import React, { useState, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
+import { useDispatch } from "react-redux";
+import { RootState, useAppDispatch } from "../../../redux/store";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { addNewAttendee, fetchAllAttendees } from "../attendeeSlice";
+import { toast } from "react-toastify";
 
 // Define the form data type
 type FormInputType = {
@@ -21,8 +27,12 @@ type FormInputType = {
 };
 
 const AddEventAttendee: React.FC = () => {
+    const { token } = useSelector((state: RootState) => state.auth);
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
     const [selectedImage, setSelectedImage] = useState('');
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
+    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<FormInputType>();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     // Handle image upload
@@ -35,9 +45,32 @@ const AddEventAttendee: React.FC = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<FormInputType> = async () => {
+    const onSubmit: SubmitHandler<FormInputType> = async (data) => {
         // Here you will handle form submission
         // Use data along with API calls and necessary actions
+
+        const formData = new FormData();
+
+        Object.entries(data).forEach(([key, value]) => {
+            formData.append(key, value as string);
+        });
+        formData.append("image", selectedImage);
+
+        console.log(formData);
+
+        try {
+            await dispatch(addNewAttendee({ formData, token })).unwrap(); // unwrap if using createAsyncThunk
+            await dispatch(fetchAllAttendees(token));
+            toast.success('Attendee added successfully!', {
+                autoClose: 2000, // Display time in milliseconds (3 seconds)
+                // onClose: () => navigate('/'), // Navigate after toast closes
+            });
+            navigate('/');
+            reset();
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || error.message || 'Something went wrong!';
+            toast.error(errorMessage);
+        }
     };
 
     const downloadSampleExcel = () => {

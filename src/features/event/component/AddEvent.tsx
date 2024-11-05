@@ -145,8 +145,6 @@ const AddEvent: React.FC = () => {
                 // onClose: () => navigate('/'), // Navigate after toast closes
             });
             navigate('/');
-
-    
     
             // Clear the form
             reset();

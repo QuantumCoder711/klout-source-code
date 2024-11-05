@@ -16,6 +16,8 @@ import axios from 'axios';
 import 'react-toastify/dist/ReactToastify.css';
 import AllEventAttendeePage from "./pages/AllEventAttendeePage";
 import AddEventAttendeePage from './pages/AddEventAttendeePage';
+import AllReports from "./pages/AllReports";
+import WhatsAppReport from "./features/reports/component/WhatsAppReport";
 
 axios.defaults.withCredentials = false; 
 const App: React.FC = () => {
@@ -39,7 +41,9 @@ const App: React.FC = () => {
           <Route path="/events/all-attendee" element={<AllEventAttendeePage />} />
           <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />
-          <Route path="/all-sponsors" element={<AllSponsorPage />} />
+          <Route path="/all-sponsors" element={<AllSponsorPage />}/>
+          <Route path="/all-reports" element={<AllReports />} />
+          <Route path="/all-reports/whatsapp-report/:id" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
         </Route>
       </Routes>
 

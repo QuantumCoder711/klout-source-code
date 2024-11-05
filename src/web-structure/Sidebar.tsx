@@ -97,6 +97,15 @@ const Sidebar: React.FC = () => {
             Profile
           </Link>
         </li>
+        <li>
+          <Link
+            to="/all-reports"
+            onClick={handlePageTitle}
+            className="py-3 px-5 block rounded font-semibold"
+          >
+            All Reports
+          </Link>
+        </li>
       </ul>
     </div>
   );
