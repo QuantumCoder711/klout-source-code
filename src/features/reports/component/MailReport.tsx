@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import ScoreCard from '../../../component/ScoreCard';
 import HeadingH2 from '../../../component/HeadingH2';
 import DataTable from './DataTable';
-import ScoreCard from '../../../component/ScoreCard';
 
-const WhatsAppReport: React.FC = () => {
+const MailReport: React.FC = () => {
 
     const [activeTab, setActiveTab] = useState<number>(1);
 
@@ -15,8 +15,8 @@ const WhatsAppReport: React.FC = () => {
         <div>
             {/* Heading  */}
             <div className="mb-6 flex justify-between items-center">
-                <HeadingH2 title='WhatsApp Report' />
-                
+                <HeadingH2 title='Mail Report' />
+
                 {/* Custom Tab Menu */}
                 <div className='flex rounded-md border border-klt_primary-500 w-fit'>
                     <div className={`font-medium py-2 px-4 cursor-pointer rounded-l-md grid place-content-center ${activeTab === 1 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => setActiveTab(1)}>Invitation</div>
@@ -34,10 +34,6 @@ const WhatsAppReport: React.FC = () => {
                     <ScoreCard cardColor='yellow' content={0} title='Read Messages' />
                     <ScoreCard cardColor='red' content={0} title='Failed Messages' />
                 </div>
-                {/* <MessageCard color='blue' number={0} title='Sent Messages'/>
-                <MessageCard color='green' number={0} title='Delivered Messages'/>
-                <MessageCard color='yellow' number={0} title='Read Messages'/>
-                <MessageCard color='red' number={0} title='Failed Messages'/> */}
             </div>
 
             {/* Rendering Table */}
@@ -47,4 +43,4 @@ const WhatsAppReport: React.FC = () => {
     )
 }
 
-export default WhatsAppReport;
+export default MailReport;

@@ -18,6 +18,9 @@ import AllEventAttendeePage from "./pages/AllEventAttendeePage";
 import AddEventAttendeePage from './pages/AddEventAttendeePage';
 import AllReports from "./pages/AllReports";
 import WhatsAppReport from "./features/reports/component/WhatsAppReport";
+import MailReport from "./features/reports/component/MailReport";
+import AllCharts from "./pages/AllCharts";
+import SendReminder from "./features/attendee/component/SendReminder";
 
 axios.defaults.withCredentials = false; 
 const App: React.FC = () => {
@@ -40,10 +43,13 @@ const App: React.FC = () => {
           <Route path="/events/edit-event" element={<EditEventPage />} />
           <Route path="/events/all-attendee" element={<AllEventAttendeePage />} />
           <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
+          <Route path="/events/send-reminder" element={<SendReminder />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />
           <Route path="/all-sponsors" element={<AllSponsorPage />}/>
           <Route path="/all-reports" element={<AllReports />} />
+          <Route path="/all-charts" element={<AllCharts />} />
           <Route path="/all-reports/whatsapp-report/:id" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
+          <Route path="/all-reports/mail-report/:id" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
         </Route>
       </Routes>
 

@@ -16,7 +16,7 @@ const ScoreCard: React.FC<scoreCardProps> = ({ title, content, cardColor }) => {
       borderTop: `8px solid ${cardColor}`,
       borderLeft: `8px solid ${cardColor}`
       }}>
-      <div className="card-body">
+      <div className="card-body text-black">
         <h2 className="card-title font-semibold text-xl">{title}</h2>
         <p className="text-2xl font-bold">{content}</p>
       </div>  

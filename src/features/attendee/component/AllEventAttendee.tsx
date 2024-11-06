@@ -134,7 +134,7 @@ const AllEventAttendee: React.FC = () => {
                     dispatch(heading('Add Attendee'));}} className = "btn btn-secondary text-white btn-sm" >
                         <FaUserFriends /> Add Attendee
                 </Link>
-            <Link to="" className="btn btn-accent text-white btn-sm">
+            <Link to="/events/send-reminder" className="btn btn-accent text-white btn-sm">
                 <BsSendFill /> Send Reminder
             </Link>
             <Link to="" className="btn btn-primary text-white btn-sm">
