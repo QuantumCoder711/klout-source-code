@@ -26,17 +26,35 @@ const Dashboard: React.FC = () => {
   const { allAttendees } = useSelector((state: RootState) => state.attendee);
   const { totalSponsors } = useSelector((state: RootState) => state.sponsor);
 
+  // // filter past events from all events
+  // const today: Date = new Date();
+  // const pastEvents = events.filter((event: eventType) => {
+  //   const eventDate: Date = new Date(event.event_start_date);
+  //   return eventDate < today;
+  // });
+
+  // const upcomingEvents = events.filter((event: eventType) => {
+  //   const eventDate: Date = new Date(event.event_start_date);
+  //   return eventDate >= today;
+  // });
+
+  // console.log(pastEvents);
+
   // filter past events from all events
   const today: Date = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const pastEvents = events.filter((event: eventType) => {
     const eventDate: Date = new Date(event.event_start_date);
+    eventDate.setHours(0, 0, 0, 0);
     return eventDate < today;
-  });
+  }).slice(0, 4);
 
   const upcomingEvents = events.filter((event: eventType) => {
     const eventDate: Date = new Date(event.event_start_date);
+    eventDate.setHours(0, 0, 0, 0);
     return eventDate >= today;
-  });
+  }).slice(0, 4);
 
   console.log(pastEvents);
 
@@ -87,7 +105,7 @@ const Dashboard: React.FC = () => {
         <Link to='/events' onClick={() => dispatch(heading('All Events'))}><Button
           buttonTitle='View All'
         /></Link>
-        
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -117,7 +135,7 @@ const Dashboard: React.FC = () => {
         <Link to='/events' onClick={() => dispatch(heading('All Events'))}><Button
           buttonTitle='View All'
         /></Link>
-        
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

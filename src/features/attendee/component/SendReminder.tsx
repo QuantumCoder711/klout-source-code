@@ -7,9 +7,9 @@ import { IoMail } from "react-icons/io5";
 
 const SendReminder: React.FC = () => {
     // State to keep track of selected roles and selected sending method
-    const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-    const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'mail' | null>(null);
-    const [sendTime, setSendTime] = useState<'now' | 'later' | null>(null); // State for "now" and "later" radio buttons
+    const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
+    const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'mail' | null>("mail");
+    const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now"); // State for "now" and "later" radio buttons
 
     // Handle change of checkboxes
     const handleCheckboxChange = (role: string) => {
@@ -136,18 +136,6 @@ const SendReminder: React.FC = () => {
                         <div className='mt-10'>
                             <h5 className='font-semibold mb-3'>Send By</h5>
                             <div className="flex gap-10 pl-5">
-                                {/* Radio button for WhatsApp */}
-                                <label className="flex items-center cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="sendMethod"
-                                        checked={selectedMethod === 'whatsapp'}
-                                        onChange={() => handleMethodChange('whatsapp')}
-                                        className="bg-transparent border-zinc-400"
-                                    />
-                                    <RiWhatsappFill size={24} className='text-green-500 ml-2' />
-                                </label>
-
                                 {/* Radio button for Mail */}
                                 <label className="flex items-center cursor-pointer">
                                     <input
@@ -159,20 +147,43 @@ const SendReminder: React.FC = () => {
                                     />
                                     <IoMail size={24} className='text-blue-500 ml-2' />
                                 </label>
+
+                                {/* Radio button for WhatsApp */}
+                                <label className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="sendMethod"
+                                        checked={selectedMethod === 'whatsapp'}
+                                        onChange={() => handleMethodChange('whatsapp')}
+                                        className="bg-transparent border-zinc-400"
+                                    />
+                                    <RiWhatsappFill size={24} className='text-green-500 ml-2' />
+                                </label>
                             </div>
                         </div>
 
+                        {/* WhatsApp Message */}
+                        {selectedMethod==="whatsapp" && <div className="mt-10">
+                            <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
+                            <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
+                                <p>
+                                    Hi "<strong>firstname</strong>", just a reminder for our event "<strong>Event-Title</strong>". We're excited to welcome you to this exclusive event. "<strong>Event-Date-Time</strong>". <br /> <br /> To ensure a smooth check-in experience, please download the  Klout Club app in advance. You can download it here <a href="https://onelink.to/r3fzb9" className='font-bold'>https://onelink.to/r3fzb9</a>
+                                </p>
+                            </div>
+                        </div>}
+
+
                         {/* Subject Input */}
-                        <div className='mt-10'>
+                        {selectedMethod==="mail" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Subject</label>
                             <input type="text" name="Subject" id="subject" className='input w-full mt-2' />
-                        </div>
+                        </div>}
 
                         {/* Rich Textarea */}
-                        <div className='mt-10'>
+                        {selectedMethod==="mail" && <div className="mt-10">
                             <label htmlFor="Message" className='block font-semibold'>Message</label>
                             <textarea name="Message" id="message" className='w-full h-96 rounded-xl p-2 mt-2'></textarea>
-                        </div>
+                        </div>}
 
                         {/* Send Time: Now or Later */}
                         <div className='mt-10'>
@@ -189,7 +200,7 @@ const SendReminder: React.FC = () => {
                                     />
                                     <span>Now</span>
                                 </label>
-
+                                
                                 {/* Radio button for Later */}
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
@@ -206,7 +217,6 @@ const SendReminder: React.FC = () => {
                         <button className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>Submit Now</button>
                     </div>
                 </div>
-
 
                 {/* Event Details Div Wrapper */}
                 <div className='border border-zinc-400 w-2/6 rounded-xl'>

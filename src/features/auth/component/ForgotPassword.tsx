@@ -1,10 +1,10 @@
 import React from 'react';
+import { RootState, useAppDispatch } from '../../../redux/store';
 import { useForm } from 'react-hook-form';
-import { useSelector } from 'react-redux'; // Use the custom hook
+import { useSelector } from 'react-redux';
 import { login } from '../authSlice';
-import { RootState, useAppDispatch } from '../../../redux/store'; // Your Redux store type
-import { Navigate } from 'react-router-dom';
 import signinBanner from '../../../assets/images/signinbanner.webp';
+import { Navigate } from 'react-router-dom';
 import typingEffect from '../../../utils/typingEffect';
 import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
@@ -14,7 +14,7 @@ type LoginFormInputs = {
     password: string;
 };
 
-const Login: React.FC = () => {
+const ForgotPassword: React.FC = () => {
     const dispatch = useAppDispatch();
     const { token, loading, error } = useSelector((state: RootState) => state.auth);
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
@@ -50,8 +50,9 @@ const Login: React.FC = () => {
             {/* Right side with form */}
             <div className="w-1/3 flex items-center justify-center bg-gray-100">
                 <div className="w-full max-w-md p-8 space-y-4">
-                    <div className='flex justify-center'>
-                        <HeadingH2 title='Login' />
+                    <div className='flex flex-col gap-10 mb-5 text-sm justify-center'>
+                        <HeadingH2 title='Forgot Your Password ?' />
+                        <p>We get it, stuff happens. Just enter your email address below and we'll send you a link to reset your password!</p>
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -66,17 +67,6 @@ const Login: React.FC = () => {
                             {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                         </div>
 
-                        {/* Password Field */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Password</label>
-                            <input
-                                type="password"
-                                {...register('password', { required: 'Password is required' })}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                            />
-                            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-                        </div>
-
                         {/* Error Message */}
                         {error && <p className="text-red-500 text-sm">{error}</p>}
 
@@ -87,18 +77,18 @@ const Login: React.FC = () => {
                                 className="w-full bg-klt_primary-900 text-white py-2 rounded-md"
                                 disabled={loading}
                             >
-                                {loading ? 'Logging in...' : 'Login'}
+                                {loading ? 'Sending...' : 'Send Reset Link'}
                             </button>
                         </div>
 
-                        <hr className='!my-10 border border-zinc-200'/>
+                        <hr className='!my-10 border border-zinc-200' />
 
-                        <Link to={"/forgot-password"} className='text-klt_primary-900'>Forgot Password ?</Link>
+                        <p>Already have an account ? <Link to={"/login"} className='text-klt_primary-900'>Login</Link></p>
                     </form>
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default Login;
+export default ForgotPassword;

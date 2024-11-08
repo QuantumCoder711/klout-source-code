@@ -6,6 +6,8 @@ import { fetchAllAttendees } from "../features/attendee/attendeeSlice";
 import { fetchSponsor } from "../features/sponsor/sponsorSlice";
 import { logout } from '../features/auth/authSlice';
 import { Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { heading } from "../features/heading/headingSlice";
 
 
 const Navbar: React.FC = () => {
@@ -19,7 +21,7 @@ const Navbar: React.FC = () => {
     dispatch(fetchEvents(token));
     dispatch(fetchAllAttendees(token));
     dispatch(fetchSponsor(token));
-    dispatch(fetchExistingEvent({eventuuid:currentEventUUID, token}));
+    dispatch(fetchExistingEvent({ eventuuid: currentEventUUID, token }));
   }, [dispatch, currentEventUUID]);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -30,15 +32,18 @@ const Navbar: React.FC = () => {
 
   if (!token) {
     return <Navigate to="/login" />;
-}
+  }
 
-  const handleLogout =() => {
+  const handleLogout = () => {
     dispatch(logout());
+  }
 
+  const handlePageTitle = (e: React.MouseEvent<HTMLElement>) => {
+    dispatch(heading(e.currentTarget.innerText))
   }
 
   return (
-    <nav className="bg-klt_primary-900 p-4 text-white" style={{borderLeft: '1px solid #fff'}}>
+    <nav className="bg-klt_primary-900 p-4 text-white" style={{ borderLeft: '1px solid #fff' }}>
       <div className="container mx-auto flex justify-between items-center">
         {/* Left side - Branding or Logo */}
         <div className="text-xl font-bold ml-6">{pageHeading}</div>
@@ -65,7 +70,12 @@ const Navbar: React.FC = () => {
             <div className="absolute z-10 right-0 mt-0 pt-2 w-48  text-black rounded-md shadow-lg">
               <ul className="bg-white">
                 <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
-                  Profile
+                  <Link
+                    to="/profile"
+                    onClick={handlePageTitle}
+                  >
+                    Profile
+                  </Link>
                 </li>
                 <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer" onClick={handleLogout}>
                   Logout

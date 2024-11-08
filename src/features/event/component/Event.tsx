@@ -201,7 +201,7 @@ const Event: React.FC = () => {
                                                 <img
                                                     src={`${imageBaseUrl}/${event.image}`}
                                                     alt={event.title}
-                                                    className="w-16 h-16 rounded-lg object-cover"
+                                                    className="w-96 h-60 rounded-lg object-cover"
                                                 />
                                             </td>
                                             <td className="py-3 px-6 font-semibold">{event.title}</td>
@@ -228,7 +228,7 @@ const Event: React.FC = () => {
                                                 <Link to='/events/all-attendee' className="bg-blue-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => { dispatch(eventUUID(event.uuid)); dispatch(heading('All Attendee')); setTimeout(() => {
                                                     }, 500); }}>All Attendees</Link> <br />
                                                 <button className="bg-green-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Sponsors</button> <br />
-                                                <button className="bg-yellow-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Agendas</button> <br />
+                                                <Link to={"/events/view-agendas"} className="bg-yellow-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Agendas</Link> <br />
                                                 <button className="bg-red-500 hover:underline text-white px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={(e) => deleteEvent(e, event.id)}>Delete Event</button>
                                             </td>
                                         </tr>

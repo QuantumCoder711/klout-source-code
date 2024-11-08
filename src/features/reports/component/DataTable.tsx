@@ -1,103 +1,55 @@
 import React, { useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
-import { RootState } from '../../../redux/store';
-import { useSelector } from 'react-redux';
-import mockAttendees from './tempData';
-
-type attendeeType = {
-  uuid: string;
-  title: string;
-  first_name: string;
-  job_title: string;
-  company_name: string;
-  email_id: string;
-  phone_number: string;
-  status: string;
-  last_name: string;
-  check_in: number;
-  event_name: string;
-};
+import { messageData, MessageStatusData } from './tempData';
 
 const DataTable: React.FC = () => {
-
-  // Fetch attendees from the Redux store
-  let { allAttendees = [] }: { allAttendees: attendeeType[] } = useSelector(
-    (state: RootState) => state.attendee
-  );
-
-  allAttendees = mockAttendees;
-
   // Pagination state
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchName, setSearchName] = useState('');
-  const [searchCompany, setSearchCompany] = useState('');
-  const [searchDesignation, setSearchDesignation] = useState('');
-  const [checkInFilter, setCheckInFilter] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
+  const itemsPerPage = 10;
 
-  // Filter attendees based on the search terms
-  const filteredAttendees = allAttendees.filter((attendee) => {
-    const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
-    const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
-    const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
-    const matchesCheckIn = checkInFilter === '' || attendee.check_in === Number(checkInFilter);
-    const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
-    return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
+  // Filter state
+  const [nameFilter, setNameFilter] = useState('');
+  const [phoneFilter, setPhoneFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+
+  // Filtered data based on the filters
+  const filteredData = messageData.filter((data: MessageStatusData) => {
+    const nameMatch = nameFilter ? data.Name.toLowerCase().includes(nameFilter.toLowerCase()) : true;
+    const phoneMatch = phoneFilter ? data['Phone No.'].includes(phoneFilter) : true;
+    const statusMatch = statusFilter ? data['Message Status'] === statusFilter : true;
+
+    return nameMatch && phoneMatch && statusMatch;
   });
 
-  // Total pages calculation
-  const totalPages = allAttendees.length > 0 ? Math.ceil(allAttendees.length / itemsPerPage) : 1;
+  // Calculate total number of pages for filtered data
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // Current page slice of attendees
+  // Function to handle pagination (next/prev)
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // Get the data for the current page
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentAttendees: attendeeType[] = allAttendees.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  // Handle page change
-  const handlePageChange = (pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setCurrentPage(pageNumber);
-    }
-  };
-
-  // Handle change in items per page
-  const handleItemsPerPageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setItemsPerPage(Number(event.target.value));
-    setCurrentPage(1); // Reset to the first page when changing items per page
-  };
-
-  // Render pagination numbers with edge-case handling
+  // Render pagination numbers
   const renderPaginationNumbers = () => {
-    const paginationNumbers: number[] = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage < maxVisiblePages - 1) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    const paginationNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      paginationNumbers.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`p-1 px-3 border rounded-md bg-klt_primary-600 text-white ${currentPage === i ? 'bg-green-200' : 'bg-klt_primary-600/30'}`}
+        >
+          {i}
+        </button>
+      );
     }
-
-    for (let i = startPage; i <= endPage; i++) {
-      paginationNumbers.push(i);
-    }
-
-    return (
-      <div className="flex items-center space-x-1">
-        {startPage > 1 && <span className="text-klt_primary-500">1</span>}
-        {startPage > 2 && <span className="text-klt_primary-500">...</span>}
-        {paginationNumbers.map((number) => (
-          <button
-            key={number}
-            className={`px-3 py-1 border rounded-md ${number === currentPage ? 'bg-klt_primary-500 text-white' : 'text-klt_primary-500 hover:bg-green-100'}`}
-            onClick={() => handlePageChange(number)}
-          >
-            {number}
-          </button>
-        ))}
-        {endPage < totalPages - 1 && <span className="text-gray-600">...</span>}
-        {endPage < totalPages && <span className="text-gray-600">{totalPages}</span>}
-      </div>
-    );
+    return paginationNumbers;
   };
 
   return (
@@ -112,7 +64,7 @@ const DataTable: React.FC = () => {
             id="itemsPerPage"
             className="border border-gray-500 rounded-md p-2 bg-white outline-none"
             value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            onChange={(e) => setCurrentPage(1)} // Reset to page 1 when items per page change
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -123,82 +75,35 @@ const DataTable: React.FC = () => {
 
         {/* Search inputs */}
         <div className="mb-2 flex gap-2">
+          {/* Search By Name Filter */}
           <input
             type="text"
             className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
             placeholder="Search by name"
-            value={searchName}
-            onChange={(e) => {
-              setSearchName(e.target.value);
-              setCurrentPage(1); // Reset to the first page when searching
-            }}
-          />
-          <input
-            type="text"
-            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
-            placeholder="Search by company"
-            value={searchCompany}
-            onChange={(e) => {
-              setSearchCompany(e.target.value);
-              setCurrentPage(1); // Reset to the first page when searching
-            }}
-          />
-          <input
-            type="text"
-            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
-            placeholder="Search by designation"
-            value={searchDesignation}
-            onChange={(e) => {
-              setSearchDesignation(e.target.value);
-              setCurrentPage(1); // Reset to the first page when searching
-            }}
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
           />
 
-          {/* Check-in filter */}
+          {/* Search By Phone No. Filter */}
+          <input
+            type="tel"
+            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+            placeholder="Search by Phone No."
+            value={phoneFilter}
+            onChange={(e) => setPhoneFilter(e.target.value)}
+          />
+
+          {/* Message Status filter */}
           <select
             className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
-            value={checkInFilter}
-            onChange={(e) => {
-              setCheckInFilter(e.target.value);
-              setCurrentPage(1); // Reset to the first page when filtering
-            }}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="">Checked In</option>
-            <option value="1">Yes</option>
-            <option value="0">No</option>
+            <option value="">Sent</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Read">Read</option>
+            <option value="Failed">Failed</option>
           </select>
-
-          {/* Role filter */}
-          <select
-            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
-            value={roleFilter}
-            onChange={(e) => {
-              setRoleFilter(e.target.value);
-              setCurrentPage(1); // Reset to the first page when filtering
-            }}
-          >
-            <option value="">Role</option>
-            <option value="speaker">Speaker</option>
-            <option value="delegate">Delegate</option>
-            <option value="sponsor">Sponsor</option>
-            <option value="panelist">Panelist</option>
-            <option value="moderator">Moderator</option>
-          </select>
-        </div>
-
-        {/* Total Attendee Info */}
-        <div className="mb-2 text-right">
-          <span className="text-gray-800 font-semibold">
-            Total Attendee: {filteredAttendees.length}
-          </span>
-          <br />
-          <span className="text-gray-800 font-semibold">
-            Checked In: {filteredAttendees.filter((item) => item.check_in === 1).length}
-          </span>
-          <br />
-          <span className="text-gray-800 font-semibold">
-            Search Result: {filteredAttendees.length}
-          </span>
         </div>
       </div>
 
@@ -207,51 +112,28 @@ const DataTable: React.FC = () => {
         <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
           <thead>
             <tr className="bg-klt_primary-500 text-white">
-              <th className="py-3 px-4 text-start text-nowrap">#</th>
+              <th className="py-3 px-4 text-start text-nowrap">S.No</th>
               <th className="py-3 px-4 text-start text-nowrap">Name</th>
-              <th className="py-3 px-4 text-start text-nowrap">Designation</th>
-              <th className="py-3 px-4 text-start text-nowrap">Company</th>
-              <th className="py-3 px-4 text-start text-nowrap">Email</th>
-              <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
-              <th className="py-3 px-4 text-start text-nowrap">Role</th>
-              <th className="py-3 px-4 text-start text-nowrap">Check In</th>
-              <th className="py-3 px-4 text-start text-nowrap">Action</th>
+              <th className="py-3 px-4 text-start text-nowrap">Phone No.</th>
+              <th className="py-3 px-4 text-start text-nowrap">Message Status</th>
+              <th className="py-3 px-4 text-start text-nowrap">Date</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAttendees.length > 0 ? (
-              filteredAttendees.map((attendee, index) => (
-                <tr key={attendee.uuid}>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>{attendee.check_in === 1 ? 'Yes' : 'No'}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
-                    {/* <Link to={`/edit/${attendee.uuid}`} className="text-blue-500 hover:text-blue-700">
-                                                <FaEdit />
-                                            </Link>
-                                            <button className="text-red-500 hover:text-red-700">
-                                                <MdDelete />
-                                            </button> */}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={9} className="py-4 text-center text-gray-600">
-                  No attendees found.
-                </td>
+            {currentData.map((data: MessageStatusData, index: number) => (
+              <tr key={index}>
+                <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
+                <td className="py-3 px-4 text-gray-800 text-nowrap">{data.Name}</td>
+                <td className="py-3 px-4 text-gray-800 text-nowrap">{data['Phone No.']}</td>
+                <td className="py-3 px-4 text-gray-800 text-nowrap">{data['Message Status']}</td>
+                <td className="py-3 px-4 text-gray-800 text-nowrap">{data.Date}</td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       <div className="flex justify-end items-center mt-4">
         <div className="flex items-center space-x-1">
           <button
