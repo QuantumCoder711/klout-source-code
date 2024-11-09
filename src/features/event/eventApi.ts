@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const fetchTotalEvents = async (token:string | null) => {
-    try{
+export const fetchTotalEvents = async (token: string | null) => {
+    try {
         const response = await axios.post('/api/eventslist', {}, {
             headers: {
                 // 'Content-Type': 'application/json',
@@ -9,26 +9,26 @@ export const fetchTotalEvents = async (token:string | null) => {
             }
         });
         return response.data;
-    }catch(error){
+    } catch (error) {
         throw error;
     }
 }
 
-export const fetchCurrentEvent = async (token:string | null, eventuuid: string | null) => {
-    try{
-        const response = await axios.post('/api/display/'+eventuuid, {}, {
+export const fetchCurrentEvent = async (token: string | null, eventuuid: string | null) => {
+    try {
+        const response = await axios.post('/api/display/' + eventuuid, {}, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
         return response.data;
-        
-    }catch(error){
+
+    } catch (error) {
         throw error;
     }
 }
 
-export const addEventApi = async (eventData: FormData, token:string | null) => {
+export const addEventApi = async (eventData: FormData, token: string | null) => {
     try {
         const response = await axios.post('/api/events', eventData, {
             headers: {
@@ -43,7 +43,7 @@ export const addEventApi = async (eventData: FormData, token:string | null) => {
 };
 
 export const allEventAttendeeApi = async (eventuuid: string | null, token: string | null) => {
-    try{
+    try {
         const response = await axios.post(`/api/totalattendees/${eventuuid}`, {}, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -51,8 +51,26 @@ export const allEventAttendeeApi = async (eventuuid: string | null, token: strin
             }
         });
         return response.data;
-    }catch(error){{
-        throw error;
-    }}
+    } catch (error) {
+        {
+            throw error;
+        }
+    }
 }
 
+// Fetching allAgendas
+export const allAgendasApi = async (token: string | null) => {
+    try {
+        const response = await axios.post(`/api/all-agendas`, {}, {
+            headers: {
+                // 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log("Error Occured in allAgendaApi: ", error);
+        throw error;
+    }
+}

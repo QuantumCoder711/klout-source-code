@@ -99,7 +99,8 @@ const DataTable: React.FC = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="">Sent</option>
+            <option value="">All</option>
+            <option value="Sent">Sent</option>
             <option value="Delivered">Delivered</option>
             <option value="Read">Read</option>
             <option value="Failed">Failed</option>

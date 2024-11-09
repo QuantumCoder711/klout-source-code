@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { fetchTotalEvents, fetchCurrentEvent, addEventApi, allEventAttendeeApi } from './eventApi';
+import { fetchTotalEvents, fetchCurrentEvent, addEventApi, allEventAttendeeApi, allAgendasApi } from './eventApi';
+// import state from "sweetalert/typings/modules/state";
 
 
 type eventType = {
@@ -48,6 +49,25 @@ type eventType = {
     total_pending_delegate: number
 }
 
+type AgendaType = {
+    id: number;
+    uuid: string;
+    event_id: number;
+    title: string;
+    description: string;
+    event_date: string;
+    start_time: string;
+    start_time_type: string;
+    end_time: string;
+    end_time_type: string;
+    image_path: string;
+    created_at: string;
+    updated_at: string;
+    start_minute_time: string;
+    end_minute_time: string;
+    position: number;
+};
+
 interface AddEventResponse {
     data: eventType;
 }
@@ -58,6 +78,7 @@ type eventState = {
     currentEvent: eventType | null,  // Changed to `eventType | null` for consistency
     currentEventUUID: string | null,
     eventAttendee: [],
+    agendas: AgendaType[],
     loading: boolean,
     error: string | null;
 }
@@ -67,13 +88,14 @@ const initialState: eventState = {
     currentEvent: null,  // Initialize as null
     currentEventUUID: null,
     eventAttendee: [],
+    agendas: [],
     loading: false,
     error: null
 };
 
 // Async thunks
 export const fetchEvents = createAsyncThunk<{ data: eventType[], total_events: number }, string | null>(
-    'events/fetchEvents', 
+    'events/fetchEvents',
     async (token, { rejectWithValue }) => {
         try {
             const response = await fetchTotalEvents(token);
@@ -85,7 +107,7 @@ export const fetchEvents = createAsyncThunk<{ data: eventType[], total_events: n
 );
 
 export const fetchExistingEvent = createAsyncThunk(
-    'events/fetchExistingEvent', 
+    'events/fetchExistingEvent',
     async ({ token, eventuuid }: { token: string | null, eventuuid: string | null }, { rejectWithValue }) => {
         try {
             const response = await fetchCurrentEvent(token, eventuuid);
@@ -108,13 +130,28 @@ export const addNewEvent = createAsyncThunk<AddEventResponse, { eventData: FormD
 );
 
 export const allEventAttendee = createAsyncThunk(
-    'events/allEventAttendee', 
-    async ({eventuuid, token} : { eventuuid: string | null, token: string | null }, { rejectWithValue }) => {
+    'events/allEventAttendee',
+    async ({ eventuuid, token }: { eventuuid: string | null, token: string | null }, { rejectWithValue }) => {
         try {
             const response = await allEventAttendeeApi(eventuuid, token);
             return response;
         } catch (error) {
             return rejectWithValue('Failed to fetch events');
+        }
+    }
+);
+
+export const fetchAllAgendas = createAsyncThunk<{ data: AgendaType[] }, string | null>(
+    'events/allAgendas',
+    async (token, { rejectWithValue }) => {
+        try {
+            if (!token) {
+                return rejectWithValue('No token provided');
+            }
+            const response = await allAgendasApi(token);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue('Failed to fetch agendas');
         }
     }
 );
@@ -133,59 +170,74 @@ const eventSlice = createSlice({
             state.loading = true;
             state.error = null;
         })
-        .addCase(fetchEvents.fulfilled, (state, action) => {
-            state.loading = false;
-            state.events = action.payload.data;
-            state.error = null;
-        })
-        .addCase(fetchEvents.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload as string;
-        })
-        .addCase(fetchExistingEvent.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(fetchExistingEvent.fulfilled, (state, action) => {
-            state.loading = false;
-            state.currentEvent = action.payload.data;
-            state.error = null;
-        })
-        .addCase(fetchExistingEvent.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload as string;
-        })
-        .addCase(addNewEvent.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(addNewEvent.fulfilled, (state, action) => {
-            state.loading = false;
-            if (action.payload.data) {
-                state.events.push(action.payload.data);
-            }
-            state.error = null;
-        })
-        .addCase(addNewEvent.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload as string;
-        })
-        .addCase(allEventAttendee.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(allEventAttendee.fulfilled, (state, action) => {
-            state.loading = false;
-            state.eventAttendee = action.payload.data;
-            state.error = null;
-        })
-        .addCase(allEventAttendee.rejected, (state,action) => {
-            state.loading = false;
-            state.error = action.payload as string;
-        })
+            .addCase(fetchEvents.fulfilled, (state, action) => {
+                state.loading = false;
+                state.events = action.payload.data;
+                state.error = null;
+            })
+            .addCase(fetchEvents.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(fetchExistingEvent.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchExistingEvent.fulfilled, (state, action) => {
+                state.loading = false;
+                state.currentEvent = action.payload.data;
+                state.error = null;
+            })
+            .addCase(fetchExistingEvent.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(addNewEvent.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addNewEvent.fulfilled, (state, action) => {
+                state.loading = false;
+                if (action.payload.data) {
+                    state.events.push(action.payload.data);
+                }
+                state.error = null;
+            })
+            .addCase(addNewEvent.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(allEventAttendee.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(allEventAttendee.fulfilled, (state, action) => {
+                state.loading = false;
+                state.eventAttendee = action.payload.data;
+                state.error = null;
+            })
+            .addCase(allEventAttendee.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            //Adding all cases
+            .addCase(fetchAllAgendas.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAllAgendas.fulfilled, (state, action) => {
+                state.loading = false;
+                state.agendas = action.payload.data;
+                state.error = null;
+            })
+            .addCase(fetchAllAgendas.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
     }
 });
 
 export const { eventUUID } = eventSlice.actions;
+// export const selectAgendas = (state: { events: eventState }) => state.events.agendas;
 
 export default eventSlice.reducer;

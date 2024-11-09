@@ -20,7 +20,7 @@ const rootReducer = combineReducers({
     auth: authReducer,
     attendee: attendeeReducer,
     sponsor: sponsorReducer,
-    pageHeading: pageHeadingReducer
+    pageHeading: pageHeadingReducer,
 });
 
 // Apply persistReducer to the combined rootReducer
