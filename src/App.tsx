@@ -58,8 +58,8 @@ const App: React.FC = () => {
           <Route path="/all-sponsors" element={<AllSponsorPage />} />
           <Route path="/all-reports" element={<AllReports />} />
           <Route path="/all-charts" element={<AllCharts />} />
-          <Route path="/all-reports/whatsapp-report/:id" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
-          <Route path="/all-reports/mail-report/:id" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
+          <Route path="/all-reports/whatsapp-report" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
+          <Route path="/all-reports/mail-report" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
         </Route>
       </Routes>
 

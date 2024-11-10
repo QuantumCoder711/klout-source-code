@@ -79,7 +79,7 @@ const Sidebar: React.FC = () => {
             All Sponsors
           </Link>
         </li>
-        <li>
+        {/* <li>
           <Link
             to="/settings"
             onClick={handlePageTitle}
@@ -87,8 +87,8 @@ const Sidebar: React.FC = () => {
           >
             Settings
           </Link>
-        </li>
-        <li>
+        </li> */}
+        {/* <li>
           <Link
             to="/profile"
             onClick={handlePageTitle}
@@ -96,7 +96,7 @@ const Sidebar: React.FC = () => {
           >
             Profile
           </Link>
-        </li>
+        </li> */}
         <li>
           <Link
             to="/all-reports"

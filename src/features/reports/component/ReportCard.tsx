@@ -1,11 +1,14 @@
 import React from 'react';
 import { FaWhatsapp } from "react-icons/fa";
-import { FiMail } from "react-icons/fi";
+// import { FiMail } from "react-icons/fi";
 import { MdDateRange, MdMyLocation } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+// import { eventUUID } from '../../event/eventSlice';
+import { eventUUID } from '../../../features/event/eventSlice';
 
 interface ReportCardProps {
-    id: number;
+    uuid: string;
     image: string;
     title: string;
     venue: string;
@@ -13,6 +16,10 @@ interface ReportCardProps {
 }
 
 const ReportCard: React.FC<ReportCardProps> = (props) => {
+
+    // console.log()
+
+    const dispatch = useDispatch();
 
     return (
         <div className="card bg-base-100 shadow-xl rounded-lg">
@@ -30,14 +37,14 @@ const ReportCard: React.FC<ReportCardProps> = (props) => {
                 <div className="mt-2 flex items-center gap-2 rounded-bl-lg rounded-br-lg">
 
                     {/* Whatsapp Button */}
-                    <Link to={`/all-reports/whatsapp-report/${props.id}`} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-green-500 text-white text-xl grid place-content-center'>
+                    <Link to={`/all-reports/whatsapp-report`} onClick={()=>dispatch(eventUUID(props.uuid))} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-green-500 text-white text-xl grid place-content-center'>
                         <FaWhatsapp />
                     </Link>
 
                     {/* Mail Button */}
-                    <Link to={`/all-reports/mail-report/${props.id}`} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-blue-500 text-white text-xl grid place-content-center'>
+                    {/* <Link to={`/all-reports/mail-report/${props.id}`} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-blue-500 text-white text-xl grid place-content-center'>
                         <FiMail />
-                    </Link>
+                    </Link> */}
                 </div>
                 {/* <div className="card-actions justify-end">
                     <Link to='/events/view-event/' onClick={() => handleClick(eventuuid)} className="underline text-blue-800 hover:text-blue-900">{buttonTitle}</Link>

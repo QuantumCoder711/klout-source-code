@@ -37,7 +37,7 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
                 <h2 className="card-title">{title}</h2>
                 <p className="inline-flex gap-2 items-start"><MdMyLocation className="text-2xl" /> {venue}</p>
                 <p className="font-semibold inline-flex gap-2 items-center"><MdDateRange className="text-2xl" /> {date}</p>
-                <div className="flex gap-3 mt-5 text-xs flex-wrap">
+                <div className="flex gap-3 mt-2 text-xs flex-wrap">
                     <Link to='/events/view-event/' onClick={() => handleClick(eventuuid)} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
                     <Link to='/events/edit-event' onClick={() => handleClick(eventuuid)} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
                     <Link to='/events/all-attendee/' onClick={() => handleClick(eventuuid)} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>

@@ -28,19 +28,20 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
     return (
         <div className='p-5 border-b flex items-center justify-between gap-5 rounded-lg'>
+            
             {/* Displaying Image */}
-            <img src={props.image} alt={props.title} className='w-96 h-60 object-cover object-center rounded-lg' />
+            <img src={props.image} alt={props.title} className='min-w-60 2xl:min-w-96 h-40 2xl:h-60 object-cover object-center rounded-lg' />
 
             {/* Title */}
-            <h3 className='text-lg font-semibold'>{props.title}</h3>
+            <h3 className='text-lg font-semibold max-w-[236px] 2xl:max-w-fit'>{props.title}</h3>
 
             {/* Date, Time and Venue */}
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col gap-2 text-sm 2xl:text-base'>
                 <div>
                     <span className="font-semibold text-black">Date</span> - {props.event_start_date}
                 </div>
                 <div>
-                    <span className="font-semibold text-black">Time</span> - {props.start_time + ':' + props.start_minute_time + ' ' + props.start_time_type}
+                    <span className="font-semibold text-black">Time</span> - {props.start_time + ':' + props.start_minute_time + ' ' + props.start_time_type} 
                 </div>
                 <div>
                     <span className="font-semibold text-black">Venue</span> - {props.event_venue_name}
@@ -48,7 +49,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             </div>
 
             {/* Event Joiners Info */}
-            <div className='h-full flex flex-col gap-y-2 min-w-48'>
+            <div className='h-full flex flex-col gap-y-2 min-w-48 text-sm 2xl:text-base'>
                 <div className='flex items-center gap-2 font-semibold'>Total Registrations: <p className='font-medium'>{props.total_attendee}</p></div>
                 <div className='flex items-center gap-2 font-semibold'>Total Attendees: <p className='font-medium'>{props.total_checkedin}</p></div>
                 <div className='flex items-center gap-2 font-semibold'>Checked In Speakers: <p className='font-medium'>{props.total_checkedin_speaker}</p></div>

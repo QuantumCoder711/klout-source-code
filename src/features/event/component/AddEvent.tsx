@@ -123,21 +123,21 @@ const AddEvent: React.FC = () => {
             toast.error('Please upload an image before submitting the event.');
             return; // Stop the form submission
         }
-    
+
         const formData = new FormData();
         Object.entries(data).forEach(([key, value]) => {
             formData.append(key, value as string);
         });
-    
+
         // Append image if available
         if (image) {
             formData.append('image', image);
         }
-    
+
         try {
             // Dispatch the addNewEvent action
             await dispatch(addNewEvent({ eventData: formData, token })).unwrap(); // unwrap if using createAsyncThunk
-            
+
             await dispatch(fetchEvents(token));
             // Show success message
             toast.success('Event added successfully!', {
@@ -145,7 +145,7 @@ const AddEvent: React.FC = () => {
                 // onClose: () => navigate('/'), // Navigate after toast closes
             });
             navigate('/');
-    
+
             // Clear the form
             reset();
         } catch (error: any) {
@@ -154,7 +154,7 @@ const AddEvent: React.FC = () => {
             toast.error(errorMessage);
         }
     };
-    
+
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
     const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
@@ -175,11 +175,38 @@ const AddEvent: React.FC = () => {
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
                 </div>
 
+
+                <div className='flex flex-row gap-3'>
+                    {/* Image Upload */}
+                    <label htmlFor="image" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
+                        <span className="font-semibold text-green-700 flex justify-between items-center">
+                            Banner Image &nbsp; <TiArrowRight className='mt-1' />
+                        </span>
+                        <input
+                            id="image"
+                            type="file"
+                            accept="image/*"
+                            className="grow"
+                            onChange={handleImageUpload}
+                        />
+                    </label>
+                    {errors.image && <p className="text-red-600">{errors.image.message}</p>}
+
+                    {/* Display the uploaded image or dummy image */}
+                    <div className="mt-3 w-full">
+                        <img
+                            src={selectedImage || dummyImage}
+                            alt="Selected Banner"
+                            className="w-full h-60 object-cover"
+                        />
+                    </div>
+                </div>
+
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Description */}
                     <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className=" font-semibold text-green-700 flex justify-between items-center">Description &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <textarea id="description"  className="grow bg-white" {...register('description', { required: 'Description is required' })} />
+                        <textarea id="description" className="grow bg-white" {...register('description', { required: 'Description is required' })} />
                     </label>
                     {errors.description && <p className="text-red-600">{errors.description.message}</p>}
                 </div>
@@ -347,33 +374,6 @@ const AddEvent: React.FC = () => {
                     </div>
                 </div>
 
-
-
-                <div className='flex flex-col gap-3'>
-                    {/* Image Upload */}
-                    <label htmlFor="image" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className="font-semibold text-green-700 flex justify-between items-center">
-                            Banner Image &nbsp; <TiArrowRight className='mt-1' />
-                        </span>
-                        <input
-                            id="image"
-                            type="file"
-                            accept="image/*"
-                            className="grow"
-                            onChange={handleImageUpload}
-                        />
-                    </label>
-                    {errors.image && <p className="text-red-600">{errors.image.message}</p>}
-
-                    {/* Display the uploaded image or dummy image */}
-                    <div className="mt-3">
-                        <img
-                            src={selectedImage || dummyImage}
-                            alt="Selected Banner"
-                            className="w-96 h-60 object-cover"
-                        />
-                    </div>
-                </div>
 
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Google Map Link */}

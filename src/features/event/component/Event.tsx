@@ -179,17 +179,21 @@ const Event: React.FC = () => {
                     </button>
                 </div>
 
+
+
                 {/* Event Table */}
-                <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+                < div className="overflow-x-auto bg-white shadow-md rounded-lg">
                     {/* <thead className=''>
                         <tr className="bg-gray-200 text-gray-700" style={{ fontSize: '17px' }}>
-                            <th className="py-4 px-6">Image</th>
-                            <th className="py-4 px-6">Title</th>
-                            <th className="py-4 px-6">Event Details</th>
-                            <th className="py-4 px-6">Attendees Details</th>
-                            <th className="py-4 px-6">Actions</th>
                         </tr>
                     </thead> */}
+                    {/* <div className='flex w-full justify-between bg-gray-200 text-gray-700 px-5 py-6'>
+                        <div className="">Image</div>
+                        <div className="">Title</div>
+                        <div className="">Event Details</div>
+                        <div className="">Attendees Details</div>
+                        <div className="">Actions</div>
+                    </div> */}
                     {
                         currentEvents.map((event) => (
                             <EventRow
@@ -200,6 +204,7 @@ const Event: React.FC = () => {
                                 event_venue_name={event.event_venue_name}
                                 start_minute_time={event.start_minute_time}
                                 start_time={event.start_time}
+                                start_time_type={event.start_time_type}
                                 total_attendee={event.total_attendee}
                                 total_pending_delegate={event.total_pending_delegate}
                                 total_checkedin={event.total_checkedin}
@@ -347,7 +352,8 @@ const Event: React.FC = () => {
                         </button>
                     </div>
                 </div>
-            </div>
+
+            </div >
         </>
     );
 };

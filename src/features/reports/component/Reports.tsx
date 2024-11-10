@@ -2,10 +2,15 @@ import React from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import ReportCard from './ReportCard';
 // import {messageData} from "../temp/dummyData";
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store';
 
 const Reports: React.FC = () => {
 
-  const ids:number[] = [1];
+
+  const { events } = useSelector((state: RootState) => state.events);
+  const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+
 
   return (
     <div>
@@ -16,20 +21,18 @@ const Reports: React.FC = () => {
       </div>
 
       {/* For displaying all reports */}
-      <div className='flex flex-wrap w-full gap-5'>
+      <div className='grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5'>
         {
-          ids.map((id) => (
+          events.map((event) => (
             <ReportCard
-              key={id}
-              id={id}
-              title="Test Event"
-              venue='Delhi'
-              date='6-Nov-24'
-              image='https://img.freepik.com/free-photo/cascade-boat-clean-china-natural-rural_1417-1356.jpg?t=st=1730783905~exp=1730787505~hmac=df20ed75bff729cbd492dc80aced253f1e07251399d3d721a9132c98d8d94789&w=1380' />
+              key={event.uuid}
+              uuid={event.uuid}
+              title={event.title}
+              venue={event.event_venue_name}
+              date={event.event_date}
+              image={`${imageBaseUrl}/${event.image}`} />
           ))
         }
-        {/* <ReportCard />
-        <ReportCard /> */}
       </div>
 
     </div>

@@ -3,6 +3,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
 import { MdOutlineFileDownload } from "react-icons/md";
 
+const dummyImage = "https://via.placeholder.com/150";
+
 // Define the form data type
 type FormInputType = {
     first_name: string;
@@ -267,9 +269,9 @@ const AddEventAttendee: React.FC = () => {
                         <div className="mt-3">
                             <h3 className="text-lg font-semibold mb-2">Selected Image</h3>
                             <img
-                                src={selectedImage}
+                                src={selectedImage || dummyImage}
                                 alt="Selected Profile"
-                                className="w-96 h-60 object-cover"
+                                className="w-60 object-cover"
                             />
                         </div>
                     </div>

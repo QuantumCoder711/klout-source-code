@@ -4,7 +4,7 @@ import { RootState, useAppDispatch } from '../redux/store';
 import { fetchEvents, fetchExistingEvent } from "../features/event/eventSlice";
 import { fetchAllAttendees } from "../features/attendee/attendeeSlice";
 import { fetchSponsor } from "../features/sponsor/sponsorSlice";
-import { logout } from '../features/auth/authSlice';
+import { logout, fetchUser } from '../features/auth/authSlice';
 import { Navigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { heading } from "../features/heading/headingSlice";
@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
     dispatch(fetchEvents(token));
     dispatch(fetchAllAttendees(token));
     dispatch(fetchSponsor(token));
+    dispatch(fetchUser(token));
     dispatch(fetchExistingEvent({ eventuuid: currentEventUUID, token }));
   }, [dispatch, currentEventUUID]);
 
