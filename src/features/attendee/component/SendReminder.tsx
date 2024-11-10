@@ -4,6 +4,7 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from 'react-router-dom';
 import { RiWhatsappFill } from "react-icons/ri";
 import { IoMail } from "react-icons/io5";
+import { Editor } from '@tinymce/tinymce-react';
 
 const SendReminder: React.FC = () => {
     // State to keep track of selected roles and selected sending method
@@ -163,7 +164,7 @@ const SendReminder: React.FC = () => {
                         </div>
 
                         {/* WhatsApp Message */}
-                        {selectedMethod==="whatsapp" && <div className="mt-10">
+                        {selectedMethod === "whatsapp" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
                             <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
                                 <p>
@@ -174,15 +175,52 @@ const SendReminder: React.FC = () => {
 
 
                         {/* Subject Input */}
-                        {selectedMethod==="mail" && <div className="mt-10">
+                        {selectedMethod === "mail" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Subject</label>
                             <input type="text" name="Subject" id="subject" className='input w-full mt-2' />
                         </div>}
 
                         {/* Rich Textarea */}
-                        {selectedMethod==="mail" && <div className="mt-10">
+                        {selectedMethod === "mail" && <div className="mt-10">
                             <label htmlFor="Message" className='block font-semibold'>Message</label>
-                            <textarea name="Message" id="message" className='w-full h-96 rounded-xl p-2 mt-2'></textarea>
+
+                            {/* TinyMCE Editor */}
+                            <div className="form-group">
+                                <Editor
+                                    apiKey="nv4qeg7zimei3mdz8lj1yzl5bakrmw4li6baiikh87f8vksz" // Get your API key from TinyMCE
+                                    // value={formInput.message}
+                                    // className={`form-control ${errors.message ? "is-invalid" : ""
+                                    //     }`}
+                                    initialValue="<p>Please type here...</p>"
+                                    init={{
+                                        height: 500,
+                                        menubar: false,
+                                        plugins: [
+                                            "advlist autolink lists link image charmap print preview anchor",
+                                            "searchreplace visualblocks code fullscreen",
+                                            "insertdatetime media table paste code help wordcount",
+                                        ],
+                                        toolbar:
+                                            "undo redo | formatselect | bold italic backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist outdent indent | removeformat | help",
+                                    }}
+                                // onEditorChange={handleEditorChange}
+                                // onBlur={handleBlur}
+                                // onFocus={handleInputFocus}
+                                />
+                                {/* 
+                                {errors.message && (
+                                    <div
+                                        className="invalid-feedback"
+                                        style={{
+                                            textAlign: "left",
+                                        }}
+                                    >
+                                        {errors.message}
+                                    </div>
+                                )} */}
+                            </div>
                         </div>}
 
                         {/* Send Time: Now or Later */}
@@ -200,7 +238,7 @@ const SendReminder: React.FC = () => {
                                     />
                                     <span>Now</span>
                                 </label>
-                                
+
                                 {/* Radio button for Later */}
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input

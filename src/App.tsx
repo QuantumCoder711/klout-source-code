@@ -25,6 +25,7 @@ import ViewAgendasPage from "./pages/ViewAgendasPage";
 import AddAgendaPage from "./pages/AddAgendaPage";
 import EditAgendaPage from "./pages/EditAgendaPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import Loader from "./component/Loader";
 
 axios.defaults.withCredentials = false;
 const App: React.FC = () => {
@@ -40,6 +41,7 @@ const App: React.FC = () => {
           element={<Layout />}
         >
           <Route path="/" element={<DashboardPage />} />
+          {/* <Route path="/" element={<Loader />} /> */}
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventPage />} />

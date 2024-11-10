@@ -34,11 +34,35 @@ const DataTable: React.FC = () => {
   // Get the data for the current page
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
-
-  // Render pagination numbers
+  
   const renderPaginationNumbers = () => {
-    const paginationNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
+    const paginationNumbers: JSX.Element[] = [];
+    const delta = 2; // Number of pages before and after the current page to show
+  
+    // Always show the first page
+    paginationNumbers.push(
+      <button
+        key={1}
+        onClick={() => handlePageChange(1)}
+        className={`p-1 px-3 border rounded-md bg-klt_primary-600 text-white ${currentPage === 1 ? 'bg-green-200' : 'bg-klt_primary-600/30'}`}
+      >
+        1
+      </button>
+    );
+  
+    // Show the second page if not the first page, and show ellipses if necessary
+    if (currentPage > delta + 2) {
+      paginationNumbers.push(
+        <span key="ellipsis-start" className="p-1 px-3 text-gray-500">...</span>
+      );
+    }
+  
+    // Show the current page and pages around it (if applicable)
+    const start = Math.max(2, currentPage - delta); // Start the range near the current page
+    const end = Math.min(totalPages - 1, currentPage + delta); // End the range near the current page
+  
+    // If we have room, show pages in the middle range (after 1, before last page)
+    for (let i = start; i <= end; i++) {
       paginationNumbers.push(
         <button
           key={i}
@@ -49,8 +73,31 @@ const DataTable: React.FC = () => {
         </button>
       );
     }
+  
+    // Show ellipses before the last page if needed
+    if (currentPage < totalPages - delta - 1) {
+      paginationNumbers.push(
+        <span key="ellipsis-end" className="p-1 px-3 text-gray-500">...</span>
+      );
+    }
+  
+    // Always show the last page
+    if (totalPages > 1) {
+      paginationNumbers.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageChange(totalPages)}
+          className={`p-1 px-3 border rounded-md bg-klt_primary-600 text-white ${currentPage === totalPages ? 'bg-green-200' : 'bg-klt_primary-600/30'}`}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+  
     return paginationNumbers;
   };
+  
+  
 
   return (
     <div className="text-black py-10">

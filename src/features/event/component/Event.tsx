@@ -218,15 +218,19 @@ const Event: React.FC = () => {
                                                 <span className="font-semibold text-black">Pending Delegates </span> - {event.total_pending_delegate}
                                             </td>
                                             <td className="py-3 px-6 space-y-2">
-                                                <Link to='/events/view-event/' className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => { dispatch(eventUUID(event.uuid)); dispatch(heading('Events')); dispatch(heading('Edit Event')); setTimeout(() => {
-                                                    }, 500); }}>View Event</Link> <br />
+                                                <Link to='/events/view-event/' className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
+                                                    dispatch(eventUUID(event.uuid)); dispatch(heading('Events')); dispatch(heading('Edit Event')); setTimeout(() => {
+                                                    }, 500);
+                                                }}>View Event</Link> <br />
                                                 <button className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
                                                     dispatch(eventUUID(event.uuid)); dispatch(heading('Edit Event')); setTimeout(() => {
                                                         navigate('/events/edit-event')
                                                     }, 500);
                                                 }} >Edit Event</button> <br />
-                                                <Link to='/events/all-attendee' className="text-blue-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => { dispatch(eventUUID(event.uuid)); dispatch(heading('All Attendee')); setTimeout(() => {
-                                                    }, 500); }}>All Attendees</Link> <br />
+                                                <Link to='/events/all-attendee' className="text-blue-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
+                                                    dispatch(eventUUID(event.uuid)); dispatch(heading('All Attendee')); setTimeout(() => {
+                                                    }, 500);
+                                                }}>All Attendees</Link> <br />
                                                 <button className="text-green-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Sponsors</button> <br />
                                                 <Link to={"/events/view-agendas"} className="text-yellow-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Agendas</Link> <br />
                                                 <button className="text-red-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={(e) => deleteEvent(e, event.id)}>Delete Event</button>

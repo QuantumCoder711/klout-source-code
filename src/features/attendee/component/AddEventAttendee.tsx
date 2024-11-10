@@ -1,12 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
-import { useDispatch } from "react-redux";
-import { RootState, useAppDispatch } from "../../../redux/store";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { addNewAttendee, fetchAllAttendees } from "../attendeeSlice";
-import { toast } from "react-toastify";
+import { MdOutlineFileDownload } from "react-icons/md";
 
 // Define the form data type
 type FormInputType = {
@@ -27,12 +22,8 @@ type FormInputType = {
 };
 
 const AddEventAttendee: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-
     const [selectedImage, setSelectedImage] = useState('');
-    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<FormInputType>();
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     // Handle image upload
@@ -45,37 +36,60 @@ const AddEventAttendee: React.FC = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<FormInputType> = async (data) => {
+    const onSubmit: SubmitHandler<FormInputType> = async () => {
         // Here you will handle form submission
         // Use data along with API calls and necessary actions
-
-        const formData = new FormData();
-
-        Object.entries(data).forEach(([key, value]) => {
-            formData.append(key, value as string);
-        });
-        formData.append("image", selectedImage);
-
-        console.log(formData);
-
-        try {
-            await dispatch(addNewAttendee({ formData, token })).unwrap(); // unwrap if using createAsyncThunk
-            await dispatch(fetchAllAttendees(token));
-            toast.success('Attendee added successfully!', {
-                autoClose: 2000, // Display time in milliseconds (3 seconds)
-                // onClose: () => navigate('/'), // Navigate after toast closes
-            });
-            navigate('/');
-            reset();
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || 'Something went wrong!';
-            toast.error(errorMessage);
-        }
     };
 
     const downloadSampleExcel = () => {
-        // Add your Excel sample download logic
+        const data = [
+            [
+                "first_name",
+                "last_name",
+                "job_title",
+                "company_name",
+                "industry",
+                "email",
+                "phone_number",
+                "alternate_mobile_number",
+                "website",
+                "status",
+                "employee_size",
+                "company_turn_over",
+                "linkedin_page_link",
+            ],
+            [
+                "John",
+                "Doe",
+                "CEO",
+                "Digimantra",
+                "IT",
+                "johndoe@example.com",
+                "8709289369",
+                "7865656575",
+                "www.digimantra.com",
+                "Speaker",
+                "200",
+                "5M",
+                "https://linkedin/company/digimantra",
+            ],
+        ];
+
+        // Convert data to CSV format
+        const csvContent =
+            "data:text/csv;charset=utf-8," +
+            data.map((row) => row.join(",")).join("\n");
+
+        // Create a virtual anchor element and trigger download
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", "attendee_list_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
+
+
 
     const handleExcelUpload = () => {
         // Logic for handling Excel file uploads
@@ -83,14 +97,16 @@ const AddEventAttendee: React.FC = () => {
 
     return (
         <div className="p-6 pt-3">
-            <h2 className="text-black text-2xl font-semibold ps-5">
-                Add Attendee Details
-            </h2>
-            <button type="button" onClick={downloadSampleExcel} className="btn btn-primary mb-4">
-                Download Sample Excel CSV Sheet Format
-                <i className="fa fa-download mx-2"></i>
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex justify-between items-center mb-5">
+                <h2 className="text-black text-2xl font-semibold ps-5">
+                    Add Attendee Details
+                </h2>
+                <button type="button" onClick={downloadSampleExcel} className="btn btn-secondary btn-sm btn-outline">
+                    <MdOutlineFileDownload /> Download Sample Excel CSV Sheet Format
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-[60%,40%] gap-4">
                 {/* Left Section - Form */}
                 <form onSubmit={handleSubmit(onSubmit)} className="gap-4">
                     <div className="flex flex-col gap-3 my-4">
@@ -107,6 +123,21 @@ const AddEventAttendee: React.FC = () => {
                             <input id="last_name" type="text" className="grow" {...register('last_name', { required: 'Last Name is required' })} />
                         </label>
                         {errors.last_name && <p className="text-red-600">{errors.last_name.message}</p>}
+                    </div>
+
+                    <div className="flex flex-col gap-3 my-4">
+                        <label htmlFor="image" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">Profile Picture &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <input
+                                id="image"
+                                type="file"
+                                accept="image/*"
+                                className="grow"
+                                onChange={handleImageUpload}
+                                ref={fileInputRef}
+                            />
+                        </label>
+
                     </div>
 
                     <div className="flex flex-col gap-3 my-4">
@@ -144,7 +175,7 @@ const AddEventAttendee: React.FC = () => {
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="phone_number" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className="font-semibold text-green-700 flex justify-between items-center">Phone Number &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="phone_number" type="tel" className="grow" {...register('phone_number')} />
+                            <input id="phone_number" type="tel" className="grow" {...register('phone_number', { required: 'Phone Number is required' })} />
                         </label>
                         {errors.phone_number && <p className="text-red-600">{errors.phone_number.message}</p>}
                     </div>
@@ -205,27 +236,6 @@ const AddEventAttendee: React.FC = () => {
                         {errors.status && <p className="text-red-600">{errors.status.message}</p>}
                     </div>
 
-                    <div className="flex flex-col gap-3 my-4">
-                        <label htmlFor="image" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Profile Picture &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input
-                                id="image"
-                                type="file"
-                                accept="image/*"
-                                className="grow"
-                                onChange={handleImageUpload}
-                                ref={fileInputRef}
-                            />
-                        </label>
-                        <div className="mt-3">
-                            <img
-                                src={selectedImage}
-                                alt="Selected Profile"
-                                className="w-32 h-32 object-cover"
-                            />
-                        </div>
-                    </div>
-
                     <div className="col-span-3 flex justify-center mt-4">
                         <button type="submit" className="btn btn-primary">
                             Submit
@@ -234,23 +244,36 @@ const AddEventAttendee: React.FC = () => {
                 </form>
 
                 {/* Right Section - Excel Upload */}
-                <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                    <h3 className="text-lg font-semibold mb-2">Bulk Upload</h3>
-                    <div className="flex flex-col gap-3">
-                        <label htmlFor="excel_file" className="input input-bordered bg-white text-black flex items-center gap-2 mb-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Upload Excel &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input
-                                id="excel_file"
-                                type="file"
-                                accept=".xlsx, .xls, .csv"
-                                className="grow"
-                                onChange={() => handleExcelUpload()}
+                <div className="bg-gray-100">
+                    <div className="shadow-md p-4 rounded-lg">
+                        <h3 className="text-lg font-semibold mb-2">Bulk Upload</h3>
+                        <div className="flex flex-col gap-3">
+                            <label htmlFor="excel_file" className="input input-bordered bg-white text-black flex items-center justify-between gap-2 mb-2">
+                                <span className="font-semibold text-green-700 flex items-center">
+                                    Upload Excel <TiArrowRight />
+                                </span>
+                                <input
+                                    id="excel_file"
+                                    type="file"
+                                    accept=".xlsx, .xls, .csv"
+                                    className="grow"
+                                    onChange={() => handleExcelUpload()}
+                                />
+                            </label>
+                            <button type="button" className="btn btn-warning btn-sm" onClick={handleExcelUpload}>
+                                Upload Excel Now
+                            </button>
+                        </div>
+                        <div className="mt-3">
+                            <h3 className="text-lg font-semibold mb-2">Selected Image</h3>
+                            <img
+                                src={selectedImage}
+                                alt="Selected Profile"
+                                className="w-96 h-60 object-cover"
                             />
-                        </label>
-                        <button type="button" className="btn btn-primary" onClick={handleExcelUpload}>
-                            Upload Excel Now
-                        </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
