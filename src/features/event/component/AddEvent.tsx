@@ -370,7 +370,7 @@ const AddEvent: React.FC = () => {
                         <img
                             src={selectedImage || dummyImage}
                             alt="Selected Banner"
-                            className="w-32 h-32 object-cover"
+                            className="w-96 h-60 object-cover"
                         />
                     </div>
                 </div>
