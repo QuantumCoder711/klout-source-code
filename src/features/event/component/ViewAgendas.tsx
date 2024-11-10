@@ -59,39 +59,68 @@ const ViewAgendas: React.FC = () => {
         setCurrentPage(page);
     };
 
-    // Render pagination numbers with edge-case handling
-  const renderPaginationNumbers = () => {
-    const paginationNumbers = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage < maxVisiblePages - 1) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      paginationNumbers.push(i);
-    }
-
-    return (
-      <div className="flex items-center space-x-1">
-        {startPage > 1 && <span className="text-klt_primary-500">1</span>}
-        {startPage > 2 && <span className="text-klt_primary-500">...</span>}
-        {paginationNumbers.map((number) => (
+    const renderPaginationNumbers = () => {
+        const paginationNumbers: JSX.Element[] = [];
+        const delta = 2; // Number of pages before and after the current page to show
+      
+        // Always show the first page
+        paginationNumbers.push(
           <button
-            key={number}
-            className={`px-3 py-1 border rounded-md ${number === currentPage ? 'bg-klt_primary-500 text-white' : 'text-klt_primary-500 hover:bg-green-100'}`}
-            onClick={() => handlePageChange(number)}
+            key={1}
+            onClick={() => handlePageChange(1)}
+            className={`p-1 px-3 border rounded-md bg-klt_primary-600 text-white ${currentPage === 1 ? 'bg-green-200' : 'bg-klt_primary-600/30'}`}
           >
-            {number}
+            1
           </button>
-        ))}
-        {endPage < totalPages - 1 && <span className="text-gray-600">...</span>}
-        {endPage < totalPages && <span className="text-gray-600">{totalPages}</span>}
-      </div>
-    );
-  };
+        );
+      
+        // Show the second page if not the first page, and show ellipses if necessary
+        if (currentPage > delta + 2) {
+          paginationNumbers.push(
+            <span key="ellipsis-start" className="p-1 px-3 text-gray-500">...</span>
+          );
+        }
+      
+        // Show the current page and pages around it (if applicable)
+        const start = Math.max(2, currentPage - delta); // Start the range near the current page
+        const end = Math.min(totalPages - 1, currentPage + delta); // End the range near the current page
+      
+        // If we have room, show pages in the middle range (after 1, before last page)
+        for (let i = start; i <= end; i++) {
+          paginationNumbers.push(
+            <button
+              key={i}
+              onClick={() => handlePageChange(i)}
+              className={`p-1 px-3 border rounded-md bg-klt_primary-600 text-white ${currentPage === i ? 'bg-green-200' : 'bg-klt_primary-600/30'}`}
+            >
+              {i}
+            </button>
+          );
+        }
+      
+        // Show ellipses before the last page if needed
+        if (currentPage < totalPages - delta - 1) {
+          paginationNumbers.push(
+            <span key="ellipsis-end" className="p-1 px-3 text-gray-500">...</span>
+          );
+        }
+      
+        // Always show the last page
+        if (totalPages > 1) {
+          paginationNumbers.push(
+            <button
+              key={totalPages}
+              onClick={() => handlePageChange(totalPages)}
+              className={`p-1 px-3 border rounded-md bg-klt_primary-600 text-white ${currentPage === totalPages ? 'bg-green-200' : 'bg-klt_primary-600/30'}`}
+            >
+              {totalPages}
+            </button>
+          );
+        }
+      
+        return paginationNumbers;
+      };
+      
 
     return (
         <div>
@@ -106,13 +135,13 @@ const ViewAgendas: React.FC = () => {
                 </div>
             </div>
 
-            <Link to="/events/add-agenda" className="btn mt-10 btn-primary w-fit flex items-center text-white btn-sm">
+            <Link to="/events/add-agenda" className="btn mt-5 btn-secondary w-fit flex items-center text-white btn-sm">
                 <TiPlus size={20} /> Add Agenda
             </Link>
 
             {/* table filters and pagination wrapper div */}
-            <div className=''>
-                <div className='mt-3'>
+            <div className='bg-white p-6 rounded-lg shadow-md mt-3'>
+                <div className='mt-4'>
                     {/* Filters */}
                     <div className='flex justify-between items-baseline'>
                         <input

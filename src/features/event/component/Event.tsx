@@ -10,6 +10,7 @@ import { eventUUID, fetchEvents } from '../eventSlice';
 import Swal from "sweetalert2";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import EventRow from '../../../component/EventRow';
 
 
 const Event: React.FC = () => {
@@ -180,8 +181,85 @@ const Event: React.FC = () => {
 
                 {/* Event Table */}
                 <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-                    <table className="min-w-full text-left text-sm">
-                        <thead>
+                    {/* <thead className=''>
+                        <tr className="bg-gray-200 text-gray-700" style={{ fontSize: '17px' }}>
+                            <th className="py-4 px-6">Image</th>
+                            <th className="py-4 px-6">Title</th>
+                            <th className="py-4 px-6">Event Details</th>
+                            <th className="py-4 px-6">Attendees Details</th>
+                            <th className="py-4 px-6">Actions</th>
+                        </tr>
+                    </thead> */}
+                    {
+                        currentEvents.map((event) => (
+                            <EventRow
+                                uuid={event.uuid}
+                                image={`${imageBaseUrl}/${event.image}`}
+                                title={event.title}
+                                event_start_date={event.event_start_date}
+                                event_venue_name={event.event_venue_name}
+                                start_minute_time={event.start_minute_time}
+                                start_time={event.start_time}
+                                total_attendee={event.total_attendee}
+                                total_pending_delegate={event.total_pending_delegate}
+                                total_checkedin={event.total_checkedin}
+                                total_checkedin_speaker={event.total_checkedin_speaker}
+                                total_checkedin_sponsor={event.total_checkedin_sponsor}
+                            />
+                        ))
+                    }
+
+                    {/* {
+                        currentEvents.map((event) => (
+                            <div key={event.id} className='w-full py-5 text-sm border-2 border-yellow-400'>
+                                <div className='flex border-2 rounded-xl p-5 justify-between items-center gap-10'>
+                                    <div className='flex items-center gap-5'>
+                                        <img src={`${imageBaseUrl}/${event.image}`} alt={event.title} className='w-96 h-60 object-cover object-center rounded-md' />
+                                        <h5 className='text-lg font-semibold'>{event.title}</h5>
+                                    </div>
+                                    <div className='h-full flex flex-col gap-y-2'>
+                                        <div className='flex items-center gap-2 font-bold min-w-fit'>Date: <p className='font-medium text-zinc-400'>{event.event_start_date}</p></div>
+                                        <div className='flex items-center gap-2 font-bold min-w-fit'>Time: <p className='font-medium text-zinc-400'>{event.start_time}</p></div>
+                                        <div className='flex items-center gap-2 font-bold min-w-fit'>Venue: <p className='font-medium text-zinc-400'>{event.event_venue_name}</p></div>
+                                    </div>
+
+                                    <div className='h-full flex flex-col gap-y-2'>
+                                        <div className='flex items-center gap-2 font-bold'>Total Registrations: <p className='font-medium text-zinc-400'>{event.total_attendee}</p></div>
+                                        <div className='flex items-center gap-2 font-bold'>Total Attendees: <p className='font-medium text-zinc-400'>{event.total_checkedin}</p></div>
+                                        <div className='flex items-center gap-2 font-bold'>Checked In Speakers: <p className='font-medium text-zinc-400'>{event.total_checkedin_speaker}</p></div>
+                                        <div className='flex items-center gap-2 font-bold'>Checked In Sponsors: <p className='font-medium text-zinc-400'>{event.total_checkedin_sponsor}</p></div>
+                                        <div className='flex items-center gap-2 font-bold'>Pending Delegates: <p className='font-medium text-zinc-400'>{event.total_pending_delegate}</p></div>
+                                    </div>
+
+                                    <div className='h-full text-sky-500 font-medium flex flex-col gap-y-2'>
+                                        <div className='text-purple-500'>View Event</div>
+                                        <div className='text-sky-500'>Edit Event</div>
+                                        <div className='text-blue-500'>All Attendees</div>
+                                        <div className='text-green-500'>All Sponsors</div>
+                                        <div className='text-yellow-500'>View Agendas</div>
+                                        <div className='text-red-500'>Delete Event</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        ))
+                    } */}
+                    {/* <div className='w-full flex'>
+                        <h4 className='font-bold'>Image</h4>
+                        <h4 className='font-bold'>Title</h4>
+                        <h4 className='font-bold'>Event Details</h4>
+                        <h4 className='font-bold'>Attendees Details</h4>
+                        <h4 className='font-bold'>Actions</h4>
+                    </div>
+                    {currentEvents.map((event) => (
+                        <div className='w-full border-4 border-red-600 p-10'>
+
+                        </div>
+                    ))
+
+                    } */}
+                    {/* <table className="min-w-full text-left text-sm">
+                        <thead className=''>
                             <tr className="bg-gray-200 text-gray-700" style={{ fontSize: '17px' }}>
                                 <th className="py-4 px-6">Image</th>
                                 <th className="py-4 px-6">Title</th>
@@ -246,7 +324,7 @@ const Event: React.FC = () => {
                                 )
                             }
                         </tbody>
-                    </table>
+                    </table> */}
                 </div>
 
                 {/* Pagination */}

@@ -100,10 +100,10 @@ const DataTable: React.FC = () => {
   
 
   return (
-    <div className="text-black py-10">
+    <div className="text-black py-10 bg-white p-6 rounded-lg shadow-md">
       <div className="flex justify-between items-center">
         {/* Show dropdown */}
-        <div className="mb-2 flex items-center">
+        <div className="mb-2 flex items-center ">
           <label htmlFor="itemsPerPage" className="mr-2 text-gray-800 font-semibold">
             Show:
           </label>
