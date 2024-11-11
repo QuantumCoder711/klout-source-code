@@ -2,3 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-color: rgb(224, 84, 107);
+    /* Icon background */
+    color: white;
+    /* Icon color */
+    border-radius: 50%;
+    /* Make it circular */
+    padding: 5px;
+    cursor: pointer;
+}

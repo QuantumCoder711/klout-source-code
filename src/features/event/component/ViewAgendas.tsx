@@ -6,9 +6,12 @@ import { TiChevronLeft, TiChevronRight, TiPlus } from "react-icons/ti";
 import { FaEdit } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
+import { agendaUUID } from '../eventSlice';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
 import axios from 'axios';
+import { heading } from '../../heading/headingSlice';
+import Swal from 'sweetalert2';
 
 // Define the AgendaType interface
 type AgendaType = {
@@ -32,14 +35,14 @@ type AgendaType = {
 
 const ViewAgendas: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { token } = useSelector((state: RootState) => state.auth);
+  const { token } = useSelector((state: RootState) => (state.auth));
   const [agendaData, setAgendaData] = useState<AgendaType[]>([]); // Fix agendaData to be an array
   const [filteredAgendaData, setFilteredAgendaData] = useState<AgendaType[]>([]); // To store filtered data
   const [filterTitle, setFilterTitle] = useState(""); // State for the filter input
 
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { events } = useSelector((state: RootState) => state.events);
-  
+
   const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
 
   useEffect(() => {
@@ -54,11 +57,54 @@ const ViewAgendas: React.FC = () => {
     }
   }, [currentEvent]);
 
+  console.log(agendaData);
+
+  const deleteAgenda = async (uuid: string) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      icon: "warning",
+      showDenyButton: true,
+      text: "You won't be able to revert this!",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Delete the agenda from the server
+        await axios.delete(`/api/agendas/${uuid}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        // Show success message
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your agenda has been deleted.",
+          icon: "success",
+        });
+
+        // Call the callback function to remove the row from the UI
+        deleteRow(uuid);
+      } catch (error) {
+        Swal.fire({
+          title: "Error!",
+          text: "There was an error deleting the agenda.",
+          icon: "error",
+        });
+      }
+    }
+  };
+
+  const deleteRow = (uuid: string) => {
+    setFilteredAgendaData(prevAgendas => prevAgendas.filter(agenda => agenda.uuid !== uuid));
+  };
+
   // Handle title filter input change
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value.toLowerCase();
     setFilterTitle(query);
-    
+
     // Filter the agendaData based on the title input
     const filtered = agendaData.filter((agenda) =>
       agenda.title.toLowerCase().includes(query)
@@ -157,7 +203,7 @@ const ViewAgendas: React.FC = () => {
         </div>
       </div>
 
-      <Link to="/events/add-agenda" className="btn mt-5 btn-secondary w-fit flex items-center text-white btn-sm">
+      <Link to="/events/add-agenda" onClick={() => dispatch(heading("Add Agenda"))} className="btn mt-5 btn-secondary w-fit flex items-center text-white btn-sm">
         <TiPlus size={20} /> Add Agenda
       </Link>
 
@@ -190,16 +236,16 @@ const ViewAgendas: React.FC = () => {
               </thead>
               <tbody>
                 {currentRows.map((data: AgendaType, index: number) => (
-                  <tr key={data.id}>
+                  <tr key={data.uuid}>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{indexOfFirstRow + index + 1}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.title}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.event_date}</td>
-                    <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' +  data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' + data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
-                      <Link to={`/events/edit-agenda/${data.uuid}`} className="text-blue-500 hover:text-blue-700">
+                      <Link to={`/events/edit-agenda`} onClick={()=>dispatch(agendaUUID(data.uuid))} className="text-blue-500 hover:text-blue-700">
                         <FaEdit size={20} />
                       </Link>
-                      <button className="text-red-500 hover:text-red-700">
+                      <button onClick={() => deleteAgenda(data.uuid)} className="text-red-500 hover:text-red-700">
                         <MdDelete size={20} />
                       </button>
                     </td>

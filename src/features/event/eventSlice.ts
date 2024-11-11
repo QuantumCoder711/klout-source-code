@@ -49,24 +49,24 @@ type eventType = {
     total_pending_delegate: number
 }
 
-type AgendaType = {
-    id: number;
-    uuid: string;
-    event_id: number;
-    title: string;
-    description: string;
-    event_date: string;
-    start_time: string;
-    start_time_type: string;
-    end_time: string;
-    end_time_type: string;
-    image_path: string;
-    created_at: string;
-    updated_at: string;
-    start_minute_time: string;
-    end_minute_time: string;
-    position: number;
-};
+// type AgendaType = {
+//     id: number;
+//     uuid: string;
+//     event_id: number;
+//     title: string;
+//     description: string;
+//     event_date: string;
+//     start_time: string;
+//     start_time_type: string;
+//     end_time: string;
+//     end_time_type: string;
+//     image_path: string;
+//     created_at: string;
+//     updated_at: string;
+//     start_minute_time: string;
+//     end_minute_time: string;
+//     position: number;
+// };
 
 type PendingRequestType = {
     id: number;                              // Unique identifier for the event
@@ -116,6 +116,7 @@ type eventState = {
     events: eventType[],  // Corrected to hold an array of eventType
     currentEvent: eventType | null,  // Changed to `eventType | null` for consistency
     currentEventUUID: string | null,
+    currentAgendaUUID: string | null,
     eventAttendee: [],
     agendas: [],
     pendingRequests: PendingRequestType[],
@@ -128,6 +129,7 @@ const initialState: eventState = {
     events: [],
     currentEvent: null,  // Initialize as null
     currentEventUUID: null,
+    currentAgendaUUID: null,  // Initialize as null
     eventAttendee: [],
     agendas: [],
     pendingRequests: [],
@@ -217,6 +219,9 @@ const eventSlice = createSlice({
     reducers: {
         eventUUID(state, action: PayloadAction<string>) {
             state.currentEventUUID = action.payload;
+        },
+        agendaUUID(state, action: PayloadAction<string>) {
+            state.currentAgendaUUID = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -306,7 +311,7 @@ const eventSlice = createSlice({
     }
 });
 
-export const { eventUUID } = eventSlice.actions;
+export const { eventUUID, agendaUUID } = eventSlice.actions;
 // export const selectAgendas = (state: { events: eventState }) => state.events.agendas;
 
 export default eventSlice.reducer;
