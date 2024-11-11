@@ -2,6 +2,9 @@ import React, { useState, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
 import { MdOutlineFileDownload } from "react-icons/md";
+import axios from "axios";
+import { RootState } from "../../../redux/store";
+import { useSelector } from "react-redux";
 
 const dummyImage = "https://via.placeholder.com/150";
 
@@ -21,12 +24,16 @@ type FormInputType = {
     company_turn_over: number;
     status: string;
     image: File | null;
+    excel_file: File | null;
 };
 
 const AddEventAttendee: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState('');
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
+    const [selectedExcelFile, setSelectedExcelFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const { currentEventUUID } = useSelector((state: RootState) => (state.events));
 
     // Handle image upload
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,10 +45,40 @@ const AddEventAttendee: React.FC = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<FormInputType> = async () => {
-        // Here you will handle form submission
-        // Use data along with API calls and necessary actions
-    };
+    const onSubmit: SubmitHandler<FormInputType> = async (data) => {
+
+        const formData = new FormData();
+
+        Object.keys(data).forEach((key) => {
+            const value = data[key as keyof FormInputType];
+
+            if (key === "image" && value instanceof File) {
+                formData.append(key, value);  // Append the image file
+            } else if (key === "excel_file" && value instanceof File) {
+                formData.append(key, value);  // Append the Excel file if it exists
+            } else {
+                formData.append(key, value ? value.toString() : ""); // Append other form data as strings
+            }
+        });
+
+        console.log(formData);
+
+        // try {
+        //     axios
+        //         .post(`/api/attendees/upload/${event_id}`, formData, {
+        //             headers: { "Content-Type": "multipart/form-data" },
+        //         })
+        //         .then((res) => {
+        //             if (res.data.status === 200) {
+        //                 swal("Success", res.data.message, "success");
+        //             }
+        //         });
+        // } catch (error) {
+        //     alert('An error occurred while submitting the form.');
+        //     console.error('Error:', error);
+        // }
+            
+    }
 
     const downloadSampleExcel = () => {
         const data = [
@@ -92,9 +129,14 @@ const AddEventAttendee: React.FC = () => {
     };
 
 
-
-    const handleExcelUpload = () => {
+    const handleExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         // Logic for handling Excel file uploads
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedExcelFile(file);  // Store the selected file in state
+            setValue('excel_file', file);  // Set it in the form data as well
+        }
+
     };
 
     return (
@@ -256,13 +298,15 @@ const AddEventAttendee: React.FC = () => {
                                 </span>
                                 <input
                                     id="excel_file"
+                                    {...register('excel_file', { required: 'Excel File is required' })}
                                     type="file"
                                     accept=".xlsx, .xls, .csv"
                                     className="grow"
-                                    onChange={() => handleExcelUpload()}
+                                    // onChange={() => handleExcelUpload()}
                                 />
                             </label>
-                            <button type="button" className="btn btn-warning btn-sm" onClick={handleExcelUpload}>
+                            {errors.excel_file && <p className="text-red-600">{errors.excel_file.message}</p>}
+                            <button type="button" className="btn btn-warning btn-sm" onClick={() => handleExcelUpload}>
                                 Upload Excel Now
                             </button>
                         </div>

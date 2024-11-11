@@ -59,18 +59,31 @@ export const allEventAttendeeApi = async (eventuuid: string | null, token: strin
 }
 
 // Fetching allAgendas
-export const allAgendasApi = async (token: string | null) => {
+export const allAgendasApi = async (id: number, token: string | null) => {
     try {
-        const response = await axios.post(`/api/all-agendas`, {}, {
-            headers: {
-                // 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await axios.get(`/api/all-agendas/${id}`);
         console.log(response.data);
         return response.data;
     } catch (error) {
         console.log("Error Occured in allAgendaApi: ", error);
         throw error;
+    }
+}
+
+//Fetching allPendingRequest
+export const allPendingRequest = async (eventuuid: string | null, token: string | null, user_id: string | null | number) => {
+    try {
+        const response = await axios.post(`/api/pending_event_requests/${eventuuid}`, { user_id }, {
+            headers: {
+                // 'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        {
+            throw error;
+        }
     }
 }

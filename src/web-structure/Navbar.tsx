@@ -13,9 +13,13 @@ import { heading } from "../features/heading/headingSlice";
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
 
+  const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+
   const { token } = useSelector((state: RootState) => state.auth);
   const { pageHeading } = useSelector((state: RootState) => state.pageHeading);
-  const { currentEventUUID } = useSelector((state: RootState) => state.events)
+  const { currentEventUUID } = useSelector((state: RootState) => state.events);
+  const { user } = useSelector((state: RootState) => state.auth);
+
 
   useEffect(() => {
     dispatch(fetchEvents(token));
@@ -58,12 +62,12 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-2 cursor-pointer">
             {/* User Avatar */}
             <img
-              src="https://via.placeholder.com/40"
+              src={`${imageBaseUrl}/${user?.image}`||"https://via.placeholder.com/40"}
               alt="User Avatar"
-              className="w-10 h-10 rounded-full"
+              className="w-10 h-10 object-contain border-2 border-white rounded-full"
             />
             {/* User Name */}
-            <span className="font-medium">John Doe</span>
+            <span className="font-bold">{user?.first_name}</span>
           </div>
 
           {/* Dropdown Menu */}

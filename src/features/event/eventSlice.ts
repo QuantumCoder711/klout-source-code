@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { fetchTotalEvents, fetchCurrentEvent, addEventApi, allEventAttendeeApi, allAgendasApi } from './eventApi';
+import { fetchTotalEvents, fetchCurrentEvent, addEventApi, allEventAttendeeApi, allAgendasApi, allPendingRequest } from './eventApi';
 // import state from "sweetalert/typings/modules/state";
 
 
@@ -68,6 +68,45 @@ type AgendaType = {
     position: number;
 };
 
+type PendingRequestType = {
+    id: number;                              // Unique identifier for the event
+    uuid: string;                            // A universally unique identifier
+    user_id: number;                         // ID of the user associated with the event
+    slug: string;                            // URL-friendly identifier (slug) for the event
+    title: string;                           // The title of the event
+    description: string;                     // A detailed description of the event
+    event_date: string;                      // Date of the event in YYYY-MM-DD format
+    location: string;                        // Location ID, which might refer to a specific location in a database
+    start_time: string;                      // Start time (hour) in 24-hour format
+    start_time_type: "AM" | "PM";            // Time of the day (AM/PM)
+    end_time: string;                        // End time (hour) in 24-hour format
+    end_time_type: "AM" | "PM";              // Time of the day (AM/PM)
+    image: string;                           // URL or path to the event image
+    event_venue_name: string;                // The name of the event venue
+    event_venue_address_1: string;           // Address line 1 of the event venue
+    event_venue_address_2: string;           // Address line 2 of the event venue
+    city: string;                            // City of the event
+    state: string;                           // State of the event
+    country: string;                         // Country of the event
+    pincode: string;                         // Pincode for the event location
+    google_map_link: string;                 // Google Maps link for the event venue location
+    created_at: string;                      // Timestamp when the event was created (ISO 8601 format)
+    updated_at: string;                      // Timestamp when the event was last updated (ISO 8601 format)
+    status: number;                          // Event status, where 1 typically means active and 0 means inactive
+    pdf_path: string;                        // Path to an associated PDF (event brochure, agenda, etc.)
+    end_minute_time: string;                 // Minutes part of the event end time
+    start_minute_time: string;               // Minutes part of the event start time
+    qr_code: string;                         // Path to the event's QR code image
+    start_time_format: string;               // Start time in "HH:MM:SS" format (24-hour)
+    feedback: number;                        // Feedback status (whether feedback is enabled)
+    event_start_date: string;                // The start date of the event (same as `event_date`)
+    event_end_date: string;                  // The end date of the event (same as `event_date`)
+    why_attend_info: string | null;          // Optional information on why someone should attend
+    more_information: string | null;         // Additional information about the event (optional)
+    t_and_conditions: string | null;         // Optional terms and conditions for the event
+    video_url: string | null;                // Optional video URL related to the event (e.g., promotional video)
+};
+
 interface AddEventResponse {
     data: eventType;
 }
@@ -78,7 +117,9 @@ type eventState = {
     currentEvent: eventType | null,  // Changed to `eventType | null` for consistency
     currentEventUUID: string | null,
     eventAttendee: [],
-    agendas: AgendaType[],
+    agendas: [],
+    pendingRequests: PendingRequestType[],
+    // pendingRequests: string | null,
     loading: boolean,
     error: string | null;
 }
@@ -89,6 +130,7 @@ const initialState: eventState = {
     currentEventUUID: null,
     eventAttendee: [],
     agendas: [],
+    pendingRequests: [],
     loading: false,
     error: null
 };
@@ -141,17 +183,29 @@ export const allEventAttendee = createAsyncThunk(
     }
 );
 
-export const fetchAllAgendas = createAsyncThunk<{ data: AgendaType[] }, string | null>(
+export const fetchAllAgendas = createAsyncThunk(
     'events/allAgendas',
-    async (token, { rejectWithValue }) => {
+    async ({ id, token }: { id: number, token: string | null }, { rejectWithValue }) => {
         try {
             if (!token) {
                 return rejectWithValue('No token provided');
             }
-            const response = await allAgendasApi(token);
+            const response = await allAgendasApi(id, token);
             return response.data;
         } catch (error) {
             return rejectWithValue('Failed to fetch agendas');
+        }
+    }
+);
+
+export const fetchAllPendingUserRequests = createAsyncThunk(
+    'events/fetchAllPendingUserRequests',
+    async ({ eventuuid, token, user_id }: { eventuuid: string | null, token: string | null, user_id: string | null | number }, { rejectWithValue }) => {
+        try {
+            const response = await allPendingRequest(eventuuid, token, user_id);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue('Failed to fetch pending requests');
         }
     }
 );
@@ -231,6 +285,21 @@ const eventSlice = createSlice({
                 state.error = null;
             })
             .addCase(fetchAllAgendas.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            //Adding all cases
+            .addCase(fetchAllPendingUserRequests.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAllPendingUserRequests.fulfilled, (state, action) => {
+                state.loading = false;
+                state.pendingRequests = action.payload;
+                state.error = null;
+            })
+            .addCase(fetchAllPendingUserRequests.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })

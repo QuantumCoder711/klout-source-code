@@ -1,8 +1,11 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiArrowRight } from "react-icons/ti";
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { RootState } from '../../../redux/store';
 
 type formInputType = {
     title: string,
@@ -20,6 +23,7 @@ type formInputType = {
 };
 
 const AddAgenda: React.FC = () => {
+    const { token } = useSelector((state: RootState) => (state.auth));
     const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState('');
     const [image, setImage] = useState(null);
@@ -47,7 +51,21 @@ const AddAgenda: React.FC = () => {
         }
 
         console.log(formData);
-    };
+
+
+        axios
+            .post(`/api/agendas/`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    'Authorization': `Bearer ${token}`
+                },
+            })
+            .then((res) => {
+                if (res.data.status === 200) {
+                    swal("Success", res.data.message, "success");
+                }
+            });
+    }
 
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));

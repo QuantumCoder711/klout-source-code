@@ -143,7 +143,7 @@ const AllEventAttendee: React.FC = () => {
             <Link to="" className="btn btn-warning text-white btn-sm">
                 <BiSolidMessageSquareDots /> Send Same Day Reminder
             </Link>
-            <Link to="" className="btn btn-error text-white btn-sm">
+            <Link to="/events/pending-user-request" onClick={()=>{dispatch(heading("Pending Requests"))}} className="btn btn-error text-white btn-sm">
                 <FaUserClock /> Pending User Request
             </Link>
             <button className="btn btn-success btn-outline btn-sm ml-auto" onClick={handleExport}>

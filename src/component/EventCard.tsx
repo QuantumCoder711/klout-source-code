@@ -41,7 +41,7 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
                     <Link to='/events/view-event/' onClick={() => handleClick(eventuuid)} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
                     <Link to='/events/edit-event' onClick={() => handleClick(eventuuid)} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
                     <Link to='/events/all-attendee/' onClick={() => handleClick(eventuuid)} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
-                    <Link to='/events/view-sponsers/' onClick={() => handleClick(eventuuid)} className="underline text-green-500 hover:text-green-600">View Sponsers</Link>
+                    {/* <Link to='/events/view-sponsers/' onClick={() => handleClick(eventuuid)} className="underline text-green-500 hover:text-green-600">View Sponsers</Link> */}
                     <Link to='/events/view-agendas/' onClick={() => handleClick(eventuuid)} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
                     <Link to='' onClick={() => handleClick(eventuuid)} className="underline text-red-500 hover:text-red-600">Delete Event</Link>
                 </div>

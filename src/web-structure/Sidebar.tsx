@@ -3,10 +3,16 @@ import { Link } from "react-router-dom";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { heading } from "../features/heading/headingSlice";
+import { RootState } from "../redux/store";
+import { useSelector } from "react-redux";
 
 const Sidebar: React.FC = () => {
   const dispatch = useDispatch();
   const [showEvents, setShowEvents] = useState(false);
+
+  const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const toggleEventsMenu = () => {
     setShowEvents(!showEvents);
@@ -18,12 +24,18 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="h-screen w-56 flex-shrink-0 bg-klt_primary-900 text-white">
-      <div
+      {
+        user?.company_logo &&
+        <div className="border-b border-white">
+          <img className="p-4 mx-auto h-[72px]" src={`${imageBaseUrl}/${user.company_logo}`} alt={user.company_name} />
+        </div>
+      }
+      {!user?.company_logo && <div
         className="px-4 py-5 text-2xl font-bold border-b border-white-500"
         style={{ marginBottom: "30px" }}
       >
         KLOUT CLUB
-      </div>
+      </div>}
       <ul className="my-5 space-y-2">
         <li>
           <Link to="/" onClick={handlePageTitle} className="py-3 px-5 block rounded font-semibold">

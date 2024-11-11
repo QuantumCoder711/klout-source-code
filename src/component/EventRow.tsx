@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { eventUUID } from '../features/event/eventSlice';
 import { useDispatch } from 'react-redux';
 import { heading } from '../features/heading/headingSlice';
+import axios from 'axios';
 
 interface EventRowProps {
     title?: string,
@@ -23,12 +24,28 @@ interface EventRowProps {
 
 const EventRow: React.FC<EventRowProps> = (props) => {
 
+    const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const generatePDF = (uuid: string) => {
+        // setLoading(true)
+        axios.get(`/api/generatePDF/${uuid}`)
+            .then(res => {
+                if (res.data.status === 200) {
+                    //   setLoading(false)
+                    const url = imageBaseUrl + res.data.data.pdf_path;
+                    window.open(url, '_blank');
+
+                }
+
+            })
+    }
+
     return (
         <div className='p-5 border-b flex items-center justify-between gap-5 rounded-lg'>
-            
+
             {/* Displaying Image */}
             <img src={props.image} alt={props.title} className='min-w-60 2xl:min-w-96 h-40 2xl:h-60 object-cover object-center rounded-lg' />
 
@@ -41,7 +58,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                     <span className="font-semibold text-black">Date</span> - {props.event_start_date}
                 </div>
                 <div>
-                    <span className="font-semibold text-black">Time</span> - {props.start_time + ':' + props.start_minute_time + ' ' + props.start_time_type} 
+                    <span className="font-semibold text-black">Time</span> - {props.start_time + ':' + props.start_minute_time + ' ' + props.start_time_type}
                 </div>
                 <div>
                     <span className="font-semibold text-black">Venue</span> - {props.event_venue_name}
@@ -73,11 +90,14 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('All Attendee')); setTimeout(() => {
                     }, 500);
                 }}>All Attendees</Link> <br />
-                <button className="text-green-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Sponsors</button> <br />
+                {/* <button className="text-green-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Sponsors</button> <br /> */}
                 <Link to={"/events/view-agendas"} className="text-yellow-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
                     dispatch(heading('View Agendas')); setTimeout(() => {
-                    }, 500);
+                    }, 500); dispatch(eventUUID(props.uuid));
                 }} >View Agendas</Link> <br />
+
+                <button className="text-purple-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1"
+                    onClick={() => generatePDF(props.uuid)}>Generate PDF</button> <br />
                 <button className="text-red-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1"
                 // onClick={(e) => deleteEvent(e, props.id)}
                 >Delete Event</button>
