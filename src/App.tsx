@@ -27,6 +27,7 @@ import EditAgendaPage from "./pages/EditAgendaPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import Loader from "./component/Loader";
 import PendingUserRequest from "./features/attendee/component/PendingUserRequest";
+import EditAttendeePage from "./pages/EditAttendeePage";
 
 axios.defaults.withCredentials = false;
 const App: React.FC = () => {
@@ -53,6 +54,7 @@ const App: React.FC = () => {
           <Route path="/events/edit-agenda" element={<EditAgendaPage />} />
           <Route path="/events/edit-event" element={<EditEventPage />} />
           <Route path="/events/all-attendee" element={<AllEventAttendeePage />} />
+          <Route path="/events/edit-attendee" element={<EditAttendeePage />} />
           <Route path="/events/pending-user-request" element={<PendingUserRequest />} />
           <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
           <Route path="/events/send-reminder" element={<SendReminder />} />

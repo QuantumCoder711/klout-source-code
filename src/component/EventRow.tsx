@@ -4,6 +4,9 @@ import { eventUUID } from '../features/event/eventSlice';
 import { useDispatch } from 'react-redux';
 import { heading } from '../features/heading/headingSlice';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import { RootState } from '../redux/store';
+import { useSelector } from 'react-redux';
 
 interface EventRowProps {
     title?: string,
@@ -25,6 +28,7 @@ interface EventRowProps {
 const EventRow: React.FC<EventRowProps> = (props) => {
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+    const { token } = useSelector((state: RootState) => (state.auth));
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -41,6 +45,43 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                 }
 
             })
+    }
+
+    const handleDelete = async (id: number) => {
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            icon: "warning",
+            showDenyButton: true,
+            text: "You won't be able to revert this!",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Delete the event from the server
+                await axios.delete(`/api/events/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                // Show success message
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your event has been deleted.",
+                    icon: "success",
+                });
+
+            } catch (error) {
+                Swal.fire({
+                    title: "Error!",
+                    text: "There was an error deleting the event.",
+                    icon: "error",
+                });
+            }
+        }
+        // https://api.klout.club/api/events/144
     }
 
     return (
@@ -99,7 +140,11 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                 <button className="text-purple-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1"
                     onClick={() => generatePDF(props.uuid)}>Generate PDF</button> <br />
                 <button className="text-red-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1"
-                // onClick={(e) => deleteEvent(e, props.id)}
+                    onClick={() => {
+                        if (props.id !== undefined) {
+                            handleDelete(props.id);
+                        }
+                    }}
                 >Delete Event</button>
             </div>
         </div >

@@ -4,7 +4,8 @@ import { addAttendee, fetchTotalAttendee } from './attendeeApi';
 type attendeeState = {
     allAttendees: [],
     loading: boolean,
-    error: string | null
+    error: string | null,
+    currentAttendeeUUID: string | null;
 };
 
 interface AddAttendeeResponse {
@@ -13,6 +14,7 @@ interface AddAttendeeResponse {
 
 const initialState: attendeeState = {
     allAttendees: [],
+    currentAttendeeUUID: null,
     loading: false,
     error: null
 };
@@ -45,7 +47,9 @@ const attendeeSlice = createSlice({
     name: 'attendee',
     initialState,
     reducers: {
-
+        attendeeUUID(state, action: PayloadAction<string>) {
+            state.currentAttendeeUUID = action.payload;
+        },
     },
     extraReducers: (builder) => {
         // pending State
@@ -68,7 +72,7 @@ const attendeeSlice = createSlice({
         })
     }
 });
-
+export const { attendeeUUID } = attendeeSlice.actions;
 
 export default attendeeSlice.reducer;
 

@@ -9,6 +9,7 @@ import { RootState, useAppDispatch } from '../../../redux/store';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 type formInputType = {
     title: string,
@@ -129,50 +130,83 @@ const EditEvent: React.FC = () => {
 
 
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
-
-        data.event_venue_address_2 = data.event_venue_address_1;
-        data.event_date = data.event_start_date;
-        data.feedback = 1;
-        data.status = 1;
-        data._method = 'PUT';
-
-
-        const formData = new FormData();
-        Object.entries(data).forEach(([key, value]) => {
-            formData.append(key, value as string);
+        // Step 1: Show confirmation dialog to ask if the user wants to update
+        const result = await Swal.fire({
+            title: 'Are you sure you want to update this event?',
+            icon: 'warning',
+            showDenyButton: true,
+            text: "You won't be able to revert this!",
+            confirmButtonText: 'Yes, update it!',
+            denyButtonText: 'No, cancel',
         });
 
-        if (image) {
-            formData.set('image', image);
-        }
+        // If the user confirms, proceed with the update
+        if (result.isConfirmed) {
+            // Prepare FormData
+            data.event_venue_address_2 = data.event_venue_address_1;
+            data.event_date = data.event_start_date;
+            data.feedback = 1;
+            data.status = 1;
+            data._method = 'PUT';
 
-        try {
-            const response = await axios.post('/api/events/' + currentEventUUID, formData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                formData.append(key, value as string);
             });
 
-            console.log(response.data)
-
-            if (response.data.status === 200) {
-                await dispatch(fetchEvents(token))
-                toast.success('Event updated successfully!', {
-                    autoClose: 2000,
-                });
+            // Append the image only if it exists
+            if (image) {
+                formData.set('image', image);  // Append the actual File object
             }
 
-            navigate('/');
+            try {
+                // Step 2: Make the API request to update the event
+                const response = await axios.post('/api/events/' + currentEventUUID, formData, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
+                // Step 3: If the update is successful, show success message
+                if (response.data.status === 200) {
+                    await dispatch(fetchEvents(token));
+                    Swal.fire({
+                        title: "Success",
+                        text: 'Event updated successfully!',
+                        icon: "success",
+                        confirmButtonText: "Ok",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Navigate to the home page if user clicks "Ok"
+                            navigate('/');
+                        }
+                    });
+                } else {
+                    // Handle other response scenarios
+                    Swal.fire({
+                        title: "Error",
+                        text: 'Something went wrong. Please try again.',
+                        icon: "error",
+                        confirmButtonText: "Ok",
+                    });
+                }
 
+                // Clear the form after successful submission
+                reset();
 
-            // Clear the form
-            reset();
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || 'Something went wrong!';
-            toast.error(errorMessage);
+            } catch (error: any) {
+                // Step 4: If there's an error, show error message
+                const errorMessage = error.response?.data?.message || error.message || 'Something went wrong!';
+                Swal.fire({
+                    title: 'Error',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
         }
     };
+
 
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
@@ -192,6 +226,33 @@ const EditEvent: React.FC = () => {
                         <input id="title" defaultValue={currentEvent.title} type="text" className="grow" {...register('title', { required: 'Title is required' })} />
                     </label>
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
+                </div>
+
+
+                <div className='flex gap-3'>
+                    {/* Image Upload */}
+                    <label htmlFor="image" className="w-full input input-bordered bg-white text-black flex items-center gap-2">
+                        <span className="font-semibold text-green-700 flex justify-between items-center">
+                            Banner Image &nbsp; <TiArrowRight className='mt-1' />
+                        </span>
+                        <input
+                            id="image"
+                            type="file"
+                            accept="image/*"
+                            className="grow"
+                            onChange={handleImageUpload}
+                        />
+                    </label>
+                    {errors.image && <p className="text-red-600">{errors.image.message}</p>}
+
+                    {/* Display the uploaded image or dummy image */}
+                    <div className="mt-3 w-full">
+                        <img
+                            src={selectedImage || dummyImage}
+                            alt="Selected Banner"
+                            className="w-full h-60 object-cover"
+                        />
+                    </div>
                 </div>
 
                 <div className='flex flex-col gap-3 my-4'>
@@ -366,33 +427,6 @@ const EditEvent: React.FC = () => {
                     </div>
                 </div>
 
-
-
-                <div className='flex flex-col gap-3'>
-                    {/* Image Upload */}
-                    <label htmlFor="image" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className="font-semibold text-green-700 flex justify-between items-center">
-                            Banner Image &nbsp; <TiArrowRight className='mt-1' />
-                        </span>
-                        <input
-                            id="image"
-                            type="file"
-                            accept="image/*"
-                            className="grow"
-                            onChange={handleImageUpload}
-                        />
-                    </label>
-                    {errors.image && <p className="text-red-600">{errors.image.message}</p>}
-
-                    {/* Display the uploaded image or dummy image */}
-                    <div className="mt-3">
-                        <img
-                            src={selectedImage || dummyImage}
-                            alt="Selected Banner"
-                            className="w-96 h-60 object-cover"
-                        />
-                    </div>
-                </div>
 
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Google Map Link */}

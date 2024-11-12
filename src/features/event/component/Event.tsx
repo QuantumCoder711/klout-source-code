@@ -198,6 +198,7 @@ const Event: React.FC = () => {
                         currentEvents.map((event) => (
                             <EventRow
                                 uuid={event.uuid}
+                                id={event.id}
                                 image={`${imageBaseUrl}/${event.image}`}
                                 title={event.title}
                                 event_start_date={event.event_start_date}

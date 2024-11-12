@@ -4,6 +4,10 @@ import { Link } from 'react-router-dom';
 import { eventUUID } from '../features/event/eventSlice';
 import { heading } from '../features/heading/headingSlice';
 import { useDispatch } from 'react-redux';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { RootState } from '../redux/store';
+import { useSelector } from 'react-redux';
 
 type eventCardProps = {
     title: string,
@@ -19,11 +23,51 @@ type eventCardProps = {
 const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, imageAlt, buttonTitle, eventuuid }) => {
 
     const dispatch = useDispatch();
+    const { token } = useSelector((state: RootState) => (state.auth));
+    const eventId = useSelector((state: RootState) => state.events.currentEvent);
 
     const handleClick = (eventuuid: string) => {
         // dispatch(heading('View Event'));
-        dispatch(eventUUID(eventuuid))
+        dispatch(eventUUID(eventuuid));
     }
+
+    const handleDelete = async (id: number) => {
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            icon: "warning",
+            showDenyButton: true,
+            text: "You won't be able to revert this!",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // Delete the event from the server
+                await axios.delete(`/api/events/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                // Show success message
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your event has been deleted.",
+                    icon: "success",
+                });
+
+            } catch (error) {
+                Swal.fire({
+                    title: "Error!",
+                    text: "There was an error deleting the event.",
+                    icon: "error",
+                });
+            }
+        }
+        // https://api.klout.club/api/events/144
+    }
+
     return (
         <div className="card bg-base-100 shadow-xl rounded-lg">
             <figure>
@@ -43,7 +87,11 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
                     <Link to='/events/all-attendee/' onClick={() => handleClick(eventuuid)} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
                     {/* <Link to='/events/view-sponsers/' onClick={() => handleClick(eventuuid)} className="underline text-green-500 hover:text-green-600">View Sponsers</Link> */}
                     <Link to='/events/view-agendas/' onClick={() => handleClick(eventuuid)} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
-                    <Link to='' onClick={() => handleClick(eventuuid)} className="underline text-red-500 hover:text-red-600">Delete Event</Link>
+                    <button onClick={() => {
+                        if (eventId?.id !== undefined) {
+                            handleDelete(eventId?.id);
+                        }
+                    }} className="underline text-red-500 hover:text-red-600">Delete Event</button>
                 </div>
                 {/* <div className="card-actions justify-end">
                     <Link to='/events/view-event/' onClick={() => handleClick(eventuuid)} className="underline text-blue-800 hover:text-blue-900">{buttonTitle}</Link>

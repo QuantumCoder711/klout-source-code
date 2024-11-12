@@ -1,10 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
 import { MdOutlineFileDownload } from "react-icons/md";
 import axios from "axios";
 import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const dummyImage = "https://via.placeholder.com/150";
 
@@ -23,17 +24,53 @@ type FormInputType = {
     employee_size: number;
     company_turn_over: number;
     status: string;
+    event_id: string;
     image: File | null;
     excel_file: File | null;
 };
 
+
+type ApiType = {
+    created_at: string;
+    id: number;
+    name: string;
+    parent_id: number;
+    updated_at: string;
+    uuid: string;
+}
+
 const AddEventAttendee: React.FC = () => {
+    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState('');
+    const { token } = useSelector((state: RootState) => (state.auth));
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
     const [selectedExcelFile, setSelectedExcelFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const { currentEventUUID } = useSelector((state: RootState) => (state.events));
+    const [industries, setIndustries] = useState<ApiType[] | undefined>();
+    const [selectedIndustry, setSelectedIndustry] = useState<string>(''); // Track selected industry
+
+    const [jobTitles, setJobTitles] = useState<ApiType[] | undefined>();
+    const [selectedCompany, setSelectedCompany] = useState<string>(''); // Track selected company
+
+    const [companies, setCompanies] = useState<ApiType[] | undefined>();
+    const [selectedJobTitle, setSelectedJobTitle] = useState<string>(''); // Track selected job title
+
+    const { currentAttendeeUUID } = useSelector((state: RootState) => state.attendee);
+
+    const { currentEventUUID } = useSelector((state: RootState) => state.events);
+
+    console.log(currentAttendeeUUID, currentEventUUID);
+
+    useEffect(() => {
+        axios.get("/api/job-titles").then(res => setJobTitles(res.data.data));
+        axios.get("/api/companies").then(res => setCompanies(res.data.data));
+        axios.get("/api/get-industries").then(res => setIndustries(res.data.data));
+    }, []);
+
+    // console.log(eventId);
+
+    // console.log(currentEventUUID);
 
     // Handle image upload
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,23 +98,30 @@ const AddEventAttendee: React.FC = () => {
             }
         });
 
+        if (currentEventUUID) {
+            formData.append("event_id", currentEventUUID);
+        }
+
         console.log(formData);
 
-        // try {
-        //     axios
-        //         .post(`/api/attendees/upload/${event_id}`, formData, {
-        //             headers: { "Content-Type": "multipart/form-data" },
-        //         })
-        //         .then((res) => {
-        //             if (res.data.status === 200) {
-        //                 swal("Success", res.data.message, "success");
-        //             }
-        //         });
-        // } catch (error) {
-        //     alert('An error occurred while submitting the form.');
-        //     console.error('Error:', error);
-        // }
-            
+        try {
+            axios
+                .post(`/api/attendees/`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "Authorization": `Bearer ${token}`,
+                    },
+                })
+                .then((res) => {
+                    if (res.data.status === 200) {
+                        swal("Success", res.data.message, "success").then(() => navigate("/events/all-attendee"));
+                    }
+                });
+        } catch (error) {
+            alert('An error occurred while submitting the form.');
+            console.error('Error:', error);
+        }
+
     }
 
     const downloadSampleExcel = () => {
@@ -194,27 +238,145 @@ const AddEventAttendee: React.FC = () => {
 
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="job_title" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Job Title &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="job_title" type="text" className="grow" {...register('job_title', { required: 'Job Title is required' })} />
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Job Title &nbsp; <TiArrowRight className="mt-1" />
+                            </span>
+                            <select
+                                id="job_title"
+                                className="grow bg-white"
+                                {...register("job_title", { required: "Job Title is required" })}
+                                value={selectedJobTitle}
+                                onChange={(e) => {
+                                    setSelectedJobTitle(e.target.value); // Update state for selected job title
+                                    setValue("job_title", e.target.value);  // Update form value for job title
+                                }}
+                            >
+                                <option value="">Select Job Title</option>
+                                {jobTitles?.map((jobTitle) => (
+                                    <option key={jobTitle.id} value={jobTitle.name}>
+                                        {jobTitle.name}
+                                    </option>
+                                ))}
+                                {/* Add an option for 'Other' */}
+                                <option value="Other">Other</option>
+                            </select>
                         </label>
                         {errors.job_title && <p className="text-red-600">{errors.job_title.message}</p>}
                     </div>
 
+                    {/* Render the text input only when "Other" is selected */}
+                    {selectedJobTitle === "Others" && (
+                        <div className="flex flex-col gap-3 my-4">
+                            <label htmlFor="job_title_other" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                <span className="font-semibold text-green-700 flex justify-between items-center">
+                                    Specify Job Title &nbsp; <TiArrowRight className="mt-1" />
+                                </span>
+                                <input
+                                    id="job_title_other"
+                                    type="text"
+                                    className="grow"
+                                    {...register('job_title', { required: 'Please specify a job title' })}
+                                />
+                            </label>
+                            {errors.job_title && <p className="text-red-600">{errors.job_title.message}</p>}
+                        </div>
+                    )}
+
+
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="company_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Company Name &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="company_name" type="text" className="grow" {...register('company_name', { required: 'Company Name is required' })} />
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Company Name &nbsp; <TiArrowRight className="mt-1" />
+                            </span>
+                            <select
+                                id="company_name"
+                                className="grow bg-white"
+                                {...register("company_name", { required: "Company Name is required" })}
+                                value={selectedCompany}
+                                onChange={(e) => {
+                                    setSelectedCompany(e.target.value); // Update state for selected company
+                                    setValue("company_name", e.target.value);  // Update form value for company name
+                                }}
+                            >
+                                <option value="">Select Company</option>
+                                {companies?.map((company) => (
+                                    <option key={company.id} value={company.name}>
+                                        {company.name}
+                                    </option>
+                                ))}
+                                {/* Add an option for 'Other' */}
+                                <option value="Other">Other</option>
+                            </select>
                         </label>
                         {errors.company_name && <p className="text-red-600">{errors.company_name.message}</p>}
                     </div>
 
+                    {/* Render the text input only when "Other" is selected */}
+                    {selectedCompany === "Others" && (
+                        <div className="flex flex-col gap-3 my-4">
+                            <label htmlFor="company_name_other" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                <span className="font-semibold text-green-700 flex justify-between items-center">
+                                    Specify Company Name &nbsp; <TiArrowRight className="mt-1" />
+                                </span>
+                                <input
+                                    id="company_name_other"
+                                    type="text"
+                                    className="grow"
+                                    {...register('company_name', { required: 'Please specify a company name' })}
+                                />
+                            </label>
+                            {errors.company_name && <p className="text-red-600">{errors.company_name.message}</p>}
+                        </div>
+                    )}
+
+
+
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="industry" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Industry &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="industry" type="text" className="grow" {...register('industry', { required: 'Industry is required' })} />
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Industry &nbsp; <TiArrowRight className="mt-1" />
+                            </span>
+                            <select
+                                id="industry"
+                                className="grow bg-white"
+                                {...register("industry", { required: "Industry is required" })}
+                                value={selectedIndustry}
+                                onChange={(e) => {
+                                    setSelectedIndustry(e.target.value); // Update state for selected industry
+                                    setValue("industry", e.target.value);  // Update form value for industry
+                                }}
+                            >
+                                <option value="">Select Industry</option>
+                                {industries?.map((industry) => (
+                                    <option key={industry.id} value={industry.name}>
+                                        {industry.name}
+                                    </option>
+                                ))}
+                                {/* Add an option for 'Other' */}
+                                <option value="Other">Other</option>
+                            </select>
                         </label>
                         {errors.industry && <p className="text-red-600">{errors.industry.message}</p>}
                     </div>
+
+                    {/* Render the text input only when "Other" is selected */}
+                    {selectedIndustry === "Others" && (
+                        <div className="flex flex-col gap-3 my-4">
+                            <label htmlFor="industry_other" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                <span className="font-semibold text-green-700 flex justify-between items-center">
+                                    Specify Industry &nbsp; <TiArrowRight className="mt-1" />
+                                </span>
+                                <input
+                                    id="industry_other"
+                                    type="text"
+                                    className="grow"
+                                    {...register('industry', { required: 'Please specify an industry' })}
+                                />
+                            </label>
+                            {errors.industry && <p className="text-red-600">{errors.industry.message}</p>}
+                        </div>
+                    )}
+
 
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="phone_number" className="input input-bordered bg-white text-black flex items-center gap-2">
@@ -298,11 +460,11 @@ const AddEventAttendee: React.FC = () => {
                                 </span>
                                 <input
                                     id="excel_file"
-                                    {...register('excel_file', { required: 'Excel File is required' })}
+                                    // {...register('excel_file', { required: 'Excel File is required' })}
                                     type="file"
                                     accept=".xlsx, .xls, .csv"
                                     className="grow"
-                                    // onChange={() => handleExcelUpload()}
+                                // onChange={() => handleExcelUpload()}
                                 />
                             </label>
                             {errors.excel_file && <p className="text-red-600">{errors.excel_file.message}</p>}

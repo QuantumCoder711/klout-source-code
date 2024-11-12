@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 type formInputType = {
     title: string,
@@ -113,47 +114,78 @@ const AddEvent: React.FC = () => {
 
 
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
-        // Prepare data
-        data.event_venue_address_2 = data.event_venue_address_1; // Duplicate address
-        data.event_date = data.event_start_date; // Map event date
-        data.feedback = 1; // Set default feedback
-        data.status = 1; // Set default status
-
-        if (!image) {
-            toast.error('Please upload an image before submitting the event.');
-            return; // Stop the form submission
-        }
-
-        const formData = new FormData();
-        Object.entries(data).forEach(([key, value]) => {
-            formData.append(key, value as string);
+        // Step 1: Show confirmation dialog to ask if the user wants to submit the event
+        const result = await Swal.fire({
+            title: 'Are you sure you want to submit this event?',
+            icon: 'warning',
+            showDenyButton: true,
+            text: "You won't be able to revert this once submitted!",
+            confirmButtonText: 'Yes, submit it!',
+            denyButtonText: 'No, cancel',
         });
 
-        // Append image if available
-        if (image) {
-            formData.append('image', image);
-        }
+        // If the user confirms, proceed with the submission
+        if (result.isConfirmed) {
+            // Step 2: Prepare data
+            data.event_venue_address_2 = data.event_venue_address_1; // Duplicate address
+            data.event_date = data.event_start_date; // Map event date
+            data.feedback = 1; // Set default feedback
+            data.status = 1; // Set default status
 
-        try {
-            // Dispatch the addNewEvent action
-            await dispatch(addNewEvent({ eventData: formData, token })).unwrap(); // unwrap if using createAsyncThunk
+            // Check if image is provided
+            if (!image) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Please upload an image before submitting the event.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+                return; // Stop the form submission if no image
+            }
 
-            await dispatch(fetchEvents(token));
-            // Show success message
-            toast.success('Event added successfully!', {
-                autoClose: 2000, // Display time in milliseconds (3 seconds)
-                // onClose: () => navigate('/'), // Navigate after toast closes
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                formData.append(key, value as string);
             });
-            navigate('/');
 
-            // Clear the form
-            reset();
-        } catch (error: any) {
-            // Show error message
-            const errorMessage = error.response?.data?.message || error.message || 'Something went wrong!';
-            toast.error(errorMessage);
+            // Append image if available
+            if (image) {
+                formData.append('image', image);
+            }
+
+            try {
+                // Dispatch the addNewEvent action
+                await dispatch(addNewEvent({ eventData: formData, token })).unwrap(); // unwrap if using createAsyncThunk
+
+                // Fetch events after adding the new one
+                await dispatch(fetchEvents(token));
+
+                // Show success message
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Event added successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                }).then(() => {
+                    // Navigate to the home page after success
+                    navigate('/');
+                });
+
+                // Clear the form
+                reset();
+            } catch (error: any) {
+                // Show error message
+                const errorMessage = error.response?.data?.message || error.message || 'Something went wrong!';
+                Swal.fire({
+                    title: 'Error',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
         }
     };
+
 
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
