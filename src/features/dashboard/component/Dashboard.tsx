@@ -119,7 +119,6 @@ const Dashboard: React.FC = () => {
                 imageAlt={pastEvent.title}
                 date={pastEvent.event_start_date}
                 venue={pastEvent.event_venue_name}
-                buttonTitle='View Detail'
                 eventuuid={pastEvent.uuid}
               />
             }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Past Event</h3>
@@ -149,7 +148,6 @@ const Dashboard: React.FC = () => {
                 imageAlt={upcomingEvent.title}
                 date={upcomingEvent.event_start_date}
                 venue={upcomingEvent.event_venue_name}
-                buttonTitle='View Detail'
                 eventuuid={upcomingEvent.uuid}
               />
             }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Upcoming Event</h3>

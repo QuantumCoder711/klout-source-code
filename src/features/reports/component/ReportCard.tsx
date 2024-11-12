@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 // import { eventUUID } from '../../event/eventSlice';
 import { eventUUID } from '../../../features/event/eventSlice';
+import { heading } from '../../heading/headingSlice';
 
 interface ReportCardProps {
     uuid: string;
@@ -37,7 +38,7 @@ const ReportCard: React.FC<ReportCardProps> = (props) => {
                 <div className="mt-2 flex items-center gap-2 rounded-bl-lg rounded-br-lg">
 
                     {/* Whatsapp Button */}
-                    <Link to={`/all-reports/whatsapp-report`} onClick={()=>dispatch(eventUUID(props.uuid))} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-green-500 text-white text-xl grid place-content-center'>
+                    <Link to={`/all-reports/whatsapp-report`} onClick={()=>{dispatch(eventUUID(props.uuid)); dispatch(heading("WhatsApp Report"))}} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-green-500 text-white text-xl grid place-content-center'>
                         <FaWhatsapp />
                     </Link>
 

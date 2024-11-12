@@ -188,7 +188,7 @@ const AllEventAttendee: React.FC = () => {
                 }} className="btn btn-secondary text-white btn-sm" >
                     <FaUserFriends /> Add Attendee
                 </Link>
-                <Link to="/events/send-reminder" className="btn btn-accent text-white btn-sm">
+                <Link to="/events/send-reminder" onClick={()=>dispatch(heading('Send Reminder'))} className="btn btn-accent text-white btn-sm">
                     <BsSendFill /> Send Reminder
                 </Link>
                 <Link to="" className="btn btn-primary text-white btn-sm">
@@ -334,7 +334,7 @@ const AllEventAttendee: React.FC = () => {
                                         <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
                                         <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>{attendee.check_in === 1 ? 'Yes' : 'No'}</td>
                                         <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
-                                            <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)) }} className="text-blue-500 hover:text-blue-700">
+                                            <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
                                                 <FaEdit />
                                             </Link>
                                             <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">

@@ -15,18 +15,18 @@ type eventCardProps = {
     venue: string,
     imageUrl: string,
     imageAlt: string,
-    buttonTitle: string,
     eventuuid: string
 }
 
 
-const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, imageAlt, buttonTitle, eventuuid }) => {
+const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, imageAlt,eventuuid }) => {
 
     const dispatch = useDispatch();
     const { token } = useSelector((state: RootState) => (state.auth));
     const eventId = useSelector((state: RootState) => state.events.currentEvent);
 
     const handleClick = (eventuuid: string) => {
+        console.log("Hello", eventuuid);
         // dispatch(heading('View Event'));
         dispatch(eventUUID(eventuuid));
     }
@@ -82,11 +82,11 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
                 <p className="inline-flex gap-2 items-start"><MdMyLocation className="text-2xl" /> {venue}</p>
                 <p className="font-semibold inline-flex gap-2 items-center"><MdDateRange className="text-2xl" /> {date}</p>
                 <div className="flex gap-3 mt-2 text-xs flex-wrap">
-                    <Link to='/events/view-event/' onClick={() => handleClick(eventuuid)} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
-                    <Link to='/events/edit-event' onClick={() => handleClick(eventuuid)} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
-                    <Link to='/events/all-attendee/' onClick={() => handleClick(eventuuid)} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
+                    <Link to='/events/view-event/' onClick={() => {handleClick(eventuuid); dispatch(heading("View Event"));}} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
+                    <Link to='/events/edit-event' onClick={() => {handleClick(eventuuid); dispatch(heading("Edit Event"));}} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
+                    <Link to='/events/all-attendee/' onClick={() => {handleClick(eventuuid); dispatch(heading("All Attendee"))}} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
                     {/* <Link to='/events/view-sponsers/' onClick={() => handleClick(eventuuid)} className="underline text-green-500 hover:text-green-600">View Sponsers</Link> */}
-                    <Link to='/events/view-agendas/' onClick={() => handleClick(eventuuid)} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
+                    <Link to='/events/view-agendas/' onClick={() => {handleClick(eventuuid); dispatch(heading("View Agendas"));}} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
                     <button onClick={() => {
                         if (eventId?.id !== undefined) {
                             handleDelete(eventId?.id);

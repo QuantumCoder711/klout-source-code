@@ -119,7 +119,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             <div className='min-w-[110px]'>
 
                 <Link to='/events/view-event/' className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
-                    dispatch(eventUUID(props.uuid)); dispatch(heading('Events')); dispatch(heading('Edit Event')); setTimeout(() => {
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('Events')); dispatch(heading('View Event')); setTimeout(() => {
                     }, 500);
                 }}>View Event</Link> <br />
                 <button className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
