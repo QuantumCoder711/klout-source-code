@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { fetchExistingEvent } from '../eventSlice';
 import { RootState, useAppDispatch } from '../../../redux/store';
+import Loader from '../../../component/Loader';
 import { useSelector } from 'react-redux';
 
 const ViewEvent: React.FC = () => {
-    const imageBaseUrl:string = import.meta.env.VITE_API_BASE_URL;
+    const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 
     type eventType = {
         title: string,
@@ -27,10 +28,11 @@ const ViewEvent: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEvent, currentEventUUID } = useSelector((state: RootState) => ({
+    const { currentEvent, currentEventUUID, loading } = useSelector((state: RootState) => ({
         currentEvent: state.events.currentEvent as eventType,
-        currentEventUUID: state.events.currentEventUUID
-    }));; 
+        currentEventUUID: state.events.currentEventUUID,
+        loading: state.events.loading
+    }));
 
     useEffect(() => {
         if (token && currentEventUUID) {
@@ -38,13 +40,18 @@ const ViewEvent: React.FC = () => {
         }
     }, [dispatch, token, currentEventUUID]);
 
+    // If loading, show the Loader component
+    if (loading) {
+        return <Loader />;
+    }
+
     return (
         <div className="p-6 pt-0">
             {/* Heading */}
             <div className="mb-4">
                 <HeadingH2 title={currentEvent.title} />
             </div>
-            
+
 
             {/* Banner and QR Code Section */}
             <div className="flex mb-6">
@@ -78,11 +85,11 @@ const ViewEvent: React.FC = () => {
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-gray-900 text-xl font-semibold">Description</h3>
                 <p className="text-gray-700 mb-2">{currentEvent.description}</p>
-                
+
                 {/* Date and Time */}
                 <h3 className="text-gray-900 text-xl font-semibold">Date</h3>
                 <p className="text-gray-700 mb-2">
-                {currentEvent.event_start_date + ' - ' + currentEvent.event_end_date}
+                    {currentEvent.event_start_date + ' - ' + currentEvent.event_end_date}
                 </p>
 
                 <h3 className="text-gray-900 text-xl font-semibold">Time</h3>
@@ -100,7 +107,7 @@ const ViewEvent: React.FC = () => {
                 {/* Google Map Link */}
                 <h3 className="text-gray-900 text-xl font-semibold">Google Map</h3>
                 <p className="text-gray-700">
-                    
+
                     <a
                         href={currentEvent.google_map_link}
                         target="_blank"

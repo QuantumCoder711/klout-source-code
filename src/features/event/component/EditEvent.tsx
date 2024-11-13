@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import Loader from '../../../component/Loader';
 
 type formInputType = {
     title: string,
@@ -63,9 +64,10 @@ type eventType = {
 
 const EditEvent: React.FC = () => {
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
-    const { currentEvent, currentEventUUID } = useSelector((state: RootState) => ({
+    const { currentEvent, currentEventUUID, loading } = useSelector((state: RootState) => ({
         currentEvent: state.events.currentEvent as eventType,
-        currentEventUUID: state.events.currentEventUUID
+        currentEventUUID: state.events.currentEventUUID,
+        loading: state.events.loading
     }));;
     const { token } = useSelector((state: RootState) => state.auth);
     const dispatch = useAppDispatch();
@@ -127,7 +129,9 @@ const EditEvent: React.FC = () => {
         setCities(City.getCitiesOfState(selectedCountryCode, selectedState));
     };
 
-
+    if(loading) {
+        return <Loader />
+    }
 
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
         // Step 1: Show confirmation dialog to ask if the user wants to update
@@ -206,6 +210,8 @@ const EditEvent: React.FC = () => {
             }
         }
     };
+    
+
 
 
 
