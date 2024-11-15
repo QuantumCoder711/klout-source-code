@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux'; // Use the custom hook
 import { login } from '../authSlice';
@@ -8,6 +8,8 @@ import signinBanner from '../../../assets/images/signinbanner.webp';
 import typingEffect from '../../../utils/typingEffect';
 import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
+import Loader from '../../../component/Loader';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
 
 type LoginFormInputs = {
     email: string;
@@ -26,12 +28,18 @@ const Login: React.FC = () => {
 
     const displayedText = typingEffect(textToType, typingSpeed, deletingSpeed, pauseDuration);
 
+    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+
     const onSubmit = async (data: LoginFormInputs) => {
         dispatch(login(data));
     };
 
     if (token) {
         return <Navigate to="/" />;
+    }
+
+    if (loading) {
+        return <Loader />
     }
 
     return (
@@ -66,15 +74,24 @@ const Login: React.FC = () => {
                             {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                         </div>
 
-                        {/* Password Field */}
-                        <div>
+                        {/* Password Field with Eye Icon */}
+                        <div className="">
                             <label className="block text-sm font-medium text-gray-700">Password</label>
-                            <input
-                                type="password"
-                                {...register('password', { required: 'Password is required' })}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                            />
-                            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                            <div className='relative'>
+                                <input
+                                    type={showPassword ? 'text' : 'password'} // Toggle the password visibility
+                                    {...register('password', { required: 'Password is required' })}
+                                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                                />
+                                {/* Eye Icon */}
+                                <span
+                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                                    onClick={() => setShowPassword(!showPassword)} // Toggle visibility
+                                >
+                                    {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
+                                </span>
+                                {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                            </div>
                         </div>
 
                         {/* Error Message */}
@@ -91,7 +108,7 @@ const Login: React.FC = () => {
                             </button>
                         </div>
 
-                        <hr className='!my-10 border border-zinc-200'/>
+                        <hr className='!my-10 border border-zinc-200' />
 
                         <Link to={"/forgot-password"} className='text-klt_primary-900'>Forgot Password ?</Link>
                     </form>

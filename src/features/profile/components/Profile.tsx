@@ -5,9 +5,12 @@ import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from "react-redux";
-import { RootState } from '../../../redux/store';
+import { AppDispatch, RootState } from '../../../redux/store';
 import axios from "axios";
 import swal from "sweetalert";
+import Loader from "../../../component/Loader";
+import { useDispatch } from "react-redux";
+import { heading } from "../../heading/headingSlice";
 
 type formInputType = {
     first_name: string,
@@ -45,13 +48,17 @@ type companyType = {
 
 const Profile: React.FC = () => {
 
-    const { user, token } = useSelector((state: RootState) => state.auth);
+    const { user, token, loading } = useSelector((state: RootState) => state.auth);
+
+    const dispatch = useDispatch<AppDispatch>()
+
+    const [edit, setEdit] = useState<boolean>(false);
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
-    const companyLogo: string = user?.company_logo ? `${imageBaseUrl}/${user?.company_logo}` : "";
+    const company_logo: string = user?.company_logo ? `${imageBaseUrl}/${user?.company_logo}` : "";
     const userImage: string = user?.image ? `${imageBaseUrl}/${user?.image}` : "";
     const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
-    const [selectedImage, setSelectedImage] = useState(companyLogo);
+    const [selectedImage, setSelectedImage] = useState(company_logo);
     const [selectedUserImage, setSelectedUserImage] = useState(userImage);
     const [image, setImage] = useState(null);
     const [jobTitle, setJobTitles] = useState([]);
@@ -67,7 +74,7 @@ const Profile: React.FC = () => {
     useEffect(() => {
         axios.get("/api/job-titles").then(res => setJobTitles(res.data.data || []));
         axios.get("/api/companies").then(res => setCompanies(res.data.data || []));
-        setSelectedCompany(user?.company_name);
+        setSelectedCompany(user?.company);
         setSelectedDesignation(user?.designation_name);
     }, []);
 
@@ -83,16 +90,6 @@ const Profile: React.FC = () => {
         if (e.target.value !== "Others") {
             setCustomDesignationName(''); // Reset custom name if a valid designation is selected
         }
-    };
-
-    const handleCustomCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCustomCompanyName(e.target.value);
-        console.log(customCompanyName);
-    };
-
-    const handleCustomDesignationNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCustomDesignationName(e.target.value);
-        console.log(customDesignationName);
     };
 
     // Handle image upload
@@ -121,44 +118,99 @@ const Profile: React.FC = () => {
             formData.append(key, value as string);
         });
 
-        if (companyLogo !== "") {
-            formData.append("companyLogo", companyLogo);
+        if (selectedImage !== "") {
+            formData.append("company_logo", selectedImage);
         }
 
-        if (userImage !== "") {
-            formData.append("userImage", userImage);
+        if (selectedUserImage !== "") {
+            formData.append("image", selectedUserImage);
         }
 
         console.log(formData);
 
         axios
             .post(`/api/updateprofile`, formData, {
-                headers: { 
+                headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${token}`
-                 },
+                },
             })
             .then((res) => {
                 if (res.data.status === 200) {
-                    swal("Success", res.data.message, "success");
+                    swal("Success", res.data.message, "success").then(() => {
+                        setEdit(false);
+                    });
                     // console.log(formData);
                 };
             });
 
     }
 
+    if (loading) {
+        return <Loader />
+    }
+
 
     return (
         <div>
 
-            <div className="flex justify-between items-center">
-                <HeadingH2 title="Profile" />
-                <Link to="/" className="btn btn-error text-white btn-sm">
+            <div className="flex justify-end">
+                {/* <HeadingH2 title="Profile" /> */}
+                <Link to="/" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go To Dasboard
                 </Link>
             </div>
 
-            <div>
+            {/* Container for the profile page */}
+            {!edit && <div className="max-w-5xl mx-auto p-8">
+
+                {/* Profile Card */}
+                <div className="bg-white p-6 rounded-lg shadow-lg relative">
+                    <div className="absolute top-2 right-2">
+                        <img src={`${imageBaseUrl}/${user?.company_logo}`} alt="Company Logo" className="w-16 h-16 rounded-md mx-auto object-contain border border-gray-300" />
+                    </div>
+                    <div className="flex items-center space-x-8">
+                        {/* Profile Picture */}
+                        <div className="flex-shrink-0">
+                            <img src={`${imageBaseUrl}/${user?.image}` || dummyImage} alt="Profile Picture" className="w-60 rounded-lg object-cover" />
+                        </div>
+
+                        {/* Personal Info */}
+                        <div className="space-y-2">
+                            <h2 className="text-2xl font-semibold text-gray-800">{user?.first_name + " " + user?.last_name}</h2>
+                            <h3 className="text-xl font-semibold text-gray-800">{user?.company_name}</h3>
+                            <p className="text-lg text-gray-600">{user?.designation_name}</p>
+                            <p className="text-gray-500 text-sm">{user?.email}</p>
+                            <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
+                            {/* <p className="text-gray-600 text-sm">{user?.designation_name}</p> */}
+                            <p className="text-gray-500 text-sm">{user?.address + ", " + user?.pincode}</p>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 border-t border-gray-200 pt-6">
+                        {/* Company Info */}
+                        <div className="flex items-center space-x-8">
+                            {/* Company Logo  */}
+                            <div className="flex-shrink-0 w-40">
+
+                            </div>
+
+                            <div className="space-y-4">
+
+                                {/* <p className="text-gray-500">{user?.pincode}</p> */}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            }
+
+            {!edit && <div className="text-center">
+                <button onClick={() => setEdit(true)} className="btn btn-primary mx-auto">Edit Profile</button>
+            </div>}
+
+            {edit && <div className="">
                 <form onSubmit={handleSubmit(onSubmit)} className="gap-4 mt-10">
                     <div className="flex w-full gap-3">
 
@@ -251,24 +303,23 @@ const Profile: React.FC = () => {
                             </label>
                             {errors.company && <p className="text-red-600">{errors.company.message}</p>}
                             {/* {errors.company && <p className="text-red-600">{errors.company.message}</p>} */}
+                            {/* Custom Company Name */}
+                            {selectedCompany === "Others" && (
+                                <div className='flex flex-col w-full gap-3 my-4'>
+                                    <label htmlFor="customCompany" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                        <span className="font-semibold text-green-700 flex items-center">Company Name &nbsp; <TiArrowRight className='mt-1' /></span>
+                                        <input
+                                            id="customCompany"
+                                            type="text"
+                                            // value={customCompanyName}
+                                            // onChange={handleCustomCompanyNameChange}
+                                            className="grow" {...register('company', { required: 'Company name is required' })}
+                                        />
+                                    </label>
+                                    {errors.company && <p className="text-red-600">{errors.company.message}</p>}
+                                </div>
+                            )}
                         </div>
-
-                        {/* Custom Company Name */}
-                        {selectedCompany === "Others" && (
-                            <div className='flex flex-col w-full gap-3 my-4'>
-                                <label htmlFor="customCompany" className="input input-bordered bg-white text-black flex items-center gap-2">
-                                    <span className="font-semibold text-green-700 flex items-center">Company Name &nbsp; <TiArrowRight className='mt-1' /></span>
-                                    <input
-                                        id="customCompany"
-                                        type="text"
-                                        // value={customCompanyName}
-                                        // onChange={handleCustomCompanyNameChange}
-                                        className="grow" {...register('company', { required: 'Company name is required' })}
-                                    />
-                                </label>
-                                {errors.company && <p className="text-red-600">{errors.company.message}</p>}
-                            </div>
-                        )}
 
                         {/* Designation */}
                         <div className='flex flex-col w-full gap-3 my-4'>
@@ -293,36 +344,36 @@ const Profile: React.FC = () => {
                             </label>
 
                             {errors.designation && <p className="text-red-600">{errors.designation.message}</p>}
-                        </div>
 
-                        {/* Custom Designation Name */}
-                        {selectedDesignation === "Others" && (
-                            <div className='flex flex-col w-full gap-3 my-4'>
-                                <label htmlFor="customDesignation" className="input input-bordered bg-white text-black flex items-center gap-2">
-                                    <span className="font-semibold text-green-700 flex items-center">Designation Name &nbsp; <TiArrowRight className='mt-1' /></span>
-                                    <input
-                                        id="customDesignation"
-                                        type="text"
-                                        // value={customDesignationName}
-                                        // onChange={handleCustomDesignationNameChange}
-                                        className="grow" {...register('designation', { required: 'Designation is required' })}
-                                    />
-                                </label>
-                                {errors.designation && <p className="text-red-600">{errors.designation.message}</p>}
-                            </div>
-                        )}
+                            {/* Custom Designation Name */}
+                            {selectedDesignation === "Others" && (
+                                <div className='flex flex-col w-full gap-3 my-4'>
+                                    <label htmlFor="customDesignation" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                        <span className="font-semibold text-green-700 flex items-center">Designation Name &nbsp; <TiArrowRight className='mt-1' /></span>
+                                        <input
+                                            id="customDesignation"
+                                            type="text"
+                                            // value={customDesignationName}
+                                            // onChange={handleCustomDesignationNameChange}
+                                            className="grow" {...register('designation', { required: 'Designation is required' })}
+                                        />
+                                    </label>
+                                    {errors.designation && <p className="text-red-600">{errors.designation.message}</p>}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
 
                     <div className="flex w-full gap-3 my-4">
                         <div className='flex flex-col w-full gap-3'>
                             {/* Company Logo Upload */}
-                            <label htmlFor="companyLogo" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <label htmlFor="company_logo" className="input input-bordered bg-white text-black flex items-center gap-2">
                                 <span className="font-semibold text-green-700 flex justify-between items-center">
                                     Company Logo &nbsp; <TiArrowRight className='mt-1' />
                                 </span>
                                 <input
-                                    id="companyLogo"
+                                    id="company_logo"
                                     type="file"
                                     accept="image/*"
                                     className="grow"
@@ -400,11 +451,12 @@ const Profile: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="col-span-3 flex justify-center mt-4">
+                    <div className="col-span-3 flex justify-center mt-4 gap-3">
                         <button type="submit" onClick={() => onSubmit} className="btn btn-primary">Update Profile</button>
+                        <button type="submit" onClick={() => setEdit(false)} className="btn bg-gray-500 text-white">Cancel</button>
                     </div>
                 </form>
-            </div>
+            </div>}
         </div>
     );
 };

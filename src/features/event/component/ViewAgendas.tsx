@@ -12,6 +12,7 @@ import { AppDispatch, RootState } from '../../../redux/store';
 import axios from 'axios';
 import { heading } from '../../heading/headingSlice';
 import Swal from 'sweetalert2';
+import Loader from '../../../component/Loader';
 
 // Define the AgendaType interface
 type AgendaType = {
@@ -41,7 +42,7 @@ const ViewAgendas: React.FC = () => {
   const [filterTitle, setFilterTitle] = useState(""); // State for the filter input
 
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
-  const { events } = useSelector((state: RootState) => state.events);
+  const { events, loading } = useSelector((state: RootState) => state.events);
 
   const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
 
@@ -191,13 +192,17 @@ const ViewAgendas: React.FC = () => {
     return paginationNumbers;
   };
 
+  if (loading) {
+    return <Loader />
+  }
+
   return (
     <div>
       {/* Heading and Buttons Wrapper Div */}
       <div className='flex justify-between items-center'>
         <HeadingH2 title={events[0].title} />
         <div className='flex items-center gap-3'>
-          <Link to="/events/" className="btn btn-error text-white btn-sm">
+          <Link to="/events/" onClick={()=>dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
             <IoMdArrowRoundBack size={20} /> Go Back
           </Link>
         </div>
@@ -235,6 +240,13 @@ const ViewAgendas: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
+                {
+                  currentRows.length === 0 && <tr>
+                    <td colSpan={5} className="py-4 text-center text-gray-600">
+                      No Agenda found.
+                    </td>
+                  </tr>
+                }
                 {currentRows.map((data: AgendaType, index: number) => (
                   <tr key={data.uuid}>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{indexOfFirstRow + index + 1}</td>
@@ -242,7 +254,7 @@ const ViewAgendas: React.FC = () => {
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.event_date}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' + data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
-                      <Link to={`/events/edit-agenda`} onClick={()=>dispatch(agendaUUID(data.uuid))} className="text-blue-500 hover:text-blue-700">
+                      <Link to={`/events/edit-agenda`} onClick={() => {dispatch(agendaUUID(data.uuid)); dispatch(heading("Edit Agenda"))}} className="text-blue-500 hover:text-blue-700">
                         <FaEdit size={20} />
                       </Link>
                       <button onClick={() => deleteAgenda(data.uuid)} className="text-red-500 hover:text-red-700">
@@ -256,29 +268,30 @@ const ViewAgendas: React.FC = () => {
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex justify-end items-center mt-4">
-            <div className="flex items-center space-x-1">
-              {/* Previous Button */}
-              <button
-                className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
-                disabled={currentPage === 1}
-                onClick={() => handlePageChange(currentPage - 1)}
-              >
-                <TiChevronLeft />
-              </button>
+          {currentRows.length !== 0 &&
+            <div className="flex justify-end items-center mt-4">
+              <div className="flex items-center space-x-1">
+                {/* Previous Button */}
+                <button
+                  className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  <TiChevronLeft />
+                </button>
 
-              {renderPaginationNumbers()}
+                {renderPaginationNumbers()}
 
-              {/* Next Button */}
-              <button
-                className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
-                disabled={currentPage === totalPages}
-                onClick={() => handlePageChange(currentPage + 1)}
-              >
-                <TiChevronRight />
-              </button>
-            </div>
-          </div>
+                {/* Next Button */}
+                <button
+                  className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  <TiChevronRight />
+                </button>
+              </div>
+            </div>}
         </div>
       </div>
     </div>

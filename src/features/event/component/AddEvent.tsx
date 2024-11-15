@@ -9,6 +9,7 @@ import { RootState, useAppDispatch } from '../../../redux/store';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Loader from '../../../component/Loader';
 
 type formInputType = {
     title: string,
@@ -65,6 +66,10 @@ const AddEvent: React.FC = () => {
         const countryList = Country.getAllCountries();
         setCountries(countryList);
     }, []);
+
+    if(!countries) {
+        return <Loader />
+    }
 
     const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedCountry = e.target.value;

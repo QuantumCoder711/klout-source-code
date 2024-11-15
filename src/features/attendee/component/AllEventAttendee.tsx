@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
-import { allEventAttendee } from '../../event/eventSlice';
+import { allEventAttendee, eventUUID } from '../../event/eventSlice';
 import { FaEdit, FaUserFriends, FaUserClock, FaFileExcel } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { attendeeUUID } from '../attendeeSlice';
@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';  // Import the xlsx library
 import { heading } from '../../heading/headingSlice';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import Loader from '../../../component/Loader';
 
 type attendeeType = {
     uuid: string;
@@ -34,20 +35,13 @@ type attendeeType = {
 const AllEventAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID, eventAttendee } = useSelector((state: RootState) => ({
+    const { currentEventUUID, eventAttendee, loading } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
         eventAttendee: state.events.eventAttendee as attendeeType[],
+        loading: state.events.attendeeLoader
     }));
 
-
-
     console.log(eventAttendee);
-
-    // const { currentAttendeeUUID } = useSelector((state: RootState) => state.attendee);
-
-    // console.log(currentAttendeeUUID);
-
-
 
     useEffect(() => {
         if (currentEventUUID && token) {
@@ -177,6 +171,10 @@ const AllEventAttendee: React.FC = () => {
         });
     }
 
+    if (loading) {
+        return <Loader />
+    }
+
     return (
         <>
             <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
@@ -188,13 +186,13 @@ const AllEventAttendee: React.FC = () => {
                 }} className="btn btn-secondary text-white btn-sm" >
                     <FaUserFriends /> Add Attendee
                 </Link>
-                <Link to="/events/send-reminder" onClick={()=>dispatch(heading('Send Reminder'))} className="btn btn-accent text-white btn-sm">
+                <Link to="/events/send-reminder" onClick={() => { dispatch(heading('Send Reminder')); }} className="btn btn-accent text-white btn-sm">
                     <BsSendFill /> Send Reminder
                 </Link>
-                <Link to="" className="btn btn-primary text-white btn-sm">
+                <Link to="/events/send-invitation" onClick={() => { dispatch(heading('Send Invitation')); }} className="btn btn-primary text-white btn-sm">
                     <FaMessage /> Send Invitation
                 </Link>
-                <Link to="" className="btn btn-warning text-white btn-sm">
+                <Link to="/events/same-day-reminder" onClick={() => { dispatch(heading('Send Same Day Reminder')); }} className="btn btn-warning text-white btn-sm">
                     <BiSolidMessageSquareDots /> Send Same Day Reminder
                 </Link>
                 <Link to="/events/pending-user-request" onClick={() => { dispatch(heading("Pending Requests")) }} className="btn btn-error text-white btn-sm">
@@ -306,53 +304,63 @@ const AllEventAttendee: React.FC = () => {
                 </div>
 
                 {/* Table */}
+                {/* Table or Loader */}
                 <div className="overflow-x-auto max-w-full">
-                    <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
-                        <thead>
-                            <tr className="bg-klt_primary-500 text-white">
-                                <th className="py-3 px-4 text-start text-nowrap">#</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Name</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Designation</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Company</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Email</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Role</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Check In</th>
-                                <th className="py-3 px-4 text-start text-nowrap">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentAttendees.length > 0 ? (
-                                currentAttendees.map((attendee, index) => (
-                                    <tr key={attendee.uuid}>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>{attendee.check_in === 1 ? 'Yes' : 'No'}</td>
-                                        <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
-                                            <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
-                                                <FaEdit />
-                                            </Link>
-                                            <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">
-                                                <MdDelete />
-                                            </button>
+                    {loading ? (
+                        <div className="flex justify-center items-center py-6">
+                            <Loader /> {/* Display the loader component */}
+                        </div>
+                    ) : (
+                        <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
+                            <thead>
+                                <tr className="bg-klt_primary-500 text-white">
+                                    <th className="py-3 px-4 text-start text-nowrap">#</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Name</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Designation</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Company</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Email</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Role</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Check In</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {currentAttendees.length > 0 ? (
+                                    currentAttendees.map((attendee, index) => (
+                                        <tr key={attendee.uuid}>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
+                                                {attendee.check_in === 1 ? 'Yes' : 'No'}
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
+                                                <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
+                                                    <FaEdit />
+                                                </Link>
+                                                <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">
+                                                    <MdDelete />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={9} className="py-4 text-center text-gray-600">
+                                            No attendees found.
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={9} className="py-4 text-center text-gray-600">
-                                        No attendees found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                )}
+                            </tbody>
+                        </table>
+                    )}
                 </div>
+
 
                 {/* Pagination */}
                 <div className="flex justify-end items-center mt-4">

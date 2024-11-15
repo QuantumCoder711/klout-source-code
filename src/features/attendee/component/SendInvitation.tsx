@@ -3,15 +3,13 @@ import HeadingH2 from '../../../component/HeadingH2';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from 'react-router-dom';
 import { RiWhatsappFill } from "react-icons/ri";
-import { IoMail } from "react-icons/io5";
-import { Editor } from '@tinymce/tinymce-react';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
-import { eventUUID } from '../../event/eventSlice';
 import { useDispatch } from 'react-redux';
+import { eventUUID } from '../../event/eventSlice';
 import { heading } from '../../heading/headingSlice';
 
-const SendReminder: React.FC = () => {
+const SendInvitation: React.FC = () => {
     // State to keep track of selected roles and selected sending method
     const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'mail' | null>("mail");
@@ -54,7 +52,6 @@ const SendReminder: React.FC = () => {
     const handleSendTimeChange = (time: 'now' | 'later') => {
         setSendTime(time);
     };
-
 
     if (!currentEvent) {
         return;
@@ -153,92 +150,27 @@ const SendReminder: React.FC = () => {
                         {/* Select WhatsApp or Mail */}
                         <div className='mt-10'>
                             <h5 className='font-semibold mb-3'>Send By</h5>
-                            <div className="flex gap-10 pl-5">
-                                {/* Radio button for Mail */}
-                                <label className="flex items-center cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="sendMethod"
-                                        checked={selectedMethod === 'mail'}
-                                        onChange={() => handleMethodChange('mail')}
-                                        className="bg-transparent border-zinc-400"
-                                    />
-                                    <IoMail size={24} className='text-blue-500 ml-2' />
-                                </label>
-
-                                {/* Radio button for WhatsApp */}
-                                <label className="flex items-center cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="sendMethod"
-                                        checked={selectedMethod === 'whatsapp'}
-                                        onChange={() => handleMethodChange('whatsapp')}
-                                        className="bg-transparent border-zinc-400"
-                                    />
-                                    <RiWhatsappFill size={24} className='text-green-500 ml-2' />
-                                </label>
-                            </div>
+                            <label className="flex items-center cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="sendMethod"
+                                    checked
+                                    onChange={() => handleMethodChange('whatsapp')}
+                                    className="bg-transparent border-zinc-400"
+                                />
+                                <RiWhatsappFill size={24} className='text-green-500 ml-2' />
+                            </label>
                         </div>
 
                         {/* WhatsApp Message */}
-                        {selectedMethod === "whatsapp" && <div className="mt-10">
+                        <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
                             <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
                                 <p>
                                     Hi "<strong>firstname</strong>", just a reminder for our event "<strong>Event-Title</strong>". We're excited to welcome you to this exclusive event. "<strong>Event-Date-Time</strong>". <br /> <br /> To ensure a smooth check-in experience, please download the  Klout Club app in advance. You can download it here <a href="https://onelink.to/r3fzb9" className='font-bold'>https://onelink.to/r3fzb9</a>
                                 </p>
                             </div>
-                        </div>}
-
-
-                        {/* Subject Input */}
-                        {selectedMethod === "mail" && <div className="mt-10">
-                            <label htmlFor="Subject" className='block font-semibold'>Subject</label>
-                            <input type="text" name="Subject" id="subject" className='input w-full mt-2' />
-                        </div>}
-
-                        {/* Rich Textarea */}
-                        {selectedMethod === "mail" && <div className="mt-10">
-                            <label htmlFor="Message" className='block font-semibold'>Message</label>
-
-                            {/* TinyMCE Editor */}
-                            <div className="form-group">
-                                <Editor
-                                    apiKey="nv4qeg7zimei3mdz8lj1yzl5bakrmw4li6baiikh87f8vksz" // Get your API key from TinyMCE
-                                    // value={formInput.message}
-                                    // className={`form-control ${errors.message ? "is-invalid" : ""
-                                    //     }`}
-                                    initialValue="<p>Please type here...</p>"
-                                    init={{
-                                        height: 500,
-                                        menubar: false,
-                                        plugins: [
-                                            "advlist autolink lists link image charmap print preview anchor",
-                                            "searchreplace visualblocks code fullscreen",
-                                            "insertdatetime media table paste code help wordcount",
-                                        ],
-                                        toolbar:
-                                            "undo redo | formatselect | bold italic backcolor | \
-            alignleft aligncenter alignright alignjustify | \
-            bullist numlist outdent indent | removeformat | help",
-                                    }}
-                                // onEditorChange={handleEditorChange}
-                                // onBlur={handleBlur}
-                                // onFocus={handleInputFocus}
-                                />
-                                {/* 
-                                {errors.message && (
-                                    <div
-                                        className="invalid-feedback"
-                                        style={{
-                                            textAlign: "left",
-                                        }}
-                                    >
-                                        {errors.message}
-                                    </div>
-                                )} */}
-                            </div>
-                        </div>}
+                        </div>
 
                         {/* Send Time: Now or Later */}
                         <div className='mt-10'>
@@ -322,4 +254,4 @@ const SendReminder: React.FC = () => {
     );
 }
 
-export default SendReminder;
+export default SendInvitation;

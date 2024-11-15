@@ -38,19 +38,19 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
   const [phoneFilter, setPhoneFilter] = useState('');
   // const [statusFilter, setStatusFilter] = useState('');
 
-    useEffect(()=>{
-      setCurrentPage(1);
-    }, [cardStatus]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [cardStatus]);
 
   // Filtered data based on the filters
   const filteredData = data.filter((data: ReciptState) => {
     const nameMatch = nameFilter ? data.firstName.toLowerCase().includes(nameFilter.toLowerCase()) : true;
     const phoneMatch = phoneFilter ? data.messageID.customerPhoneNumber.includes(phoneFilter) : true;
 
-      const cardStatusMatch = cardStatus
+    const cardStatusMatch = cardStatus
       ? cardStatus === "Sent"
         ? ["Sent", "Delivered", "Read"].includes(data.messageID.messageStatus)
-        : data.messageID.messageStatus === cardStatus 
+        : data.messageID.messageStatus === cardStatus
       : true;
 
     return nameMatch && phoneMatch && cardStatusMatch;
@@ -153,7 +153,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
             id="itemsPerPage"
             className="border border-gray-500 rounded-md p-2 bg-white outline-none"
             value={itemsPerPage}
-            onChange={(e) => {setCurrentPage(1); setItemsPerPage(Number(e.target.value))}} // Reset to page 1 when items per page change
+            onChange={(e) => { setCurrentPage(1); setItemsPerPage(Number(e.target.value)) }} // Reset to page 1 when items per page change
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -210,6 +210,14 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
             </tr>
           </thead>
           <tbody>
+            {
+              (currentData.length === 0) &&
+              <tr>
+                <td colSpan={5} className="py-3 px-4 text-center text-gray-500">
+                  Nothing found
+                </td>
+              </tr>
+            }
             {currentData.map((data: ReciptState, index: number) => (
               <tr key={index}>
                 <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>

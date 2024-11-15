@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
+import Loader from '../../../component/Loader';
 
 const AllSponsor: React.FC = () => {
 
@@ -17,7 +18,7 @@ const AllSponsor: React.FC = () => {
     last_name: string;
   }
 
-  const { allSponsors } = useSelector((state: RootState) => state.sponsor);
+  const { allSponsors, loading } = useSelector((state: RootState) => state.sponsor);
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -65,6 +66,10 @@ const AllSponsor: React.FC = () => {
       </div>
     );
   };
+
+  if(loading) {
+    return <Loader />
+  }
 
   return (
     <>

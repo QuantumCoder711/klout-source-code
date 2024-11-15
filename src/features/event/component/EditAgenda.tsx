@@ -5,8 +5,11 @@ import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { RootState } from '../../../redux/store';
+import { AppDispatch, RootState } from '../../../redux/store';
 import Swal from 'sweetalert2';
+import Loader from '../../../component/Loader';
+import { useDispatch } from 'react-redux';
+import { heading } from '../../heading/headingSlice';
 
 type formInputType = {
     title: string,
@@ -25,9 +28,10 @@ type formInputType = {
 
 const EditAgenda: React.FC = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-    const [agenda, setAgendaData] = useState<formInputType>();
+    const [agenda, setAgendaData] = useState<formInputType | null>();
     const [image, setImage] = useState<File | null>(null);  // This is where the selected image file will be stored.
     const dummyImage = "https://via.placeholder.com/150";
 
@@ -35,7 +39,7 @@ const EditAgenda: React.FC = () => {
 
     const { currentEventUUID } = useSelector((state: RootState) => state.events);
     const { currentAgendaUUID } = useSelector((state: RootState) => state.events);
-    const { events } = useSelector((state: RootState) => state.events);
+    const { events, loading } = useSelector((state: RootState) => state.events);
 
     const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
 
@@ -69,6 +73,8 @@ const EditAgenda: React.FC = () => {
         }
     }, [currentAgendaUUID, setValue]);
 
+    console.log(agenda);
+
     // Handle image upload
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
@@ -78,6 +84,10 @@ const EditAgenda: React.FC = () => {
             setSelectedImage(imageUrl);  // Display the image preview
         }
     };
+
+    if(loading) {
+        return <Loader />
+    }
 
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
         // Step 1: Show confirmation dialog to ask if the user wants to update
@@ -162,7 +172,7 @@ const EditAgenda: React.FC = () => {
             <div className='flex justify-between items-center'>
                 <h2 className='text-black text-2xl font-semibold'>Edit Agenda</h2>
                 <div className='flex items-center gap-3'>
-                    <Link to="/events/view-agendas" className="btn btn-error text-white btn-sm">
+                    <Link to="/events/view-agendas" onClick={()=>dispatch(heading("View Agendas"))} className="btn btn-error text-white btn-sm">
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>
@@ -178,7 +188,7 @@ const EditAgenda: React.FC = () => {
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
                 </div>
 
-                <div className='flex gap-3'>
+                <div className='flex items-center gap-3'>
                     {/* Image Upload */}
                     <label htmlFor="image" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
                         <span className="font-semibold text-green-700 flex justify-between items-center">
@@ -198,7 +208,7 @@ const EditAgenda: React.FC = () => {
                         <img
                             src={selectedImage || dummyImage}
                             alt="Selected Banner"
-                            className="w-full h-60 object-cover"
+                            className="w-full h-60 object-contain"
                         />
                     </div>
                 </div>

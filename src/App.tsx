@@ -28,6 +28,8 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import Loader from "./component/Loader";
 import PendingUserRequest from "./features/attendee/component/PendingUserRequest";
 import EditAttendeePage from "./pages/EditAttendeePage";
+import SendInvitation from "./features/attendee/component/SendInvitation";
+import SameDayReminder from "./features/attendee/component/SameDayReminder";
 
 axios.defaults.withCredentials = false;
 const App: React.FC = () => {
@@ -58,6 +60,8 @@ const App: React.FC = () => {
           <Route path="/events/pending-user-request" element={<PendingUserRequest />} />
           <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
           <Route path="/events/send-reminder" element={<SendReminder />} />
+          <Route path="/events/send-invitation" element={<SendInvitation />} />
+          <Route path="/events/same-day-reminder" element={<SameDayReminder />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />
           <Route path="/all-sponsors" element={<AllSponsorPage />} />
           <Route path="/all-reports" element={<AllReports />} />

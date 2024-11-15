@@ -5,6 +5,7 @@ import { RootState } from '../../../redux/store';
 import { useSelector } from 'react-redux';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TiArrowRight } from 'react-icons/ti';
+import Loader from '../../../component/Loader';
 
 // Define the form data type
 type FormInputType = {
@@ -54,7 +55,7 @@ const EditAttendee = () => {
   const [companies, setCompanies] = useState<ApiType[] | undefined>();
   const [selectedJobTitle, setSelectedJobTitle] = useState<string>(''); // Track selected job title
 
-  const { currentAttendeeUUID } = useSelector((state: RootState) => state.attendee);
+  const { currentAttendeeUUID, loading } = useSelector((state: RootState) => state.attendee);
 
   console.log(currentAttendeeUUID);
 
@@ -133,6 +134,10 @@ const EditAttendee = () => {
 
   }
 
+  if(loading) {
+    return <Loader />
+  }
+
   return (
     <div className="p-6 pt-3">
       <div className="flex justify-between items-center mb-5">
@@ -161,7 +166,7 @@ const EditAttendee = () => {
           </div>
         </div>
 
-        <div className="flex gap-3 w-full">
+        <div className="flex items-center gap-3 w-full">
 
           <label htmlFor="image" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
             <span className="font-semibold text-green-700 flex justify-between items-center">Profile Picture &nbsp; <TiArrowRight className='mt-1' /> </span>
@@ -175,7 +180,7 @@ const EditAttendee = () => {
             />
           </label>
 
-          <img src={selectedImage || dummyImage} alt="" className='w-full h-60' />
+          <img src={selectedImage || dummyImage} alt="" className='w-full h-60 object-contain' />
         </div>
 
         <div className='flex w-full gap-3'>

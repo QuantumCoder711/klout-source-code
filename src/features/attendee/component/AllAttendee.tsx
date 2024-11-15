@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store';
+import { AppDispatch, RootState } from '../../../redux/store';
+import Loader from '../../../component/Loader';
+import { useDispatch } from 'react-redux';
 
+type attendeeType = {
+  uuid: string;
+  title: string;
+  first_name: string;
+  job_title: string;
+  company_name: string;
+  email_id: string;
+  phone_number: string;
+  status: string;
+  last_name: string;
+}
 const AllAttendee: React.FC = () => {
 
-  type attendeeType =  {
-    uuid: string;
-    title: string;
-    first_name: string;
-    job_title: string;
-    company_name: string;
-    email_id: string;
-    phone_number: string;
-    status: string;
-    last_name: string;
-  }
+  const dispatch = useDispatch<AppDispatch>()
 
-  const { allAttendees } = useSelector((state: RootState) => state.attendee);
+  const { allAttendees, loading } = useSelector((state: RootState) => state.attendee);
   console.log(allAttendees);
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -66,6 +69,10 @@ const AllAttendee: React.FC = () => {
       </div>
     );
   };
+
+  if (loading) {
+    return <Loader />
+  }
 
   return (
     <>

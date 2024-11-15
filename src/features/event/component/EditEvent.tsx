@@ -235,7 +235,7 @@ const EditEvent: React.FC = () => {
                 </div>
 
 
-                <div className='flex gap-3'>
+                <div className='flex items-center gap-3'>
                     {/* Image Upload */}
                     <label htmlFor="image" className="w-full input input-bordered bg-white text-black flex items-center gap-2">
                         <span className="font-semibold text-green-700 flex justify-between items-center">
@@ -256,7 +256,7 @@ const EditEvent: React.FC = () => {
                         <img
                             src={selectedImage || dummyImage}
                             alt="Selected Banner"
-                            className="w-full h-60 object-cover"
+                            className="w-full h-60 object-contain"
                         />
                     </div>
                 </div>
@@ -351,9 +351,6 @@ const EditEvent: React.FC = () => {
                         {errors.end_time_type && <p className="text-red-600">{errors.end_time_type.message}</p>}
                     </div>
                 </div>
-
-
-
 
 
                 <div className='flex flex-col gap-3 my-4'>

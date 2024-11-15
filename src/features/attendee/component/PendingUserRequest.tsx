@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
 import { eventUUID, fetchAllPendingUserRequests } from '../../event/eventSlice';
+import Loader from '../../../component/Loader';
 
 type PendingRequestType = {
     id: number;                              // Unique identifier for the event
@@ -54,10 +55,11 @@ const PendingUserRequest: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID, pendingRequests, user_id } = useSelector((state: RootState) => ({
+    const { currentEventUUID, pendingRequests, user_id, loading } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
         pendingRequests: state.events.pendingRequests,
-        user_id: state.auth.user?.id
+        user_id: state.auth.user?.id,
+        loading: state.events.loading
     }));
 
     useEffect(() => {
@@ -161,6 +163,10 @@ const PendingUserRequest: React.FC = () => {
 
         return paginationNumbers;
     };
+
+    if(loading) {
+        return <Loader />
+    }
 
     return (
         <div>

@@ -6,6 +6,7 @@ import axios from "axios";
 import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Loader from "../../../component/Loader";
 
 const dummyImage = "https://via.placeholder.com/150";
 
@@ -13,9 +14,9 @@ const dummyImage = "https://via.placeholder.com/150";
 type FormInputType = {
     first_name: string;
     last_name: string;
-    job_title: string;
-    company_name: string;
-    industry: string;
+    job_title: string | number;
+    company_name: string | number;
+    industry: string | number;
     email_id: string;
     phone_number: string;
     alternate_mobile_number: string;
@@ -24,8 +25,8 @@ type FormInputType = {
     employee_size: number;
     company_turn_over: number;
     status: string;
-    event_id: string;
-    image: File | null;
+    event_id: number;
+    image: File | undefined;
     excel_file: File | null;
 };
 
@@ -43,34 +44,43 @@ const AddEventAttendee: React.FC = () => {
     const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState('');
     const { token } = useSelector((state: RootState) => (state.auth));
+    const { currentEventUUID } = useSelector((state: RootState) => (state.events));
+    // const { currentAttendeeUUID } = useSelector((state: RootState) => (state.attende));
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
     const [selectedExcelFile, setSelectedExcelFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const [industries, setIndustries] = useState<ApiType[] | undefined>();
-    const [selectedIndustry, setSelectedIndustry] = useState<string>(''); // Track selected industry
+    const [selectedIndustry, setSelectedIndustry] = useState<string | number>(''); // Track selected industry
 
     const [jobTitles, setJobTitles] = useState<ApiType[] | undefined>();
-    const [selectedCompany, setSelectedCompany] = useState<string>(''); // Track selected company
+    const [selectedCompany, setSelectedCompany] = useState<string | number>(''); // Track selected company
 
     const [companies, setCompanies] = useState<ApiType[] | undefined>();
-    const [selectedJobTitle, setSelectedJobTitle] = useState<string>(''); // Track selected job title
+    const [selectedJobTitle, setSelectedJobTitle] = useState<string | number>(''); // Track selected job title
 
-    const { currentAttendeeUUID } = useSelector((state: RootState) => state.attendee);
+    const [errorsExcel, setErrorsExcel] = useState({});
+    const [invalidMessage, setInvalidMessage] = useState("");
+    const [isLoadingExcel, setIsLoadingExcel] = useState(false);
+    const [columnData, setColumnData] = useState({});
+    const [inValidData, setInValidData] = useState({});
+    const [downloadInvalidExcel, setDownloadInvalidExcel] = useState(false);
+    const [showAlert, setShowAlert] = useState(true);
+    const [companyInput, setCompanyInput] = useState(false);
+    const [companyData, setCompanyData] = useState([]);
+    const [designationData, setDesignationData] = useState([]);
+    const [designationInput, setDesignationInput] = useState(false);
+    const [excelInput, setExcelInput] = useState({
+        file: null,
+    });
 
-    const { currentEventUUID } = useSelector((state: RootState) => state.events);
-
-    console.log(currentAttendeeUUID, currentEventUUID);
+    console.log(currentEventUUID);
 
     useEffect(() => {
         axios.get("/api/job-titles").then(res => setJobTitles(res.data.data));
         axios.get("/api/companies").then(res => setCompanies(res.data.data));
         axios.get("/api/get-industries").then(res => setIndustries(res.data.data));
     }, []);
-
-    // console.log(eventId);
-
-    // console.log(currentEventUUID);
 
     // Handle image upload
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,16 +96,20 @@ const AddEventAttendee: React.FC = () => {
 
         const formData = new FormData();
 
+        // formData.append("image", undefined);
+
         Object.keys(data).forEach((key) => {
             const value = data[key as keyof FormInputType];
 
-            if (key === "image" && value instanceof File) {
-                formData.append(key, value);  // Append the image file
-            } else if (key === "excel_file" && value instanceof File) {
-                formData.append(key, value);  // Append the Excel file if it exists
-            } else {
-                formData.append(key, value ? value.toString() : ""); // Append other form data as strings
-            }
+            formData.append(key, value ? value.toString() : "");
+
+            // if (key === "image" && value instanceof File) {
+            //     formData.append(key, value);  // Append the image file
+            // } else if (key === "excel_file" && value instanceof File) {
+            //     formData.append(key, value);  // Append the Excel file if it exists
+            // } else {
+            //     formData.append(key, value ? value.toString() : ""); // Append other form data as strings
+            // }
         });
 
         if (currentEventUUID) {
@@ -180,8 +194,105 @@ const AddEventAttendee: React.FC = () => {
             setSelectedExcelFile(file);  // Store the selected file in state
             setValue('excel_file', file);  // Set it in the form data as well
         }
-
     };
+
+
+    const handleFileUpload = async (e: any) => {
+        e.preventDefault();
+
+        setDownloadInvalidExcel(false);
+
+        if (!selectedExcelFile) {
+            setErrorsExcel({ message: "Please select an Excel file." });
+            return;
+        }
+
+        setIsLoadingExcel(true);
+
+        const formData = new FormData();
+
+        formData.append("file", selectedExcelFile);
+        formData.append("event_id", currentEventUUID);
+
+        await axios
+            .post(`/api/attendees/upload/${currentEventUUID}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Authorization": `Bearer ${token}`
+                },
+            })
+            .then((res) => {
+                if (res.data.status === 200) {
+                    swal("Success", res.data.message, "success");
+
+                    setColumnData({});
+
+                    setInValidData({});
+
+                    setErrorsExcel({});
+
+                    setDownloadInvalidExcel(false);
+
+                    setSelectedExcelFile(null);
+
+                    // history.push(`/organiser/admin/all-attendee/${event_id}`);
+                } else if (res.data.status === 400) {
+                    setDownloadInvalidExcel(true);
+
+                    setColumnData(res.data.column_data);
+
+                    setInValidData(res.data.invalid_data);
+
+                    setInvalidMessage(res.data.message);
+
+                    setErrorsExcel(res.data.errors);
+
+                    setSelectedExcelFile(null);
+
+                    setExcelInput({ ...excelInput, file: null });
+
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                    }
+                } else if (res.data.status === 422) {
+                    setColumnData({});
+
+                    setInValidData({});
+
+                    setErrorsExcel({ message: res.data.error });
+
+                    setSelectedExcelFile(null);
+
+                    setExcelInput({ ...excelInput, file: null });
+
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                    }
+                } else if (res.data.status === 401) {
+                    setColumnData({});
+
+                    setInValidData({});
+
+                    setDownloadInvalidExcel(false);
+
+                    setErrorsExcel({ message: res.data.message });
+
+                    setSelectedExcelFile(null);
+
+                    setExcelInput({ ...excelInput, file: null });
+
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                    }
+                }
+            });
+
+        setIsLoadingExcel(false);
+    };
+
+    // if(loading) {
+    //     return <Loader />
+    // }
 
     return (
         <div className="p-6 pt-3">
@@ -253,7 +364,7 @@ const AddEventAttendee: React.FC = () => {
                             >
                                 <option value="">Select Job Title</option>
                                 {jobTitles?.map((jobTitle) => (
-                                    <option key={jobTitle.id} value={jobTitle.name}>
+                                    <option key={jobTitle.id} value={jobTitle.id}>
                                         {jobTitle.name}
                                     </option>
                                 ))}
@@ -300,7 +411,7 @@ const AddEventAttendee: React.FC = () => {
                             >
                                 <option value="">Select Company</option>
                                 {companies?.map((company) => (
-                                    <option key={company.id} value={company.name}>
+                                    <option key={company.id} value={company.id}>
                                         {company.name}
                                     </option>
                                 ))}
@@ -329,8 +440,6 @@ const AddEventAttendee: React.FC = () => {
                         </div>
                     )}
 
-
-
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="industry" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className="font-semibold text-green-700 flex justify-between items-center">
@@ -348,7 +457,7 @@ const AddEventAttendee: React.FC = () => {
                             >
                                 <option value="">Select Industry</option>
                                 {industries?.map((industry) => (
-                                    <option key={industry.id} value={industry.name}>
+                                    <option key={industry.id} value={industry.id}>
                                         {industry.name}
                                     </option>
                                 ))}
@@ -464,11 +573,11 @@ const AddEventAttendee: React.FC = () => {
                                     type="file"
                                     accept=".xlsx, .xls, .csv"
                                     className="grow"
-                                // onChange={() => handleExcelUpload()}
+                                    onChange={(e) => handleExcelUpload(e)}
                                 />
                             </label>
                             {errors.excel_file && <p className="text-red-600">{errors.excel_file.message}</p>}
-                            <button type="button" className="btn btn-warning btn-sm" onClick={() => handleExcelUpload}>
+                            <button type="button" className="btn btn-warning btn-sm" onClick={(e) => handleFileUpload(e)}>
                                 Upload Excel Now
                             </button>
                         </div>

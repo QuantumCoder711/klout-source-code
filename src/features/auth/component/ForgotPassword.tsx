@@ -8,6 +8,7 @@ import { Navigate } from 'react-router-dom';
 import typingEffect from '../../../utils/typingEffect';
 import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
+import Loader from '../../../component/Loader';
 
 type LoginFormInputs = {
     email: string;
@@ -32,6 +33,10 @@ const ForgotPassword: React.FC = () => {
 
     if (token) {
         return <Navigate to="/" />;
+    }
+
+    if(loading) {
+        return <Loader />
     }
 
     return (

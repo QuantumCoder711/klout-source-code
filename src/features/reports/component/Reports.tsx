@@ -4,13 +4,17 @@ import ReportCard from './ReportCard';
 // import {messageData} from "../temp/dummyData";
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
+import Loader from '../../../component/Loader';
 
 const Reports: React.FC = () => {
 
 
-  const { events } = useSelector((state: RootState) => state.events);
+  const { events, loading } = useSelector((state: RootState) => state.events);
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 
+  if(loading) {
+    return <Loader />
+  }
 
   return (
     <div>

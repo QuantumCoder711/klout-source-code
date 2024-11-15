@@ -5,6 +5,7 @@ import ScoreCard from '../../../component/ScoreCard';
 import axios from 'axios';
 import { RootState } from '../../../redux/store';
 import { useSelector } from 'react-redux';
+import Loader from '../../../component/Loader';
 
 type MessageState = {
     _id: string;
@@ -31,7 +32,7 @@ const WhatsAppReport: React.FC = () => {
     const [activeTab, setActiveTab] = useState<number>(1);
     const [selectedTemplate, setSelectedTemplate] = useState('delegate_invitation');
     const [allData, setAllData] = useState([]);
-    const { user } = useSelector((state: RootState) => state.auth);
+    const { user, loading } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID } = useSelector((state: RootState) => (state.events));
     const [totalMessage, setTotalMessage] = useState(0);
     const [totalDelivered, setTotalDelivered] = useState(0);
@@ -65,6 +66,10 @@ const WhatsAppReport: React.FC = () => {
                 setTotalFailed(failed.length)
             })
     }, [selectedTemplate]);
+
+    if(loading) {
+        return <Loader />
+    }
 
     return (
         <div>

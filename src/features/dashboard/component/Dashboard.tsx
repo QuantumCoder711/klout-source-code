@@ -8,6 +8,7 @@ import { RootState } from '../../../redux/store';
 import { Link } from 'react-router-dom';
 import { MdAdd } from "react-icons/md";
 import { heading } from '../../heading/headingSlice';
+import Loader from '../../../component/Loader';
 
 
 const Dashboard: React.FC = () => {
@@ -65,6 +66,9 @@ const Dashboard: React.FC = () => {
     dispatch(heading('Add Event'))
   }
 
+  if(loading) {
+    return <Loader />
+  }
 
   return (
     <>

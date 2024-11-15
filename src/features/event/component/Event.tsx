@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import EventRow from '../../../component/EventRow';
+import Loader from '../../../component/Loader';
 
 
 const Event: React.FC = () => {
@@ -41,7 +42,7 @@ const Event: React.FC = () => {
     }
 
     // Get events data from the store
-    const { events } = useSelector((state: RootState) => state.events);
+    const { events, loading } = useSelector((state: RootState) => state.events);
 
     const today: Date = new Date();
     const pastEvents = events.filter((event: eventType) => {
@@ -130,6 +131,10 @@ const Event: React.FC = () => {
 
         for (let i = startPage; i <= endPage; i++) {
             paginationNumbers.push(i);
+        }
+
+        if (loading) {
+            return <Loader />
         }
 
         return (
@@ -334,7 +339,7 @@ const Event: React.FC = () => {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex justify-end items-center mt-4">
+                {currentEvents.length > 1 && <div className="flex justify-end items-center mt-4">
                     <div className="flex items-center space-x-1">
                         <button
                             className="px-4 py-2 border rounded-md text-klt_primary-600 hover:bg-green-100"
@@ -352,7 +357,7 @@ const Event: React.FC = () => {
                             <TiChevronRight />
                         </button>
                     </div>
-                </div>
+                </div>}
 
             </div >
         </>

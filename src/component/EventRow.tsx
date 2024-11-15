@@ -88,7 +88,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
         <div className='p-5 border-b flex items-center justify-between gap-5 rounded-lg'>
 
             {/* Displaying Image */}
-            <img src={props.image} alt={props.title} className='min-w-60 2xl:min-w-96 h-40 2xl:h-60 object-cover object-center rounded-lg' />
+            <img src={props.image} alt={props.title} className='max-w-60 2xl:max-w-96 w-full h-40 2xl:h-60 object-cover object-center rounded-lg' />
 
             {/* Title */}
             <h3 className='text-lg font-semibold max-w-[236px] 2xl:max-w-fit'>{props.title}</h3>
@@ -119,7 +119,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             <div className='min-w-[110px]'>
 
                 <Link to='/events/view-event/' className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
-                    dispatch(eventUUID(props.uuid)); dispatch(heading('Events')); dispatch(heading('View Event')); setTimeout(() => {
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('View Event')); setTimeout(() => {
                     }, 500);
                 }}>View Event</Link> <br />
                 <button className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {

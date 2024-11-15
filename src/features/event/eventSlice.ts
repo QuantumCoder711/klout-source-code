@@ -119,6 +119,7 @@ type eventState = {
     currentAgendaUUID: string | null,
     eventAttendee: [],
     agendas: [],
+    attendeeLoader: boolean,
     pendingRequests: PendingRequestType[],
     // pendingRequests: string | null,
     loading: boolean,
@@ -132,6 +133,7 @@ const initialState: eventState = {
     currentAgendaUUID: null,  // Initialize as null
     eventAttendee: [],
     agendas: [],
+    attendeeLoader: false,
     pendingRequests: [],
     loading: false,
     error: null
@@ -267,17 +269,18 @@ const eventSlice = createSlice({
                 state.error = action.payload as string;
             })
             .addCase(allEventAttendee.pending, (state) => {
-                state.loading = true;
+                state.eventAttendee = [];
+                state.attendeeLoader = true;
                 state.error = null;
             })
             .addCase(allEventAttendee.fulfilled, (state, action) => {
-                state.loading = false;
                 state.eventAttendee = action.payload.data;
+                state.attendeeLoader = false;
                 state.error = null;
             })
             .addCase(allEventAttendee.rejected, (state, action) => {
-                state.loading = false;
                 state.error = action.payload as string;
+                state.attendeeLoader = false;
             })
             //Adding all cases
             .addCase(fetchAllAgendas.pending, (state) => {
