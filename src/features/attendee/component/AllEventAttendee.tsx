@@ -159,8 +159,11 @@ const AllEventAttendee: React.FC = () => {
                             showConfirmButton: false,
                             timer: 1500,
                         });
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
                         // setFilteredAgendaData(prevAgendas => prevAgendas.filter(agenda => agenda.uuid !== uuid));
-                        setCurrentAttendees(prevAttendee => prevAttendee.filter(attendee=> attendee.id !== id));
+                        setCurrentAttendees(prevAttendee => prevAttendee.filter(attendee => attendee.id !== id));
                     })
                     .catch(function () {
                         Swal.fire({
@@ -329,8 +332,8 @@ const AllEventAttendee: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentAttendees.length > 0 ? (
-                                    currentAttendees.map((attendee, index) => (
+                                {eventAttendee.length > 0 ? (
+                                    eventAttendee.map((attendee, index) => (
                                         <tr key={attendee.uuid}>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>

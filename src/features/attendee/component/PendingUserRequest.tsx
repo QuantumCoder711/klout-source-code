@@ -46,6 +46,7 @@ interface PendingRequestType {
 const PendingUserRequest: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, pendingRequests, user_id, loading, currentEvent } = useSelector((state: RootState) => ({
@@ -92,7 +93,7 @@ const PendingUserRequest: React.FC = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Approve attendee
-                axios.post('/api/approved_pending_request', {
+                axios.post(`${apiBaseUrl}/api/approved_pending_request`, {
                     id,
                     user_id,
                     event_id,
@@ -126,7 +127,7 @@ const PendingUserRequest: React.FC = () => {
                     });
             } else if (result.isDenied) {
                 // Disapprove attendee
-                axios.post('/api/discard_pending_request', {
+                axios.post(`${apiBaseUrl}/api/discard_pending_request`, {
                     id,
                     user_id,
                     event_id,

@@ -40,6 +40,7 @@ const ViewAgendas: React.FC = () => {
   const [agendaData, setAgendaData] = useState<AgendaType[]>([]); // Fix agendaData to be an array
   const [filteredAgendaData, setFilteredAgendaData] = useState<AgendaType[]>([]); // To store filtered data
   const [filterTitle, setFilterTitle] = useState(""); // State for the filter input
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { events, loading } = useSelector((state: RootState) => state.events);
@@ -48,7 +49,7 @@ const ViewAgendas: React.FC = () => {
 
   useEffect(() => {
     if (currentEvent) {
-      axios.get(`/api/all-agendas/${currentEvent.id}`)
+      axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
         .then((res) => {
           if (res.data) {
             setAgendaData(res.data.data);

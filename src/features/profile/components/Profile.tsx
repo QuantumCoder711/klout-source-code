@@ -48,6 +48,7 @@ type companyType = {
 const Profile: React.FC = () => {
 
     const { user, token, loading } = useSelector((state: RootState) => state.auth);
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     const dispatch = useDispatch<AppDispatch>()
 
@@ -71,8 +72,8 @@ const Profile: React.FC = () => {
     console.log(token);
 
     useEffect(() => {
-        axios.get("/api/job-titles").then(res => setJobTitles(res.data.data || []));
-        axios.get("/api/companies").then(res => setCompanies(res.data.data || []));
+        axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data || []));
+        axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data || []));
         setSelectedCompany(user?.company);
         setSelectedDesignation(user?.designation_name);
     }, []);
@@ -128,7 +129,7 @@ const Profile: React.FC = () => {
         console.log(formData);
 
         axios
-            .post(`/api/updateprofile`, formData, {
+            .post(`${apiBaseUrl}/api/updateprofile`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${token}`

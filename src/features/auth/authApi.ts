@@ -1,4 +1,5 @@
 import axios from "axios";
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 type loginParams = {
     email: string,
@@ -8,7 +9,7 @@ type loginParams = {
 
 export const fetchLogin = async ({ email, password }: loginParams) => {
     try {
-        const response = await axios.post('/api/login', { email, password }, {
+        const response = await axios.post(`${apiBaseUrl}/api/login`, { email, password }, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -23,7 +24,7 @@ export const fetchLogin = async ({ email, password }: loginParams) => {
 
 export const fetchUserApi = async (token: string | null) => {
     try {
-        const response = await axios.post('/api/profile', {}, {
+        const response = await axios.post(`${apiBaseUrl}/api/profile`, {}, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`

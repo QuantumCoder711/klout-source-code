@@ -40,12 +40,13 @@ const EditAgenda: React.FC = () => {
     const { currentEventUUID } = useSelector((state: RootState) => state.events);
     const { currentAgendaUUID } = useSelector((state: RootState) => state.events);
     const { events, loading } = useSelector((state: RootState) => state.events);
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
 
     useEffect(() => {
         if (currentAgendaUUID) {
-            axios.get(`/api/agendas/${currentAgendaUUID}`)
+            axios.get(`${apiBaseUrl}/api/agendas/${currentAgendaUUID}`)
                 .then((res) => {
                     if (res.data) {
                         const agendaData = res.data.data;
@@ -85,7 +86,7 @@ const EditAgenda: React.FC = () => {
         }
     };
 
-    if(loading) {
+    if (loading) {
         return <Loader />
     }
 
@@ -172,7 +173,7 @@ const EditAgenda: React.FC = () => {
             <div className='flex justify-between items-center'>
                 <h2 className='text-black text-2xl font-semibold'>Edit Agenda</h2>
                 <div className='flex items-center gap-3'>
-                    <Link to="/events/view-agendas" onClick={()=>dispatch(heading("View Agendas"))} className="btn btn-error text-white btn-sm">
+                    <Link to="/events/view-agendas" onClick={() => dispatch(heading("View Agendas"))} className="btn btn-error text-white btn-sm">
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>

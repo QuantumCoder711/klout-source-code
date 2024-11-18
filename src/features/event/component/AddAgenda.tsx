@@ -32,6 +32,7 @@ const AddAgenda: React.FC = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState('');
     const [image, setImage] = useState(null);
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const dummyImage = "https://via.placeholder.com/150";
 
     const { currentEventUUID } = useSelector((state: RootState) => state.events);
@@ -69,7 +70,7 @@ const AddAgenda: React.FC = () => {
         console.log(formData);
 
         axios
-            .post(`/api/agendas`, formData, {
+            .post(`${apiBaseUrl}/api/agendas`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     'Authorization': `Bearer ${token}`

@@ -63,6 +63,7 @@ type eventType = {
 
 const EditEvent: React.FC = () => {
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const { currentEvent, currentEventUUID, loading } = useSelector((state: RootState) => ({
         currentEvent: state.events.currentEvent as eventType,
         currentEventUUID: state.events.currentEventUUID,
@@ -164,7 +165,7 @@ const EditEvent: React.FC = () => {
 
             try {
                 // Step 2: Make the API request to update the event
-                const response = await axios.post('/api/events/' + currentEventUUID, formData, {
+                const response = await axios.post(`${apiBaseUrl}/api/events/` + currentEventUUID, formData, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
