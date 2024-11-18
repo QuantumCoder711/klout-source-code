@@ -1,7 +1,7 @@
 import React from 'react';
 
 type headingProps = {
-    title: string
+    title: string | undefined;
 }
 
 const HeadingH2: React.FC<headingProps> = ({ title }) => {

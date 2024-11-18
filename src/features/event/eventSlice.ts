@@ -68,44 +68,33 @@ type eventType = {
 //     position: number;
 // };
 
-type PendingRequestType = {
-    id: number;                              // Unique identifier for the event
-    uuid: string;                            // A universally unique identifier
-    user_id: number;                         // ID of the user associated with the event
-    slug: string;                            // URL-friendly identifier (slug) for the event
-    title: string;                           // The title of the event
-    description: string;                     // A detailed description of the event
-    event_date: string;                      // Date of the event in YYYY-MM-DD format
-    location: string;                        // Location ID, which might refer to a specific location in a database
-    start_time: string;                      // Start time (hour) in 24-hour format
-    start_time_type: "AM" | "PM";            // Time of the day (AM/PM)
-    end_time: string;                        // End time (hour) in 24-hour format
-    end_time_type: "AM" | "PM";              // Time of the day (AM/PM)
-    image: string;                           // URL or path to the event image
-    event_venue_name: string;                // The name of the event venue
-    event_venue_address_1: string;           // Address line 1 of the event venue
-    event_venue_address_2: string;           // Address line 2 of the event venue
-    city: string;                            // City of the event
-    state: string;                           // State of the event
-    country: string;                         // Country of the event
-    pincode: string;                         // Pincode for the event location
-    google_map_link: string;                 // Google Maps link for the event venue location
-    created_at: string;                      // Timestamp when the event was created (ISO 8601 format)
-    updated_at: string;                      // Timestamp when the event was last updated (ISO 8601 format)
-    status: number;                          // Event status, where 1 typically means active and 0 means inactive
-    pdf_path: string;                        // Path to an associated PDF (event brochure, agenda, etc.)
-    end_minute_time: string;                 // Minutes part of the event end time
-    start_minute_time: string;               // Minutes part of the event start time
-    qr_code: string;                         // Path to the event's QR code image
-    start_time_format: string;               // Start time in "HH:MM:SS" format (24-hour)
-    feedback: number;                        // Feedback status (whether feedback is enabled)
-    event_start_date: string;                // The start date of the event (same as `event_date`)
-    event_end_date: string;                  // The end date of the event (same as `event_date`)
-    why_attend_info: string | null;          // Optional information on why someone should attend
-    more_information: string | null;         // Additional information about the event (optional)
-    t_and_conditions: string | null;         // Optional terms and conditions for the event
-    video_url: string | null;                // Optional video URL related to the event (e.g., promotional video)
-};
+interface PendingRequestType {
+    alternate_mobile_number: string | null;
+    check_in: number;
+    company_name: string;
+    company_turn_over: string | null;
+    created_at: string;
+    email_id: string;
+    employee_size: string | null;
+    event_id: number;
+    event_invitation: number;
+    first_name: string;
+    id: number;
+    image: string | null;
+    industry: string | null;
+    job_title: string;
+    last_name: string;
+    linkedin_page_link: string | null;
+    phone_number: string;
+    profile_completed: number;
+    status: string;
+    updated_at: string;
+    user_id: number;
+    user_invitation_request: number;
+    uuid: string;
+    virtual_business_card: string | null;
+    website: string | null;
+}
 
 interface AddEventResponse {
     data: eventType;

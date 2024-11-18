@@ -189,7 +189,7 @@ const AllEventAttendee: React.FC = () => {
                 <Link to="/events/send-reminder" onClick={() => { dispatch(heading('Send Reminder')); }} className="btn btn-accent text-white btn-sm">
                     <BsSendFill /> Send Reminder
                 </Link>
-                <Link to="/events/send-invitation" onClick={() => { dispatch(heading('Send Invitation')); }} className="btn btn-primary text-white btn-sm">
+                <Link to="/events/send-invitation" onClick={() => { dispatch(heading('Send Invitation')); }} className="btn hidden btn-primary text-white btn-sm">
                     <FaMessage /> Send Invitation
                 </Link>
                 <Link to="/events/same-day-reminder" onClick={() => { dispatch(heading('Send Same Day Reminder')); }} className="btn btn-warning text-white btn-sm">

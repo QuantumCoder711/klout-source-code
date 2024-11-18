@@ -2,74 +2,214 @@ import React, { useEffect, useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { TiChevronLeft, TiChevronRight, TiPlus } from "react-icons/ti";
+import { TiChevronLeft, TiChevronRight } from "react-icons/ti";
 import { FaEdit, FaDownload } from 'react-icons/fa';
-import { MdDelete } from 'react-icons/md';
-import { Attendee, attendees } from './tempData/tempData'; // Ensure this is the correct path
+import { TbClockHour9Filled } from "react-icons/tb";
+// import { MdDelete } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
-import { eventUUID, fetchAllPendingUserRequests } from '../../event/eventSlice';
+import { fetchAllPendingUserRequests } from '../../event/eventSlice';
 import Loader from '../../../component/Loader';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { heading } from '../../heading/headingSlice';
 
-type PendingRequestType = {
-    id: number;                              // Unique identifier for the event
-    uuid: string;                            // A universally unique identifier
-    user_id: number;                         // ID of the user associated with the event
-    slug: string;                            // URL-friendly identifier (slug) for the event
-    title: string;                           // The title of the event
-    description: string;                     // A detailed description of the event
-    event_date: string;                      // Date of the event in YYYY-MM-DD format
-    location: string;                        // Location ID, which might refer to a specific location in a database
-    start_time: string;                      // Start time (hour) in 24-hour format
-    start_time_type: "AM" | "PM";            // Time of the day (AM/PM)
-    end_time: string;                        // End time (hour) in 24-hour format
-    end_time_type: "AM" | "PM";              // Time of the day (AM/PM)
-    image: string;                           // URL or path to the event image
-    event_venue_name: string;                // The name of the event venue
-    event_venue_address_1: string;           // Address line 1 of the event venue
-    event_venue_address_2: string;           // Address line 2 of the event venue
-    city: string;                            // City of the event
-    state: string;                           // State of the event
-    country: string;                         // Country of the event
-    pincode: string;                         // Pincode for the event location
-    google_map_link: string;                 // Google Maps link for the event venue location
-    created_at: string;                      // Timestamp when the event was created (ISO 8601 format)
-    updated_at: string;                      // Timestamp when the event was last updated (ISO 8601 format)
-    status: number;                          // Event status, where 1 typically means active and 0 means inactive
-    pdf_path: string;                        // Path to an associated PDF (event brochure, agenda, etc.)
-    end_minute_time: string;                 // Minutes part of the event end time
-    start_minute_time: string;               // Minutes part of the event start time
-    qr_code: string;                         // Path to the event's QR code image
-    start_time_format: string;               // Start time in "HH:MM:SS" format (24-hour)
-    feedback: number;                        // Feedback status (whether feedback is enabled)
-    event_start_date: string;                // The start date of the event (same as `event_date`)
-    event_end_date: string;                  // The end date of the event (same as `event_date`)
-    why_attend_info: string | null;          // Optional information on why someone should attend
-    more_information: string | null;         // Additional information about the event (optional)
-    t_and_conditions: string | null;         // Optional terms and conditions for the event
-    video_url: string | null;                // Optional video URL related to the event (e.g., promotional video)
-};
+interface PendingRequestType {
+    alternate_mobile_number: string | null;
+    check_in: number;
+    company_name: string;
+    company_turn_over: string | null;
+    created_at: string;
+    email_id: string;
+    employee_size: string | null;
+    event_id: number;
+    event_invitation: number;
+    first_name: string;
+    id: number;
+    image: string | null;
+    industry: string | null;
+    job_title: string;
+    last_name: string;
+    linkedin_page_link: string | null;
+    phone_number: string;
+    profile_completed: number;
+    status: string;
+    updated_at: string;
+    user_id: number;
+    user_invitation_request: number;
+    uuid: string;
+    virtual_business_card: string | null;
+    website: string | null;
+}
 
 const PendingUserRequest: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID, pendingRequests, user_id, loading } = useSelector((state: RootState) => ({
+    const { currentEventUUID, pendingRequests, user_id, loading, currentEvent } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
         pendingRequests: state.events.pendingRequests,
         user_id: state.auth.user?.id,
-        loading: state.events.loading
+        loading: state.events.loading,
+        currentEvent: state.events.currentEvent,
     }));
+
+    const event_id: string | undefined = currentEvent?.uuid;
+
+    const [requests, setRequests] = useState<PendingRequestType[]>();
 
     useEffect(() => {
         if (currentEventUUID && token && user_id) {
-            dispatch(fetchAllPendingUserRequests({eventuuid: currentEventUUID, token, user_id}));
+            dispatch(fetchAllPendingUserRequests({ eventuuid: currentEventUUID, token, user_id }));
         }
 
-        console.log(pendingRequests);
+        setRequests(pendingRequests);
+
+        console.log("Pending Requrests are: ", pendingRequests);
     }, [currentEventUUID, token, dispatch]);
     // eventuuid: currentEventUUID, token
+
+    const requestAction = (id: number, e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        const thisClicked = e.currentTarget;
+
+        // // Assuming these values are available in the scope
+        // const userID = 'someUserID';  // Replace with actual user ID
+        // const eventID = 'someEventID';  // Replace with actual event ID
+        // const token = 'yourAuthToken';  // Replace with actual auth token
+
+        Swal.fire({
+            title: "Approve Now?",
+            text: "Approve Attendee for this Event",
+            icon: "warning",
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonColor: "#3085d6",
+            denyButtonColor: "#d33",
+            cancelButtonColor: "#aaa",
+            confirmButtonText: "Approve",
+            denyButtonText: "Disapprove",
+            cancelButtonText: "Cancel",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Approve attendee
+                axios.post('/api/approved_pending_request', {
+                    id,
+                    user_id,
+                    event_id,
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    }
+                })
+                    .then(function (res) {
+                        Swal.fire({
+                            icon: "success",
+                            title: res.data.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                        setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
+                    })
+                    .catch(function (error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "An Error Occurred!",
+                            showConfirmButton: true,  // Show the "OK" button
+                            confirmButtonText: "OK",  // You can customize the button text if needed
+                        });
+                        console.error("Error during approve request:", error);
+                    });
+            } else if (result.isDenied) {
+                // Disapprove attendee
+                axios.post('/api/discard_pending_request', {
+                    id,
+                    user_id,
+                    event_id,
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                    }
+                })
+                    .then(function (res) {
+                        Swal.fire({
+                            icon: "success",
+                            title: res.data.message,
+                            showConfirmButton: true,  // Show the "OK" button
+                            confirmButtonText: "OK",  // You can customize the button text if needed
+                        });
+
+                        // Optionally update state or reload the page after success
+                        setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
+                    })
+                    .catch(function (error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "An Error Occurred!",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                        console.error("Error during discard request:", error);
+                    });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // User canceled the action
+                Swal.fire({
+                    icon: "info",
+                    title: "Action Canceled",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            }
+        });
+    };
+
+    const deleteAttendee = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+        e.preventDefault();
+
+        const thisClicked = e.currentTarget;
+
+        // Assuming these values are available in the scope
+        // const token = 'yourAuthToken'; // Replace with actual auth token
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`/api/attendees/${id}`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    }
+                })
+                    .then(function (res) {
+                        Swal.fire({
+                            icon: "success",
+                            title: res.data.message,
+                            showConfirmButton: false,
+                            // timer: 1500,
+                        });
+                        // thisClicked.closest("tr")?.remove(); // Safely remove the row
+                    })
+                    .catch(function (error) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "An Error Occurred!",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                        console.error("Error during delete attendee:", error);
+                    });
+            }
+        });
+    };
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -81,13 +221,15 @@ const PendingUserRequest: React.FC = () => {
     const [companyFilter, setCompanyFilter] = useState('');
 
     // Calculate filtered data based on the filters
-    const filteredAttendees = attendees.filter((attendee) => {
+    const filteredAttendees = pendingRequests.filter((attendee) => {
         return (
-            attendee.firstName.toLowerCase().includes(firstNameFilter.toLowerCase()) &&
-            attendee.Email.toLowerCase().includes(emailFilter.toLowerCase()) &&
-            attendee.Company.toLowerCase().includes(companyFilter.toLowerCase())
+            attendee.first_name.toLowerCase().includes(firstNameFilter.toLowerCase()) &&
+            attendee.email_id.toLowerCase().includes(emailFilter.toLowerCase()) &&
+            attendee.company_name.toLowerCase().includes(companyFilter.toLowerCase())
         );
     });
+
+    console.log("Requests: ", requests);
 
     // Calculate the data to display for the current page
     const indexOfLastRow = currentPage * rowsPerPage;
@@ -164,7 +306,7 @@ const PendingUserRequest: React.FC = () => {
         return paginationNumbers;
     };
 
-    if(loading) {
+    if (loading) {
         return <Loader />
     }
 
@@ -172,9 +314,9 @@ const PendingUserRequest: React.FC = () => {
         <div>
             {/* Heading and Buttons Wrapper Div */}
             <div className='flex justify-between items-center'>
-                <HeadingH2 title='7th CHRO Confex & Awards 2024, Chennai' />
+                <HeadingH2 title={currentEvent?.title} />
                 <div className='flex items-center gap-3'>
-                    <Link to="/events/" className="btn btn-error text-white btn-sm">
+                    <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>
@@ -189,7 +331,7 @@ const PendingUserRequest: React.FC = () => {
                             {/* Filter by first name */}
                             <input
                                 type="text"
-                                className="border border-gray-500 rounded-md p-2 w-96 bg-white outline-none text-black"
+                                className="border border-gray-500 rounded-md p-2 max-w-96 bg-white outline-none text-black"
                                 placeholder="Search by First Name"
                                 value={firstNameFilter}
                                 onChange={(e) => setFirstNameFilter(e.target.value)}
@@ -197,7 +339,7 @@ const PendingUserRequest: React.FC = () => {
                             {/* filter by email */}
                             <input
                                 type="text"
-                                className="border border-gray-500 rounded-md p-2 w-96 bg-white outline-none text-black"
+                                className="border border-gray-500 rounded-md p-2 max-w-96 bg-white outline-none text-black"
                                 placeholder="Search by Email"
                                 value={emailFilter}
                                 onChange={(e) => setEmailFilter(e.target.value)}
@@ -205,18 +347,18 @@ const PendingUserRequest: React.FC = () => {
                             {/* filter by company */}
                             <input
                                 type="text"
-                                className="border border-gray-500 rounded-md p-2 w-96 bg-white outline-none text-black"
+                                className="border border-gray-500 rounded-md p-2 max-w-96 bg-white outline-none text-black"
                                 placeholder="Search by company"
                                 value={companyFilter}
                                 onChange={(e) => setCompanyFilter(e.target.value)}
                             />
 
 
-                            <button className="btn bg-klt_primary-500 h-full px-6 py-2 flex items-center text-white btn-sm">
+                            <button className="btn bg-klt_primary-500 h-full w-fit px-6 py-2 flex items-center text-white btn-sm">
                                 <FaDownload size={20} /> Download Excel
                             </button>
                         </div>
-                        <p className='font-semibold'>Total Pending Requests: {filteredAttendees.length}</p>
+                        <p className='font-semibold w-fit'>Pending Requests: {pendingRequests.length}</p>
                     </div>
 
                     {/* table */}
@@ -237,23 +379,24 @@ const PendingUserRequest: React.FC = () => {
                             </thead>
                             <tbody>
                                 {
-                                    currentRows.map((data: Attendee, index: number) => (
+                                    (filteredAttendees?.length != undefined) && filteredAttendees.map((data: PendingRequestType, index: number) => (
                                         <tr key={index}>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.attendeeID}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.firstName}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.lastName}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.Designation}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.Company}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.Email}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.mobile}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.Status}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.id}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.first_name}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.last_name}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.job_title}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.company_name}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.email_id}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.phone_number}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.status}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
-                                                <Link to={"/events/edit-agenda"} className="text-blue-500 hover:text-blue-700">
+                                                {/* <Link to={"/events/edit-agenda"} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit size={20} />
-                                                </Link>
-                                                <button className="text-red-500 hover:text-red-700">
-                                                    <MdDelete size={20} />
+                                                </Link> */}
+                                                <button onClick={(e) => requestAction(data.id, e)} className="text-klt_primary-500 hover:text-klt_primary-600">
+                                                    <TbClockHour9Filled size={20} />
                                                 </button>
+
                                             </td>
                                         </tr>
                                     ))

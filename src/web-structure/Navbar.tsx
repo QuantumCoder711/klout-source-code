@@ -22,12 +22,16 @@ const Navbar: React.FC = () => {
 
 
   useEffect(() => {
-    dispatch(fetchEvents(token));
-    dispatch(fetchAllAttendees(token));
-    dispatch(fetchSponsor(token));
-    dispatch(fetchUser(token));
-    dispatch(fetchExistingEvent({ eventuuid: currentEventUUID, token }));
-  }, [dispatch, currentEventUUID]);
+    if (token) {
+      dispatch(fetchEvents(token));
+      dispatch(fetchAllAttendees(token));
+      dispatch(fetchSponsor(token));
+      dispatch(fetchUser(token));
+      if (currentEventUUID) {
+        dispatch(fetchExistingEvent({ eventuuid: currentEventUUID, token }));
+      }
+    }
+  }, [dispatch, currentEventUUID, token]);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -62,7 +66,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-2 cursor-pointer">
             {/* User Avatar */}
             <img
-              src={`${imageBaseUrl}/${user?.image}`||"https://via.placeholder.com/40"}
+              src={`${imageBaseUrl}/${user?.image}` || "https://via.placeholder.com/40"}
               alt="User Avatar"
               className="w-10 h-10 object-contain border-2 border-white rounded-full"
             />
@@ -74,14 +78,14 @@ const Navbar: React.FC = () => {
           {isOpen && (
             <div className="absolute z-10 right-0 mt-0 pt-2 w-48  text-black rounded-md shadow-lg">
               <ul className="bg-white">
-                <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
-                  <Link
-                    to="/profile"
-                    onClick={handlePageTitle}
-                  >
+                <Link
+                  to="/profile"
+                  onClick={handlePageTitle}
+                >
+                  <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
                     Profile
-                  </Link>
-                </li>
+                  </li>
+                </Link>
                 <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer" onClick={handleLogout}>
                   Logout
                 </li>

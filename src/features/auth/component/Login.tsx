@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux'; // Use the custom hook
 import { login } from '../authSlice';
@@ -10,6 +10,7 @@ import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
 import Loader from '../../../component/Loader';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
+import Swal from 'sweetalert2';
 
 type LoginFormInputs = {
     email: string;
@@ -18,10 +19,10 @@ type LoginFormInputs = {
 
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { token, loading, error } = useSelector((state: RootState) => state.auth);
+    const { token, loading, loginError } = useSelector((state: RootState) => state.auth);
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 
-    const textToType = "Step into the Future of Event Management with Klout Club – Your Event, Your Way!";
+    const textToType = "Step into the Future of Event Management with Klout Club - Your Event, Your Way!";
     const typingSpeed = 100;
     const deletingSpeed = 50;
     const pauseDuration = 2000;
@@ -29,17 +30,28 @@ const Login: React.FC = () => {
     const displayedText = typingEffect(textToType, typingSpeed, deletingSpeed, pauseDuration);
 
     const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+    const [submitted, setSubmitted] = useState(false); // Track if form is submitted
 
     const onSubmit = async (data: LoginFormInputs) => {
-        dispatch(login(data));
+        setSubmitted(true); // Mark the form as submitted
+        await dispatch(login(data));
     };
+
+    useEffect(() => {
+        // Only show error modal if the form has been submitted and there's a loginError
+        if (submitted && loginError) {
+            Swal.fire({
+                icon: "error",
+                title: loginError,
+                showConfirmButton: true,
+                confirmButtonText: "OK",
+            });
+            setSubmitted(false); // Reset submitted state after error is handled
+        }
+    }, [loginError, submitted]); // Runs when loginError or submitted changes
 
     if (token) {
         return <Navigate to="/" />;
-    }
-
-    if (loading) {
-        return <Loader />
     }
 
     return (
@@ -75,27 +87,22 @@ const Login: React.FC = () => {
                         </div>
 
                         {/* Password Field with Eye Icon */}
-                        <div className="">
+                        <div className="relative">
                             <label className="block text-sm font-medium text-gray-700">Password</label>
-                            <div className='relative'>
-                                <input
-                                    type={showPassword ? 'text' : 'password'} // Toggle the password visibility
-                                    {...register('password', { required: 'Password is required' })}
-                                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                                />
-                                {/* Eye Icon */}
-                                <span
-                                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-                                    onClick={() => setShowPassword(!showPassword)} // Toggle visibility
-                                >
-                                    {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
-                                </span>
-                                {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-                            </div>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                {...register('password', { required: 'Password is required' })}
+                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                            />
+                            {/* Eye Icon */}
+                            <span
+                                className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                                onClick={() => setShowPassword(!showPassword)} // Toggle visibility
+                            >
+                                {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
+                            </span>
+                            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                         </div>
-
-                        {/* Error Message */}
-                        {error && <p className="text-red-500 text-sm">{error}</p>}
 
                         {/* Submit Button */}
                         <div>

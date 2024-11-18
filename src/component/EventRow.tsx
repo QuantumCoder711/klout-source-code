@@ -91,7 +91,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             <img src={props.image} alt={props.title} className='max-w-60 2xl:max-w-96 w-full h-40 2xl:h-60 object-cover object-center rounded-lg' />
 
             {/* Title */}
-            <h3 className='text-lg font-semibold max-w-[236px] 2xl:max-w-fit'>{props.title}</h3>
+            <h3 className='text-lg font-semibold max-w-[236px]'>{props.title}</h3>
 
             {/* Date, Time and Venue */}
             <div className='flex flex-col gap-2 text-sm 2xl:text-base'>

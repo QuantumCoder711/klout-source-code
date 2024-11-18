@@ -59,17 +59,17 @@ const AddEventAttendee: React.FC = () => {
     const [companies, setCompanies] = useState<ApiType[] | undefined>();
     const [selectedJobTitle, setSelectedJobTitle] = useState<string | number>(''); // Track selected job title
 
-    const [errorsExcel, setErrorsExcel] = useState({});
-    const [invalidMessage, setInvalidMessage] = useState("");
-    const [isLoadingExcel, setIsLoadingExcel] = useState(false);
-    const [columnData, setColumnData] = useState({});
-    const [inValidData, setInValidData] = useState({});
-    const [downloadInvalidExcel, setDownloadInvalidExcel] = useState(false);
-    const [showAlert, setShowAlert] = useState(true);
-    const [companyInput, setCompanyInput] = useState(false);
-    const [companyData, setCompanyData] = useState([]);
-    const [designationData, setDesignationData] = useState([]);
-    const [designationInput, setDesignationInput] = useState(false);
+    // const [errorsExcel, setErrorsExcel] = useState({});
+    // const [invalidMessage, setInvalidMessage] = useState("");
+    // const [isLoadingExcel, setIsLoadingExcel] = useState(false);
+    // const [columnData, setColumnData] = useState({});
+    // const [inValidData, setInValidData] = useState({});
+    // const [downloadInvalidExcel, setDownloadInvalidExcel] = useState(false);
+    // const [showAlert, setShowAlert] = useState(true);
+    // const [companyInput, setCompanyInput] = useState(false);
+    // const [companyData, setCompanyData] = useState([]);
+    // const [designationData, setDesignationData] = useState([]);
+    // const [designationInput, setDesignationInput] = useState(false);
     const [excelInput, setExcelInput] = useState({
         file: null,
     });
@@ -364,7 +364,7 @@ const AddEventAttendee: React.FC = () => {
                             >
                                 <option value="">Select Job Title</option>
                                 {jobTitles?.map((jobTitle) => (
-                                    <option key={jobTitle.id} value={jobTitle.id}>
+                                    <option key={jobTitle.id} value={jobTitle.name}>
                                         {jobTitle.name}
                                     </option>
                                 ))}
@@ -411,7 +411,7 @@ const AddEventAttendee: React.FC = () => {
                             >
                                 <option value="">Select Company</option>
                                 {companies?.map((company) => (
-                                    <option key={company.id} value={company.id}>
+                                    <option key={company.id} value={company.name}>
                                         {company.name}
                                     </option>
                                 ))}
@@ -457,7 +457,7 @@ const AddEventAttendee: React.FC = () => {
                             >
                                 <option value="">Select Industry</option>
                                 {industries?.map((industry) => (
-                                    <option key={industry.id} value={industry.id}>
+                                    <option key={industry.id} value={industry.name}>
                                         {industry.name}
                                     </option>
                                 ))}
@@ -490,7 +490,13 @@ const AddEventAttendee: React.FC = () => {
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="phone_number" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className="font-semibold text-green-700 flex justify-between items-center">Phone Number &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="phone_number" type="tel" className="grow" {...register('phone_number', { required: 'Phone Number is required' })} />
+                            <input id="phone_number" type="tel" className="grow" {...register('phone_number', {
+                                required: 'Phone Number is required',
+                                pattern: {
+                                    value: /^[0-9]{10}$/, // Regex to match exactly 10 digits
+                                    message: 'Phone number must contain exactly 10 digits'
+                                }
+                            })} />
                         </label>
                         {errors.phone_number && <p className="text-red-600">{errors.phone_number.message}</p>}
                     </div>
@@ -498,7 +504,13 @@ const AddEventAttendee: React.FC = () => {
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="alternate_mobile_number" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className="font-semibold text-green-700 flex justify-between items-center">Alternate Phone Number &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="alternate_mobile_number" type="tel" className="grow" {...register('alternate_mobile_number')} />
+                            <input id="alternate_mobile_number" type="tel" className="grow" {...register('alternate_mobile_number', {
+                                required: 'Phone Number is required',
+                                pattern: {
+                                    value: /^[0-9]{10}$/, // Regex to match exactly 10 digits
+                                    message: 'Phone number must contain exactly 10 digits'
+                                }
+                            })} />
                         </label>
                         {errors.alternate_mobile_number && <p className="text-red-600">{errors.alternate_mobile_number.message}</p>}
                     </div>

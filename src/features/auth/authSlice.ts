@@ -28,6 +28,7 @@ type authState = {
     token: string | null,
     loading: boolean,
     error: string | null,
+    loginError: string | null;
     user: UserType | null,  // Changed to single user instead of array
 };
 
@@ -35,6 +36,7 @@ const initialState: authState = {
     token: null,
     loading: false,
     error: null,
+    loginError: null,
     user: null,
 };
 
@@ -42,7 +44,13 @@ export const login = createAsyncThunk(
     'auth/login', async (credentials: { email: string, password: string }, { rejectWithValue }) => {
         try {
             const response = await fetchLogin(credentials);
-            return response.access_token;
+            // console.log(response)
+            // console.log(response.access_token);
+            if (response.status === 200) {
+                return response.access_token;
+            }
+            // console.log(response.message);
+            return rejectWithValue(response.message);
         } catch (error: any) {
             return rejectWithValue(error.response?.data || 'Login Failed');
         }
@@ -75,21 +83,35 @@ const authSlice = createSlice({
         // pending state for login
         builder.addCase(login.pending, (state) => {
             state.loading = true;
-            state.error = null;
+            state.loginError = null;
         });
 
         // fulfilled state for login
         builder.addCase(login.fulfilled, (state, action: PayloadAction<string>) => {
             state.loading = false;
+            state.loginError = null;
             state.token = action.payload;
-            state.error = null;
         });
 
         // rejected state for login
         builder.addCase(login.rejected, (state, action: PayloadAction<unknown>) => {
             state.loading = false;
-            state.error = typeof action.payload === 'string' ? action.payload : 'Login Failed';
+            state.loginError = typeof action.payload === 'string' ? action.payload : 'Login Failed';
         });
+
+        // builder.addCase(login.rejected, (state, action: PayloadAction<any>) => {
+        //     state.loading = false;
+
+        //     // Handle the error more gracefully
+        //     if (action.payload && typeof action.payload === 'string') {
+        //         state.error = action.payload;
+        //     } else if (action.payload && typeof action.payload === 'object') {
+        //         state.error = action.payload.message || 'Login Failed';
+        //     } else {
+        //         state.error = 'An unknown error occurred';
+        //     }
+        // });
+
 
         // pending state for fetchUser
         builder.addCase(fetchUser.pending, (state) => {
