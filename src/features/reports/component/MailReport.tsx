@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ScoreCard from '../../../component/ScoreCard';
 import HeadingH2 from '../../../component/HeadingH2';
-import DataTable from './DataTable';
 
 const MailReport: React.FC = () => {
 
@@ -37,7 +36,6 @@ const MailReport: React.FC = () => {
             </div>
 
             {/* Rendering Table */}
-            <DataTable />
 
         </div>
     )

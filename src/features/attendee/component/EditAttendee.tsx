@@ -1,6 +1,5 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
-import { MdOutlineFileDownload } from 'react-icons/md';
 import { RootState } from '../../../redux/store';
 import { useSelector } from 'react-redux';
 import { SubmitHandler, useForm } from 'react-hook-form';

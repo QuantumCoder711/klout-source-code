@@ -59,7 +59,7 @@ export const allEventAttendeeApi = async (eventuuid: string | null, token: strin
 }
 
 // Fetching allAgendas
-export const allAgendasApi = async (id: number, token: string | null) => {
+export const allAgendasApi = async (id: number) => {
     try {
         const response = await axios.get(`/api/all-agendas/${id}`);
         console.log(response.data);

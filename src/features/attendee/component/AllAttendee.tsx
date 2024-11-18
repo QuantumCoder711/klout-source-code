@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../../../redux/store';
 import Loader from '../../../component/Loader';
-import { useDispatch } from 'react-redux';
+import { RootState } from '../../../redux/store';
 
 type attendeeType = {
   uuid: string;
@@ -17,8 +16,6 @@ type attendeeType = {
   last_name: string;
 }
 const AllAttendee: React.FC = () => {
-
-  const dispatch = useDispatch<AppDispatch>()
 
   const { allAttendees, loading } = useSelector((state: RootState) => state.attendee);
   console.log(allAttendees);

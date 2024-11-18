@@ -1,7 +1,7 @@
 import React from 'react'
 import SameDayReminder from '../features/attendee/component/SameDayReminder'
 
-const SameDayReminderPage = () => {
+const SameDayReminderPage:React.FC = () => {
   return (
     <SameDayReminder />
   )

@@ -8,7 +8,6 @@ import signinBanner from '../../../assets/images/signinbanner.webp';
 import typingEffect from '../../../utils/typingEffect';
 import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
-import Loader from '../../../component/Loader';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
 import Swal from 'sweetalert2';
 
@@ -96,7 +95,7 @@ const Login: React.FC = () => {
                             />
                             {/* Eye Icon */}
                             <span
-                                className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                                className="absolute inset-y-0 right-3 flex items-center top-6 cursor-pointer"
                                 onClick={() => setShowPassword(!showPassword)} // Toggle visibility
                             >
                                 {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}

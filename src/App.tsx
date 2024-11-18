@@ -25,7 +25,6 @@ import ViewAgendasPage from "./pages/ViewAgendasPage";
 import AddAgendaPage from "./pages/AddAgendaPage";
 import EditAgendaPage from "./pages/EditAgendaPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import Loader from "./component/Loader";
 import PendingUserRequest from "./features/attendee/component/PendingUserRequest";
 import EditAttendeePage from "./pages/EditAttendeePage";
 import SendInvitation from "./features/attendee/component/SendInvitation";

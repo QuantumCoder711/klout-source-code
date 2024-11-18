@@ -12,7 +12,7 @@ import { heading } from '../../heading/headingSlice';
 const SameDayReminder: React.FC = () => {
     // State to keep track of selected roles and selected sending method
     const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-    const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'mail' | null>("mail");
+    const [_, setSelectedMethod] = useState<'whatsapp' | 'mail' | null>("mail");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now"); // State for "now" and "later" radio buttons
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;

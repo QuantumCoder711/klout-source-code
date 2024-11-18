@@ -3,7 +3,7 @@ import HeadingH2 from '../../../component/HeadingH2';
 import { Link, useNavigate } from 'react-router-dom';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiChevronLeft, TiChevronRight } from "react-icons/ti";
-import { FaEdit, FaDownload } from 'react-icons/fa';
+import { FaDownload } from 'react-icons/fa';
 import { TbClockHour9Filled } from "react-icons/tb";
 // import { MdDelete } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
@@ -71,7 +71,6 @@ const PendingUserRequest: React.FC = () => {
 
     const requestAction = (id: number, e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        const thisClicked = e.currentTarget;
 
         // // Assuming these values are available in the scope
         // const userID = 'someUserID';  // Replace with actual user ID
@@ -172,51 +171,51 @@ const PendingUserRequest: React.FC = () => {
         });
     };
 
-    const deleteAttendee = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
-        e.preventDefault();
+    // const deleteAttendee = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+    //     e.preventDefault();
 
-        const thisClicked = e.currentTarget;
+    //     const thisClicked = e.currentTarget;
 
-        // Assuming these values are available in the scope
-        // const token = 'yourAuthToken'; // Replace with actual auth token
+    //     // Assuming these values are available in the scope
+    //     // const token = 'yourAuthToken'; // Replace with actual auth token
 
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.delete(`/api/attendees/${id}`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    }
-                })
-                    .then(function (res) {
-                        Swal.fire({
-                            icon: "success",
-                            title: res.data.message,
-                            showConfirmButton: false,
-                            // timer: 1500,
-                        });
-                        setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
-                        // thisClicked.closest("tr")?.remove(); // Safely remove the row
-                    })
-                    .catch(function (error) {
-                        Swal.fire({
-                            icon: "error",
-                            title: "An Error Occurred!",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                        console.error("Error during delete attendee:", error);
-                    });
-            }
-        });
-    };
+    //     Swal.fire({
+    //         title: "Are you sure?",
+    //         text: "You won't be able to revert this!",
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: "#3085d6",
+    //         cancelButtonColor: "#d33",
+    //         confirmButtonText: "Yes, delete it!",
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             axios.delete(`/api/attendees/${id}`, {
+    //                 headers: {
+    //                     "Authorization": `Bearer ${token}`,
+    //                 }
+    //             })
+    //                 .then(function (res) {
+    //                     Swal.fire({
+    //                         icon: "success",
+    //                         title: res.data.message,
+    //                         showConfirmButton: false,
+    //                         // timer: 1500,
+    //                     });
+    //                     setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
+    //                     // thisClicked.closest("tr")?.remove(); // Safely remove the row
+    //                 })
+    //                 .catch(function (error) {
+    //                     Swal.fire({
+    //                         icon: "error",
+    //                         title: "An Error Occurred!",
+    //                         showConfirmButton: false,
+    //                         timer: 1500,
+    //                     });
+    //                     console.error("Error during delete attendee:", error);
+    //                 });
+    //         }
+    //     });
+    // };
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
@@ -239,10 +238,6 @@ const PendingUserRequest: React.FC = () => {
     console.log("Requests: ", requests);
 
     // Calculate the data to display for the current page
-    const indexOfLastRow = currentPage * rowsPerPage;
-    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-    const currentRows = filteredAttendees.slice(indexOfFirstRow, indexOfLastRow);
-
     // Calculate total pages
     const totalPages = Math.ceil(filteredAttendees.length / rowsPerPage);
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import HeadingH2 from "../../../component/HeadingH2";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -60,11 +59,11 @@ const Profile: React.FC = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState(company_logo);
     const [selectedUserImage, setSelectedUserImage] = useState(userImage);
-    const [image, setImage] = useState(null);
+    const [, setImage] = useState(null);
     const [jobTitle, setJobTitles] = useState([]);
     const [companies, setCompanies] = useState([]);
-    const [customCompanyName, setCustomCompanyName] = useState<string>(user?.company_name || '');
-    const [customDesignationName, setCustomDesignationName] = useState<string>('');
+    const [, setCustomCompanyName] = useState<string>(user?.company_name || '');
+    const [, setCustomDesignationName] = useState<string>('');
     const [selectedCompany, setSelectedCompany] = useState<string>();
     const [selectedDesignation, setSelectedDesignation] = useState<string | null>();
     const dummyImage = "https://via.placeholder.com/150";
@@ -150,6 +149,8 @@ const Profile: React.FC = () => {
         return <Loader />
     }
 
+    console.log(user);
+
 
     return (
         <div>
@@ -172,17 +173,17 @@ const Profile: React.FC = () => {
                     <div className="flex items-center space-x-8">
                         {/* Profile Picture */}
                         <div className="flex-shrink-0">
-                            <img src={`${imageBaseUrl}/${user?.image}` || dummyImage} alt="Profile Picture" className="w-60 rounded-lg object-cover" />
+                            <img src={`${imageBaseUrl}/${user?.image}` || dummyImage} alt="Profile Picture" className="w-80 rounded-lg object-cover" />
                         </div>
 
                         {/* Personal Info */}
                         <div className="space-y-2">
                             <h2 className="text-2xl font-semibold text-gray-800">{user?.first_name + " " + user?.last_name}</h2>
-                            <h3 className="text-xl font-semibold text-gray-800">{user?.company_name}</h3>
-                            <p className="text-lg text-gray-600">{user?.designation_name}</p>
+                            <h3 className="text-lg font-semibold text-gray-800">{user?.company}</h3>
+                            <p className="text-sm text-gray-600">{user?.designation}</p>
                             <p className="text-gray-500 text-sm">{user?.email}</p>
                             <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
-                            {/* <p className="text-gray-600 text-sm">{user?.designation_name}</p> */}
+                            <p className="text-gray-600 text-sm">{user?.designation_name}</p>
                             <p className="text-gray-500 text-sm">{user?.address + ", " + user?.pincode}</p>
                         </div>
                     </div>

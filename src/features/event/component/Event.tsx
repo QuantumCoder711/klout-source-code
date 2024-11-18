@@ -6,17 +6,11 @@ import { RootState, useAppDispatch } from '../../../redux/store';
 import { MdAdd } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { heading } from '../../../features/heading/headingSlice';
-import { eventUUID, fetchEvents } from '../eventSlice';
-import Swal from "sweetalert2";
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import EventRow from '../../../component/EventRow';
 import Loader from '../../../component/Loader';
 
 
 const Event: React.FC = () => {
-    const navigate = useNavigate();
-    const { token } = useSelector((state: RootState) => state.auth);
     const dispatch = useAppDispatch();
     const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
     const itemsPerPage: number = 10;
@@ -45,67 +39,19 @@ const Event: React.FC = () => {
     const { events, loading } = useSelector((state: RootState) => state.events);
 
     const today: Date = new Date();
-
-    const past = events.filter((event: eventType) => {
+    const pastEvents = events.filter((event: eventType) => {
         const eventDate: Date = new Date(event.event_start_date);
         return eventDate < today;
     });
-    
-    const upcoming = events.filter((event: eventType) => {
+
+    const upcomingEvents = events.filter((event: eventType) => {
         const eventDate: Date = new Date(event.event_start_date);
         return eventDate > today;
     });
-    
+
     const handleTabChange = (tab: 'upcoming' | 'past') => {
         setActiveTab(tab);
         setCurrentPage(1); // Reset page to 1 when switching tabs
-    };
-    
-    const [upcomingEvents, setUpcomingEvents] = useState<eventType[]>(upcoming);
-
-    const deleteEvent = (e: any, id: number) => {
-        e.preventDefault();
-
-        // const thisClicked = e.currentTarget;
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios
-                    .delete(`/api/events/${id}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    })
-                    .then(function (res) {
-                        Swal.fire({
-                            icon: "success",
-                            title: res.data.message,
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                        upcomingEvents
-                        dispatch(fetchEvents(token));
-                    })
-                    .catch(function () {
-                        Swal.fire({
-                            icon: "error",
-                            title: "An Error Occured!",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                    });
-
-
-            }
-        });
     };
 
     const handleHeading = () => {

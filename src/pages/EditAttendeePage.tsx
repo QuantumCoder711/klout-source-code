@@ -1,7 +1,7 @@
 import React from 'react';
 import EditAttendee from '../features/attendee/component/EditAttendee';
 
-const EditAttendeePage = () => {
+const EditAttendeePage:React.FC = () => {
   return (
     <EditAttendee />
   )

@@ -183,7 +183,7 @@ export const fetchAllAgendas = createAsyncThunk(
             if (!token) {
                 return rejectWithValue('No token provided');
             }
-            const response = await allAgendasApi(id, token);
+            const response = await allAgendasApi(id);
             return response.data;
         } catch (error) {
             return rejectWithValue('Failed to fetch agendas');

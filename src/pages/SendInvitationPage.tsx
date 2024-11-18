@@ -1,7 +1,7 @@
 import React from 'react'
 import SendInvitation from '../features/attendee/component/SendInvitation'
 
-const SendInvitationPage = () => {
+const SendInvitationPage:React.FC = () => {
   return (
     <SendInvitation />
   )

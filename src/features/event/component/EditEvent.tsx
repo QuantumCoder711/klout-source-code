@@ -6,7 +6,6 @@ import '../component/style/addEvent.css';
 import { fetchEvents } from '../eventSlice';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
-import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';

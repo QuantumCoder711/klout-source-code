@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
-import { allEventAttendee, eventUUID } from '../../event/eventSlice';
+import { allEventAttendee } from '../../event/eventSlice';
 import { FaEdit, FaUserFriends, FaUserClock, FaFileExcel } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { attendeeUUID } from '../attendeeSlice';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { BsSendFill } from 'react-icons/bs';
 import { FaMessage } from 'react-icons/fa6';
 import { BiSolidMessageSquareDots } from 'react-icons/bi';
@@ -34,7 +34,6 @@ type attendeeType = {
 
 const AllEventAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, eventAttendee, loading } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,

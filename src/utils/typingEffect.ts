@@ -5,7 +5,7 @@ const useTypingAnimation = (textToType: string, typingSpeed: number, deletingSpe
     const currentIndexRef = useRef(0);
 
     useEffect(() => {
-        let timeoutId: NodeJS.Timeout;
+        let timeoutId: ReturnType<typeof setTimeout>;
 
         const type = () => {
             if (currentIndexRef.current < textToType.length) {
