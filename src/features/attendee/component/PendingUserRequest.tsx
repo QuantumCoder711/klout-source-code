@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiChevronLeft, TiChevronRight } from "react-icons/ti";
 import { FaEdit, FaDownload } from 'react-icons/fa';
@@ -46,6 +46,7 @@ interface PendingRequestType {
 const PendingUserRequest: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, pendingRequests, user_id, loading, currentEvent } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
@@ -63,8 +64,6 @@ const PendingUserRequest: React.FC = () => {
         if (currentEventUUID && token && user_id) {
             dispatch(fetchAllPendingUserRequests({ eventuuid: currentEventUUID, token, user_id }));
         }
-
-        setRequests(pendingRequests);
 
         console.log("Pending Requrests are: ", pendingRequests);
     }, [currentEventUUID, token, dispatch]);
@@ -110,8 +109,12 @@ const PendingUserRequest: React.FC = () => {
                             title: res.data.message,
                             showConfirmButton: false,
                             timer: 1500,
-                        });
-                        setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
+                        })
+                        setTimeout(() => {
+                            navigate("/events/all-attendee");
+                        }, 1500);
+                        // latestData.
+                        // setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
                     })
                     .catch(function (error) {
                         Swal.fire({
@@ -141,6 +144,9 @@ const PendingUserRequest: React.FC = () => {
                             showConfirmButton: true,  // Show the "OK" button
                             confirmButtonText: "OK",  // You can customize the button text if needed
                         });
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
 
                         // Optionally update state or reload the page after success
                         setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
@@ -196,6 +202,7 @@ const PendingUserRequest: React.FC = () => {
                             showConfirmButton: false,
                             // timer: 1500,
                         });
+                        setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
                         // thisClicked.closest("tr")?.remove(); // Safely remove the row
                     })
                     .catch(function (error) {
@@ -388,15 +395,16 @@ const PendingUserRequest: React.FC = () => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{data.company_name}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{data.email_id}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{data.phone_number}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.status}</td>
+                                            <td>{data.user_invitation_request === 0 ? "Pending" : data.user_invitation_request === 2 ? "Disapprove" : "Approved"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
                                                 {/* <Link to={"/events/edit-agenda"} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit size={20} />
                                                 </Link> */}
-                                                <button onClick={(e) => requestAction(data.id, e)} className="text-klt_primary-500 hover:text-klt_primary-600">
-                                                    <TbClockHour9Filled size={20} />
-                                                </button>
-
+                                                {data.user_invitation_request !== 2 &&
+                                                    <button onClick={(e) => requestAction(data.id, e)} className="text-klt_primary-500 hover:text-klt_primary-600">
+                                                        <TbClockHour9Filled size={20} />
+                                                    </button>
+                                                }
                                             </td>
                                         </tr>
                                     ))

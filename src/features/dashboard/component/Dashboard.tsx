@@ -66,7 +66,7 @@ const Dashboard: React.FC = () => {
     dispatch(heading('Add Event'))
   }
 
-  if(loading) {
+  if (loading) {
     return <Loader />
   }
 
@@ -100,34 +100,6 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      {/* PAST EVENTS */}
-
-      <div className="mt-10 mb-6 flex justify-between items-center">
-        <HeadingH2
-          title='Past Events'
-        />
-        <Link to='/events' onClick={() => dispatch(heading('All Events'))}><Button
-          buttonTitle='View All'
-        /></Link>
-
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {
-          pastEvents.length > 0 ?
-            pastEvents.map((pastEvent: eventType) => {
-              return <EventCard
-                key={pastEvent.uuid}
-                title={pastEvent.title}
-                imageUrl={`${imageBaseUrl}/${pastEvent.image}`}
-                imageAlt={pastEvent.title}
-                date={pastEvent.event_start_date}
-                venue={pastEvent.event_venue_name}
-                eventuuid={pastEvent.uuid}
-              />
-            }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Past Event</h3>
-        }
-      </div>
 
       {/* UPCOMING EVENTS */}
 
@@ -158,7 +130,34 @@ const Dashboard: React.FC = () => {
         }
       </div>
 
+      {/* PAST EVENTS */}
 
+      <div className="mt-10 mb-6 flex justify-between items-center">
+        <HeadingH2
+          title='Past Events'
+        />
+        <Link to='/events' onClick={() => dispatch(heading('All Events'))}><Button
+          buttonTitle='View All'
+        /></Link>
+
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {
+          pastEvents.length > 0 ?
+            pastEvents.map((pastEvent: eventType) => {
+              return <EventCard
+                key={pastEvent.uuid}
+                title={pastEvent.title}
+                imageUrl={`${imageBaseUrl}/${pastEvent.image}`}
+                imageAlt={pastEvent.title}
+                date={pastEvent.event_start_date}
+                venue={pastEvent.event_venue_name}
+                eventuuid={pastEvent.uuid}
+              />
+            }) : <h3 className="text-2xl text-red-500 font-semibold pt-2 pb-3 px-4 bg-slate-300 rounded-md">No Past Event</h3>
+        }
+      </div>
     </>
   );
 };

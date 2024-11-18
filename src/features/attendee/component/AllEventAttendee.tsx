@@ -6,7 +6,7 @@ import { allEventAttendee, eventUUID } from '../../event/eventSlice';
 import { FaEdit, FaUserFriends, FaUserClock, FaFileExcel } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { attendeeUUID } from '../attendeeSlice';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BsSendFill } from 'react-icons/bs';
 import { FaMessage } from 'react-icons/fa6';
 import { BiSolidMessageSquareDots } from 'react-icons/bi';
@@ -34,6 +34,7 @@ type attendeeType = {
 
 const AllEventAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, eventAttendee, loading } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
@@ -71,7 +72,9 @@ const AllEventAttendee: React.FC = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
+    const [currentAttendees, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
+
+    // const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -157,7 +160,8 @@ const AllEventAttendee: React.FC = () => {
                             showConfirmButton: false,
                             timer: 1500,
                         });
-                        // dispatch(fetchEvents(token));
+                        // setFilteredAgendaData(prevAgendas => prevAgendas.filter(agenda => agenda.uuid !== uuid));
+                        setCurrentAttendees(prevAttendee => prevAttendee.filter(attendee=> attendee.id !== id));
                     })
                     .catch(function () {
                         Swal.fire({

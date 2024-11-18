@@ -45,21 +45,23 @@ const Event: React.FC = () => {
     const { events, loading } = useSelector((state: RootState) => state.events);
 
     const today: Date = new Date();
-    const pastEvents = events.filter((event: eventType) => {
+
+    const past = events.filter((event: eventType) => {
         const eventDate: Date = new Date(event.event_start_date);
         return eventDate < today;
     });
-
-    const upcomingEvents = events.filter((event: eventType) => {
+    
+    const upcoming = events.filter((event: eventType) => {
         const eventDate: Date = new Date(event.event_start_date);
         return eventDate > today;
     });
-
+    
     const handleTabChange = (tab: 'upcoming' | 'past') => {
         setActiveTab(tab);
         setCurrentPage(1); // Reset page to 1 when switching tabs
     };
-
+    
+    const [upcomingEvents, setUpcomingEvents] = useState<eventType[]>(upcoming);
 
     const deleteEvent = (e: any, id: number) => {
         e.preventDefault();
@@ -89,6 +91,7 @@ const Event: React.FC = () => {
                             showConfirmButton: false,
                             timer: 1500,
                         });
+                        upcomingEvents
                         dispatch(fetchEvents(token));
                     })
                     .catch(function () {
@@ -99,6 +102,8 @@ const Event: React.FC = () => {
                             timer: 1500,
                         });
                     });
+
+
             }
         });
     };
