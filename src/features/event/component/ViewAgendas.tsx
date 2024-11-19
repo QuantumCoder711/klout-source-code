@@ -13,6 +13,7 @@ import axios from 'axios';
 import { heading } from '../../heading/headingSlice';
 import Swal from 'sweetalert2';
 import Loader from '../../../component/Loader';
+import { FaFileImport } from "react-icons/fa6";
 
 // Define the AgendaType interface
 type AgendaType = {
@@ -42,16 +43,37 @@ const ViewAgendas: React.FC = () => {
   const [filterTitle, setFilterTitle] = useState(""); // State for the filter input
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
+  const currentEventId = useSelector((state: RootState) => state.events);
+
+  console.log(currentEventId);
+
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { events, loading } = useSelector((state: RootState) => state.events);
+  const [eventId, setEventId] = useState<number>();
+
+  const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
+
+  const [button, setButton] = useState<boolean>(false);
+
+  console.log("Total Events are: ", events);
 
   const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
+
+  // console.log("Current Event is: ",currentEvent?.id);
+
+  if (currentEvent === undefined) {
+    console.log("Cannot find the currentevent");
+    return;
+  }
+
+  // console.log("Current event is: ", currentEvent);
 
   useEffect(() => {
     if (currentEvent) {
       axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
         .then((res) => {
           if (res.data) {
+            console.log(currentEvent);
             setAgendaData(res.data.data);
             setFilteredAgendaData(res.data.data); // Initialize filtered data
           }
@@ -64,16 +86,15 @@ const ViewAgendas: React.FC = () => {
   const deleteAgenda = async (uuid: string) => {
     const result = await Swal.fire({
       title: "Are you sure?",
-      icon: "warning",
+      icon: "info",
       showDenyButton: true,
-      text: "You won't be able to revert this!",
       confirmButtonText: "Yes, delete it!",
     });
 
     if (result.isConfirmed) {
       try {
         // Delete the agenda from the server
-        await axios.delete(`/api/agendas/${uuid}`, {
+        await axios.delete(`${apiBaseUrl}/api/agendas/${uuid}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -193,6 +214,42 @@ const ViewAgendas: React.FC = () => {
     return paginationNumbers;
   };
 
+  const handleImportAgenda = () => {
+    const currentDate = currentEvent.event_date;
+    const newEventId = currentEvent.id;
+
+    try {
+      axios.post(
+        `${apiBaseUrl}/api/duplicate-agendas`,
+        {
+          event_id: eventId,
+          new_event_id: newEventId,
+          date: currentDate,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      ).then((res) => {
+        if (res.data.status === 200) {
+          const modal = document.getElementById('my_modal_2') as HTMLDialogElement;
+          if (modal) {
+            modal.close(); // Using the `.close()` method of the <dialog> element
+          }
+
+          swal("Success", res.data.message, "success").then(() => {
+            window.location.reload();
+          });
+        };
+      });
+    } catch (error: any) {
+      throw error;
+    }
+  };
+
+
   if (loading) {
     return <Loader />
   }
@@ -201,17 +258,82 @@ const ViewAgendas: React.FC = () => {
     <div>
       {/* Heading and Buttons Wrapper Div */}
       <div className='flex justify-between items-center'>
-        <HeadingH2 title={events[0].title} />
+        <HeadingH2 title={currentEvent.title} />
         <div className='flex items-center gap-3'>
-          <Link to="/events/" onClick={()=>dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
+          <Link to="/events/" onClick={() => dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
             <IoMdArrowRoundBack size={20} /> Go Back
           </Link>
         </div>
       </div>
 
-      <Link to="/events/add-agenda" onClick={() => dispatch(heading("Add Agenda"))} className="btn mt-5 btn-secondary w-fit flex items-center text-white btn-sm">
-        <TiPlus size={20} /> Add Agenda
-      </Link>
+      <div className='flex gap-3'>
+        <Link to="/events/add-agenda" onClick={() => dispatch(heading("Add Agenda"))} className="btn mt-5 btn-secondary w-fit flex items-center text-white btn-sm">
+          <TiPlus size={20} /> Add Agenda
+        </Link>
+        <button
+          className="btn mt-5 btn-info w-fit flex items-center text-white btn-sm"
+          onClick={() => {
+            const modal = document.getElementById('my_modal_2') as HTMLDialogElement;
+            if (modal) {
+              modal.showModal();
+            }
+          }}
+        >
+          <FaFileImport size={14} /> Import Agenda
+        </button>
+
+
+      </div>
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Please select an event</h3>
+
+          <ul className="mt-5 space-y-5 max-h-96">
+            {events.map((event) => {
+              // Only render if event.id is not equal to currentEvent.id
+              if (event.id === currentEvent.id) {
+                return null; // Do not render this event
+              }
+
+              return (
+                <li key={event.id}>
+                  <label className="flex items-center justify-between">
+                    {/* Display the event title */}
+                    {event.title}
+                    <input
+                      type="radio"
+                      name="event"
+                      value={event.title}
+                      checked={selectedEvent === event.title}
+                      onChange={() => {
+                        setButton(true);
+                        // Log the event id only when the radio button is clicked
+                        console.log('Selected event id:', event.id);
+                        setEventId(event.id);
+                        console.log("Event id is: ", event.id);
+                        // Update the selectedEvent state
+                        setSelectedEvent(event.title);
+                      }}
+                    />
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+
+
+          {button && <button
+            onClick={handleImportAgenda}
+            className="btn mt-5 mx-auto btn-info w-fit flex items-center text-white btn-sm"
+          >
+            <FaFileImport size={14} /> Import Agenda
+          </button>}
+        </div>
+
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
 
       {/* table filters and pagination wrapper div */}
       <div className='bg-white p-6 rounded-lg shadow-md mt-3'>
@@ -255,7 +377,7 @@ const ViewAgendas: React.FC = () => {
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.event_date}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' + data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
-                      <Link to={`/events/edit-agenda`} onClick={() => {dispatch(agendaUUID(data.uuid)); dispatch(heading("Edit Agenda"))}} className="text-blue-500 hover:text-blue-700">
+                      <Link to={`/events/edit-agenda`} onClick={() => { dispatch(agendaUUID(data.uuid)); dispatch(heading("Edit Agenda")) }} className="text-blue-500 hover:text-blue-700">
                         <FaEdit size={20} />
                       </Link>
                       <button onClick={() => deleteAgenda(data.uuid)} className="text-red-500 hover:text-red-700">

@@ -16,6 +16,7 @@ import { heading } from '../../heading/headingSlice';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import Loader from '../../../component/Loader';
+import { IoMdArrowRoundBack } from 'react-icons/io';
 
 type attendeeType = {
     uuid: string;
@@ -42,15 +43,13 @@ const AllEventAttendee: React.FC = () => {
         loading: state.events.attendeeLoader
     }));
 
-    console.log(eventAttendee);
-
     useEffect(() => {
         if (currentEventUUID && token) {
             dispatch(allEventAttendee({ eventuuid: currentEventUUID, token }));
         }
     }, [currentEventUUID, token]);
 
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchName, setSearchName] = useState('');
     const [searchCompany, setSearchCompany] = useState('');
@@ -72,9 +71,9 @@ const AllEventAttendee: React.FC = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    const [, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
+    // const [currentAttendees, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
 
-    // const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
+    const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -164,7 +163,7 @@ const AllEventAttendee: React.FC = () => {
                             window.location.reload();
                         }, 1500);
                         // setFilteredAgendaData(prevAgendas => prevAgendas.filter(agenda => agenda.uuid !== uuid));
-                        setCurrentAttendees(prevAttendee => prevAttendee.filter(attendee => attendee.id !== id));
+                        // setCurrentAttendees(prevAttendee => prevAttendee.filter(attendee => attendee.id !== id));
                     })
                     .catch(function () {
                         Swal.fire({
@@ -184,7 +183,12 @@ const AllEventAttendee: React.FC = () => {
 
     return (
         <>
+        <div className='flex justify-between items-center'>
             <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
+            <Link to="/" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                        <IoMdArrowRoundBack size={20} /> Go Back
+                    </Link>
+        </div>
             <br />
 
             <div className="flex gap-2 mb-4">
@@ -210,27 +214,26 @@ const AllEventAttendee: React.FC = () => {
                 </button>
             </div >
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-center">
-                    {/* Show dropdown */}
-                    <div className="mb-2 flex items-center">
-                        <label htmlFor="itemsPerPage" className="mr-2 text-gray-800 font-semibold">
-                            Show:
-                        </label>
-                        <select
-                            id="itemsPerPage"
-                            className="border border-gray-500 rounded-md p-2 bg-white outline-none"
-                            value={itemsPerPage}
-                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                        >
-                            <option value={10}>10</option>
-                            <option value={25}>25</option>
-                            <option value={50}>50</option>
-                            <option value={100}>100</option>
-                        </select>
-                    </div>
-
+                <div className="flex justify-between flex-col-reverse min-[1440px]:flex-row gap-5 items-center">
                     {/* Search inputs */}
-                    <div className="mb-2 flex gap-2">
+                    <div className="mb-2 flex justify-center flex-wrap gap-2">
+                        {/* Show dropdown */}
+                        <div className="mb-2 flex items-center h-full">
+                            <label htmlFor="itemsPerPage" className="mr-2 text-gray-800 font-semibold">
+                                Show:
+                            </label>
+                            <select
+                                id="itemsPerPage"
+                                className="border border-gray-500 rounded-md p-2 bg-white outline-none"
+                                value={itemsPerPage}
+                                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                            >
+                                <option value={10}>10</option>
+                                <option value={25}>25</option>
+                                <option value={50}>50</option>
+                                <option value={100}>100</option>
+                            </select>
+                        </div>
                         <input
                             type="text"
                             className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
@@ -295,7 +298,7 @@ const AllEventAttendee: React.FC = () => {
                     </div>
 
                     {/* Total Attendee Info */}
-                    <div className="mb-2 text-right">
+                    <div className="mb-2 text-right min-w-fit">
                         <span className="text-gray-800 font-semibold">
                             Total Attendee: {eventAttendee.length}
                         </span>
@@ -333,8 +336,8 @@ const AllEventAttendee: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {eventAttendee.length > 0 ? (
-                                    eventAttendee.map((attendee, index) => (
+                                {currentAttendees.length > 0 ? (
+                                    currentAttendees.map((attendee, index) => (
                                         <tr key={attendee.uuid}>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>

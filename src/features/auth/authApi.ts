@@ -6,7 +6,6 @@ type loginParams = {
     password: string
 }
 
-
 export const fetchLogin = async ({ email, password }: loginParams) => {
     try {
         const response = await axios.post(`${apiBaseUrl}/api/login`, { email, password }, {

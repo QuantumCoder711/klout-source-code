@@ -131,7 +131,7 @@ const EditAgenda: React.FC = () => {
 
             // Step 2: Make the API request to update the agenda
             try {
-                const res = await axios.post(`/api/agendas/${currentAgendaUUID}`, formData, {
+                const res = await axios.post(`${apiBaseUrl}/api/agendas/${currentAgendaUUID}`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         'Authorization': `Bearer ${token}`
