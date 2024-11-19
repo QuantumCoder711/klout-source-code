@@ -28,6 +28,8 @@ interface EventRowProps {
 const EventRow: React.FC<EventRowProps> = (props) => {
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+    const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+
     const { token } = useSelector((state: RootState) => (state.auth));
 
     const dispatch = useDispatch();
@@ -35,7 +37,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
     const generatePDF = (uuid: string) => {
         // setLoading(true)
-        axios.get(`/api/generatePDF/${uuid}`)
+        axios.get(`${apiBaseUrl}/api/generatePDF/${uuid}`)
             .then(res => {
                 if (res.data.status === 200) {
                     //   setLoading(false)
@@ -48,7 +50,6 @@ const EventRow: React.FC<EventRowProps> = (props) => {
     }
 
     const handleDelete = async (id: number) => {
-
         const result = await Swal.fire({
             title: "Are you sure?",
             icon: "warning",
@@ -60,18 +61,24 @@ const EventRow: React.FC<EventRowProps> = (props) => {
         if (result.isConfirmed) {
             try {
                 // Delete the event from the server
-                await axios.delete(`/api/events/${id}`, {
+                await axios.delete(`${apiBaseUrl}/api/events/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
 
                 // Show success message
-                Swal.fire({
+                const successResult = await Swal.fire({
                     title: "Deleted!",
                     text: "Your event has been deleted.",
                     icon: "success",
+                    confirmButtonText: "OK",
                 });
+
+                // Reload the page when the "OK" button is clicked
+                if (successResult.isConfirmed) {
+                    window.location.reload();
+                }
 
             } catch (error) {
                 Swal.fire({
@@ -81,8 +88,8 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                 });
             }
         }
-        // https://api.klout.club/api/events/144
     }
+
 
     return (
         <div className='p-5 border-b flex items-center justify-between gap-5 rounded-lg'>

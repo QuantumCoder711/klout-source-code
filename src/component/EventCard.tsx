@@ -15,15 +15,17 @@ type eventCardProps = {
     venue: string,
     imageUrl: string,
     imageAlt: string,
-    eventuuid: string
+    eventuuid: string,
+    eventId: number,
 }
 
 
-const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, imageAlt,eventuuid }) => {
+const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, imageAlt, eventuuid, eventId }) => {
 
     const dispatch = useDispatch();
+    const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const { token } = useSelector((state: RootState) => (state.auth));
-    const eventId = useSelector((state: RootState) => state.events.currentEvent);
+    // const id = useSelector((state: RootState) => state.events.currentEvent?.id);
 
     const handleClick = (eventuuid: string) => {
         console.log("Hello", eventuuid);
@@ -44,18 +46,24 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
         if (result.isConfirmed) {
             try {
                 // Delete the event from the server
-                await axios.delete(`/api/events/${id}`, {
+                await axios.delete(`${apiBaseUrl}/api/events/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
 
                 // Show success message
-                Swal.fire({
+                const successResult = await Swal.fire({
                     title: "Deleted!",
                     text: "Your event has been deleted.",
                     icon: "success",
+                    confirmButtonText: "OK",
                 });
+
+                // Reload the page when the "OK" button is clicked
+                if (successResult.isConfirmed) {
+                    window.location.reload();
+                }
 
             } catch (error) {
                 Swal.fire({
@@ -82,14 +90,14 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
                 <p className="inline-flex gap-2 items-start"><MdMyLocation className="text-2xl" /> {venue}</p>
                 <p className="font-semibold inline-flex gap-2 items-center"><MdDateRange className="text-2xl" /> {date}</p>
                 <div className="flex gap-3 mt-2 text-xs flex-wrap">
-                    <Link to='/events/view-event/' onClick={() => {handleClick(eventuuid); dispatch(heading("View Event"));}} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
-                    <Link to='/events/edit-event' onClick={() => {handleClick(eventuuid); dispatch(heading("Edit Event"));}} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
-                    <Link to='/events/all-attendee/' onClick={() => {handleClick(eventuuid); dispatch(heading("All Attendee"))}} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
+                    <Link to='/events/view-event/' onClick={() => { handleClick(eventuuid); dispatch(heading("View Event")); }} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
+                    <Link to='/events/edit-event' onClick={() => { handleClick(eventuuid); dispatch(heading("Edit Event")); }} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
+                    <Link to='/events/all-attendee/' onClick={() => { handleClick(eventuuid); dispatch(heading("All Attendee")) }} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
                     {/* <Link to='/events/view-sponsers/' onClick={() => handleClick(eventuuid)} className="underline text-green-500 hover:text-green-600">View Sponsers</Link> */}
-                    <Link to='/events/view-agendas/' onClick={() => {handleClick(eventuuid); dispatch(heading("View Agendas"));}} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
+                    <Link to='/events/view-agendas/' onClick={() => { handleClick(eventuuid); dispatch(heading("View Agendas")); }} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
                     <button onClick={() => {
-                        if (eventId?.id !== undefined) {
-                            handleDelete(eventId?.id);
+                        if (eventId !== undefined) {
+                            handleDelete(eventId);
                         }
                     }} className="underline text-red-500 hover:text-red-600">Delete Event</button>
                 </div>

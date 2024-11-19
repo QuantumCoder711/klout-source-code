@@ -120,11 +120,11 @@ const AddEvent: React.FC = () => {
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
         // Step 1: Show confirmation dialog to ask if the user wants to submit the event
         const result = await Swal.fire({
-            title: 'Are you sure you want to submit this event?',
-            icon: 'warning',
+            title: 'Do you want to add this event ?',
+            icon: 'info',
             showDenyButton: true,
-            text: "You won't be able to revert this once submitted!",
-            confirmButtonText: 'Yes, submit it!',
+            // text: "You won't be able to revert this once submitted!",
+            confirmButtonText: 'Yes, add it!',
             denyButtonText: 'No, cancel',
         });
 

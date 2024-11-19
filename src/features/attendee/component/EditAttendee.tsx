@@ -37,7 +37,7 @@ type ApiType = {
 
 
 const EditAttendee = () => {
-
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const dummyImage = "https://via.placeholder.com/150";
 
   const [selectedImage, setSelectedImage] = useState('');
@@ -61,11 +61,11 @@ const EditAttendee = () => {
   console.log(currentAttendeeUUID);
 
   useEffect(() => {
-    axios.get("/api/job-titles").then(res => setJobTitles(res.data.data));
-    axios.get("/api/companies").then(res => setCompanies(res.data.data));
-    axios.get("/api/get-industries").then(res => setIndustries(res.data.data));
+    axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
+    axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
+    axios.get(`${apiBaseUrl}/api/get-industries`).then(res => setIndustries(res.data.data));
 
-    axios.post(`/api/attendees/${currentAttendeeUUID}`, {}, {
+    axios.post(`${apiBaseUrl}/api/attendees/${currentAttendeeUUID}`, {}, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -140,7 +140,7 @@ const EditAttendee = () => {
     console.log(formData);
 
     axios
-      .post(`/api/attendees/${currentEvent?.user_id}`, formData, {
+      .post(`${apiBaseUrl}/api/attendees/${currentEvent?.user_id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${token}`

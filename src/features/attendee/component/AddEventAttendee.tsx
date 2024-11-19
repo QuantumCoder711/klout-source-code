@@ -6,9 +6,6 @@ import axios from "axios";
 import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { allEventAttendee } from "../../event/eventSlice";
-import { useDispatch } from "react-redux";
-
 const dummyImage = "https://via.placeholder.com/150";
 
 // Define the form data type

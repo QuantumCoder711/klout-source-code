@@ -10,7 +10,7 @@ export default defineConfig({
       //   secure: true, 
       //   rewrite: (path) => path.replace(/^\/api/, ''),
       // }
-      '/api': 'https://api.klout.club'
+      'api': 'https://api.klout.club'
     }
   },
   plugins: [react()],

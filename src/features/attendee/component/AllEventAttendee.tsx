@@ -34,6 +34,7 @@ type attendeeType = {
 
 const AllEventAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, eventAttendee, loading } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
@@ -71,7 +72,7 @@ const AllEventAttendee: React.FC = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    const [currentAttendees, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
+    const [, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
 
     // const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
 
@@ -147,7 +148,7 @@ const AllEventAttendee: React.FC = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(`/api/attendees/${id}`, {
+                    .delete(`${apiBaseUrl}/api/attendees/${id}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }

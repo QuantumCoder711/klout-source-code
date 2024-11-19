@@ -20,7 +20,8 @@ const Dashboard: React.FC = () => {
     image: string,
     event_start_date: string,
     uuid: string,
-    event_venue_name: string
+    event_venue_name: string,
+    id: number,
   }
 
   const { events, loading, error } = useSelector((state: RootState) => state.events);
@@ -118,8 +119,9 @@ const Dashboard: React.FC = () => {
           upcomingEvents.length > 0 ?
             upcomingEvents.map((upcomingEvent: eventType) => {
               return <EventCard
-                key={upcomingEvent.uuid}
+                key={upcomingEvent.id}
                 title={upcomingEvent.title}
+                eventId={upcomingEvent.id}
                 imageUrl={`https://api.klout.club/${upcomingEvent.image}`}
                 imageAlt={upcomingEvent.title}
                 date={upcomingEvent.event_start_date}
@@ -148,6 +150,7 @@ const Dashboard: React.FC = () => {
             pastEvents.map((pastEvent: eventType) => {
               return <EventCard
                 key={pastEvent.uuid}
+                eventId={pastEvent.id}
                 title={pastEvent.title}
                 imageUrl={`${imageBaseUrl}/${pastEvent.image}`}
                 imageAlt={pastEvent.title}
