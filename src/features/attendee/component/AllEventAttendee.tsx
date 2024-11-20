@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { BsSendFill } from 'react-icons/bs';
 import { FaMessage } from 'react-icons/fa6';
 import { BiSolidMessageSquareDots } from 'react-icons/bi';
+import { FaPoll } from "react-icons/fa";
 import HeadingH2 from '../../../component/HeadingH2';
 import * as XLSX from 'xlsx';  // Import the xlsx library
 import { heading } from '../../heading/headingSlice';
@@ -205,6 +206,9 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
                 <Link to="/events/same-day-reminder" onClick={() => { dispatch(heading('Send Same Day Reminder')); }} className="btn btn-warning text-white btn-sm">
                     <BiSolidMessageSquareDots /> Send Same Day Reminder
+                </Link>
+                <Link to="/events/send-poll" onClick={() => { dispatch(heading('Send Poll')); }} className="btn btn-info text-white btn-sm">
+                    <FaPoll /> Send Poll
                 </Link>
                 <Link to="/events/pending-user-request" onClick={() => { dispatch(heading("Pending Requests")) }} className="btn btn-error text-white btn-sm">
                     <FaUserClock /> Pending User Request

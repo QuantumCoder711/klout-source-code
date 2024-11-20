@@ -41,6 +41,7 @@ const WhatsAppReport: React.FC = () => {
     const [changeCardStatus, setChangeCartStatus] = useState<string>("Sent");
 
     const userID = user?.id;
+    console.log(userID);
 
     useEffect(() => {
 
@@ -58,11 +59,11 @@ const WhatsAppReport: React.FC = () => {
                 console.log(res.data.data);
                 setAllData(res.data.data);
                 setTotalMessage(res.data.data.length)
-                const delivered = res.data.data.filter((item:ReciptState) => item.messageID.messageStatus !== "Failed");
+                const delivered = res.data.data.filter((item:ReciptState) => item.messageID && item.messageID.messageStatus !== "Failed");
                 setTotalDelivered(delivered.length);
-                const read = res.data.data.filter((item:ReciptState) => item.messageID.messageStatus === "Read");
+                const read = res.data.data.filter((item:ReciptState) => item.messageID && item.messageID.messageStatus === "Read");
                 setTotalRead(read.length)
-                const failed = res.data.data.filter((item:ReciptState) => item.messageID.messageStatus === "Failed");
+                const failed = res.data.data.filter((item:ReciptState) => item.messageID && item.messageID.messageStatus === "Failed");
                 setTotalFailed(failed.length)
             })
     }, [selectedTemplate]);
@@ -79,9 +80,10 @@ const WhatsAppReport: React.FC = () => {
 
                 {/* Custom Tab Menu */}
                 <div className='flex rounded-md border border-klt_primary-500 w-fit'>
-                    <div className={`font-medium py-2 px-4 cursor-pointer rounded-l-md grid place-content-center ${activeTab === 1 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(1); setSelectedTemplate("delegate_invitation");  setChangeCartStatus("Sent")}}>Invitation</div>
-                    <div className={`font-medium py-2 px-4 border-x border-klt_primary-500 cursor-pointer grid place-content-center ${activeTab === 2 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(2); setSelectedTemplate("event_downloadapp");  setChangeCartStatus("Sent")}}>Reminder</div>
-                    <div className={`font-medium py-2 px-4 cursor-pointer rounded-r-md grid place-content-center ${activeTab === 3 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(3); setSelectedTemplate("event_reminder_today");  setChangeCartStatus("Sent")}}>Same Day Invitation</div>
+                    {/* <div className={`font-medium py-2 px-4 cursor-pointer rounded-l-md grid place-content-center ${activeTab === 1 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(1); setSelectedTemplate("delegate_invitation");  setChangeCartStatus("Sent")}}>Invitation</div> */}
+                    <div className={`font-medium py-2 px-4 border-x border-klt_primary-500 cursor-pointer grid place-content-center ${activeTab === 1 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(1); setSelectedTemplate("event_downloadapp");  setChangeCartStatus("Sent")}}>Reminder</div>
+                    <div className={`font-medium py-2 px-4 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 2 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(2); setSelectedTemplate("event_reminder_today");  setChangeCartStatus("Sent")}}>Same Day Invitation</div>
+                    <div className={`font-medium py-2 px-4 cursor-pointer rounded-r-md grid place-content-center ${activeTab === 3 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(3); setSelectedTemplate("event_poll_feedback");  setChangeCartStatus("Sent")}}>Event Poll</div>
                 </div>
             </div>
 

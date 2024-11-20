@@ -10,12 +10,17 @@ import { AppDispatch, RootState } from '../../../redux/store';
 import { eventUUID } from '../../event/eventSlice';
 import { useDispatch } from 'react-redux';
 import { heading } from '../../heading/headingSlice';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const SendReminder: React.FC = () => {
     // State to keep track of selected roles and selected sending method
+    const { token } = useSelector((state: RootState) => state.auth);
     const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-    const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'mail' | null>("mail");
+    const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'email' | null>("email");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now"); // State for "now" and "later" radio buttons
+    const [title, setTitle] = useState<string>("");
+    const [message, setMessage] = useState<string>("");
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
@@ -46,7 +51,7 @@ const SendReminder: React.FC = () => {
     };
 
     // Handle method selection (WhatsApp or Mail)
-    const handleMethodChange = (method: 'whatsapp' | 'mail') => {
+    const handleMethodChange = (method: 'whatsapp' | 'email') => {
         setSelectedMethod(method);
     };
 
@@ -55,6 +60,89 @@ const SendReminder: React.FC = () => {
         setSendTime(time);
     };
 
+    const handleSubmit = () => {
+        // const formData = new FormData();
+        let dataObj = {};
+        if (currentEvent) {
+            dataObj = {
+                "event_id": currentEvent?.uuid,
+                "send_to": 'All',
+                "send_method": selectedMethod === "whatsapp" ? "Template" : selectedMethod,
+                "subject": title,
+                "message": "Template",
+                "start_date": currentEvent?.event_start_date,
+                "delivery_schedule": sendTime,
+                "start_date_time": "01",
+                "start_date_type": "am",
+                "end_date": currentEvent?.event_end_date,
+                "end_date_time": "01",
+                "end_date_type": "pm",
+                "no_of_times": "1",
+                "hour_interval": "1",
+                "status": 1,
+            };
+        }
+
+        console.log(dataObj); // Check if `check_in` is added correctly
+
+        try {
+            axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Authorization": `Bearer ${token}`
+                },
+            })
+                .then(res => {
+                    // Check if the response is successful (status 200)
+                    if (res.status === 200) {
+                        // Show success message using SweetAlert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'The invitation was sent successfully!',
+                        }).then((result) => {
+                            // Check if the OK button was clicked
+                            if (result.isConfirmed) {
+                                // Navigate to the '/events/all-attendee' route
+                                window.location.href = "/events/all-attendee";
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    // Show error message if there is any issue
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Something went wrong',
+                        text: error.response?.data?.message || 'An error occurred. Please try again.'
+                    });
+                });
+        } catch (error) {
+            // Catch any unexpected errors
+            Swal.fire({
+                icon: 'error',
+                title: 'Something went wrong',
+                text: 'An unexpected error occurred.'
+            });
+        }
+
+
+        //     event_id: eventId,
+        // send_to: null,
+        // send_method: "whatsapp",
+        // subject: "",
+        // message: "",
+        // start_date: currentDate,
+        // delivery_schedule: "now",
+        // start_date_time: "01",
+        // start_date_type: "am",
+        // end_date: currentDate,
+        // end_date_time: "01",
+        // end_date_type: "pm",
+        // no_of_times: "1",
+        // hour_interval: "1",
+        // status: 1,
+    }
 
     if (!currentEvent) {
         return;
@@ -81,7 +169,7 @@ const SendReminder: React.FC = () => {
                         {/* Select Roles */}
                         <div className='mt-2'>
                             <h5 className='font-semibold mb-3'>Select Roles</h5>
-                            <div className="flex flex-row items-center gap-10 pl-5">
+                            <div className="flex flex-row items-center justify-between pl-5 text-sm">
                                 {/* Checkbox for All Roles */}
                                 <label className="flex items-center space-x-2 cursor-pointer">
                                     <input
@@ -159,8 +247,8 @@ const SendReminder: React.FC = () => {
                                     <input
                                         type="radio"
                                         name="sendMethod"
-                                        checked={selectedMethod === 'mail'}
-                                        onChange={() => handleMethodChange('mail')}
+                                        checked={selectedMethod === 'email'}
+                                        onChange={() => handleMethodChange('email')}
                                         className="bg-transparent border-zinc-400"
                                     />
                                     <IoMail size={24} className='text-blue-500 ml-2' />
@@ -192,20 +280,22 @@ const SendReminder: React.FC = () => {
 
 
                         {/* Subject Input */}
-                        {selectedMethod === "mail" && <div className="mt-10">
+                        {selectedMethod === "email" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Subject</label>
-                            <input type="text" name="Subject" id="subject" className='input w-full mt-2' />
+                            <input type="text" name="Subject" onChange={(e) => setTitle(e.target.value)} id="subject" className='input w-full mt-2' />
                         </div>}
 
                         {/* Rich Textarea */}
-                        {selectedMethod === "mail" && <div className="mt-10">
+                        {selectedMethod === "email" && <div className="mt-10">
                             <label htmlFor="Message" className='block font-semibold'>Message</label>
 
                             {/* TinyMCE Editor */}
                             <div className="form-group">
                                 <Editor
                                     apiKey="nv4qeg7zimei3mdz8lj1yzl5bakrmw4li6baiikh87f8vksz" // Get your API key from TinyMCE
-                                    // value={formInput.message}
+                                    value={message}
+                                    onEditorChange={(content) => setMessage(content)}
+                                    // onEditorChange={(e)=>setTitle()}
                                     // className={`form-control ${errors.message ? "is-invalid" : ""
                                     //     }`}
                                     initialValue="<p>Please type here...</p>"
@@ -269,7 +359,7 @@ const SendReminder: React.FC = () => {
                                 </label>
                             </div>
                         </div>
-                        <button className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>Submit Now</button>
+                        <button onClick={handleSubmit} className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>Submit Now</button>
                     </div>
                 </div>
 

@@ -29,6 +29,8 @@ import PendingUserRequest from "./features/attendee/component/PendingUserRequest
 import EditAttendeePage from "./pages/EditAttendeePage";
 import SendInvitation from "./features/attendee/component/SendInvitation";
 import SameDayReminder from "./features/attendee/component/SameDayReminder";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
+import SendPollPage from "./pages/SendPollPage";
 
 axios.defaults.withCredentials = false;
 const App: React.FC = () => {
@@ -44,7 +46,7 @@ const App: React.FC = () => {
           element={<Layout />}
         >
           <Route path="/" element={<DashboardPage />} />
-          {/* <Route path="/" element={<Loader />} /> */}
+          <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventPage />} />
@@ -59,6 +61,7 @@ const App: React.FC = () => {
           <Route path="/events/pending-user-request" element={<PendingUserRequest />} />
           <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
           <Route path="/events/send-reminder" element={<SendReminder />} />
+          <Route path="/events/send-poll" element={<SendPollPage />} />
           <Route path="/events/send-invitation" element={<SendInvitation />} />
           <Route path="/events/same-day-reminder" element={<SameDayReminder />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />

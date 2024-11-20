@@ -86,6 +86,14 @@ const Navbar: React.FC = () => {
                     Profile
                   </li>
                 </Link>
+                <Link
+                  to="/change-password"
+                  onClick={handlePageTitle}
+                >
+                  <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
+                    Change Password
+                  </li>
+                </Link>
                 <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer" onClick={handleLogout}>
                   Logout
                 </li>

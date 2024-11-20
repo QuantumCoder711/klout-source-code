@@ -8,15 +8,31 @@ import { AppDispatch, RootState } from '../../../redux/store';
 import { useDispatch } from 'react-redux';
 import { eventUUID } from '../../event/eventSlice';
 import { heading } from '../../heading/headingSlice';
-import axios from 'axios';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
-const SameDayReminder: React.FC = () => {
+const SendPoll: React.FC = () => {
     const { token } = useSelector((state: RootState) => state.auth);
     const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now");
+
+    const [link, setLink] = useState('');
+    const [error, setError] = useState('');
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setLink(value);
+
+        // Regular expression to validate a URL
+        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,6}(\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/;
+        if (value && !urlPattern.test(value)) {
+            setError('Please enter a valid URL');
+        } else {
+            setError('');
+        }
+    };
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
@@ -57,12 +73,12 @@ const SameDayReminder: React.FC = () => {
         }
     };
 
-    console.log(currentEvent);
     const handleSubmit = () => {
         // const formData = new FormData();
         let dataObj = {};
         if (currentEvent) {
             dataObj = {
+                "link": link,
                 "event_id": currentEvent?.uuid,
                 "send_to": 'All',
                 "send_method": "whatsapp",
@@ -86,7 +102,7 @@ const SameDayReminder: React.FC = () => {
         console.log(dataObj); // Check if `check_in` is added correctly
 
         try {
-            axios.post(`${imageBaseUrl}/api/notifications-samedayinvitation`, dataObj, {
+            axios.post(`${imageBaseUrl}/api/notification-poll`, dataObj, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${token}`
@@ -99,7 +115,7 @@ const SameDayReminder: React.FC = () => {
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: 'The invitation was sent successfully!',
+                            text: 'The poll was sent successfully!',
                         }).then((result) => {
                             // Check if the OK button was clicked
                             if (result.isConfirmed) {
@@ -125,23 +141,6 @@ const SameDayReminder: React.FC = () => {
                 text: 'An unexpected error occurred.'
             });
         }
-
-
-        //     event_id: eventId,
-        // send_to: null,
-        // send_method: "whatsapp",
-        // subject: "",
-        // message: "",
-        // start_date: currentDate,
-        // delivery_schedule: "now",
-        // start_date_time: "01",
-        // start_date_type: "am",
-        // end_date: currentDate,
-        // end_date_time: "01",
-        // end_date_type: "pm",
-        // no_of_times: "1",
-        // hour_interval: "1",
-        // status: 1,
     }
 
     // Check if all roles are selected
@@ -251,6 +250,23 @@ const SameDayReminder: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* Poll Link */}
+                        <div className='mt-10'>
+                            <label htmlFor="link" className="block text-gray-700 font-semibold">
+                                Link <span className="text-red-500">*</span> {/* Red asterisk */}
+                            </label>
+                            <input
+                                id="link"
+                                type="text"
+                                value={link}
+                                onChange={handleChange}
+                                className="mt-2 p-2 border border-gray-300 rounded-md w-full"
+                                placeholder="Enter your link here"
+                            />
+                            {error && <p className="mt-2 text-red-500 text-sm">{error}</p>}
+                        </div>
+
+
                         {/* WhatsApp Message */}
                         <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
@@ -342,4 +358,4 @@ const SameDayReminder: React.FC = () => {
     );
 };
 
-export default SameDayReminder;
+export default SendPoll;
