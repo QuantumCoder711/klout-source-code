@@ -24,6 +24,7 @@ const SendReminder: React.FC = () => {
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
+    const [loading, setLoading] = useState<boolean>(false);
 
     const { currentEvent } = useSelector((state: RootState) => state.events);
 
@@ -85,6 +86,8 @@ const SendReminder: React.FC = () => {
 
         console.log(dataObj); // Check if `check_in` is added correctly
 
+        setLoading(true);
+
         try {
             axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
                 headers: {
@@ -94,6 +97,7 @@ const SendReminder: React.FC = () => {
             })
                 .then(res => {
                     // Check if the response is successful (status 200)
+                    setLoading(false);
                     if (res.status === 200) {
                         // Show success message using SweetAlert
                         Swal.fire({
@@ -111,6 +115,7 @@ const SendReminder: React.FC = () => {
                 })
                 .catch(error => {
                     // Show error message if there is any issue
+                    setLoading(false);
                     Swal.fire({
                         icon: 'error',
                         title: 'Something went wrong',
@@ -119,6 +124,7 @@ const SendReminder: React.FC = () => {
                 });
         } catch (error) {
             // Catch any unexpected errors
+            setLoading(false);
             Swal.fire({
                 icon: 'error',
                 title: 'Something went wrong',
@@ -150,9 +156,14 @@ const SendReminder: React.FC = () => {
 
     return (
         <div>
+            {loading && (
+                <div className="w-full h-screen fixed top-0 left-0 bg-black/50 grid place-content-center">
+                    <span className="loading loading-spinner text-klt_primary-500"></span>
+                </div>
+            )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send Email / SMS to Attendee' />
-                <Link to="/events/all-attendee" className="btn btn-error text-white btn-sm">
+                <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>

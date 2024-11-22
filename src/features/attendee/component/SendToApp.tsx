@@ -24,13 +24,12 @@ const SendToApp: React.FC = () => {
     const [title, setTitle] = useState<string>("");
     const [selectedMethod, setSelectedMethod] = useState<'kloutApp'>("kloutApp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
+    const [loading, setLoading] = useState<boolean>(false); // Loading state
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
 
     const { currentEvent } = useSelector((state: RootState) => state.events);
-
-    console.log(currentEvent);
 
     // Handle method selection (WhatsApp only now)
     const handleMethodChange = () => {
@@ -42,20 +41,15 @@ const SendToApp: React.FC = () => {
         setSelectedCheckedUser(status);
     };
 
-    console.log(currentEvent);
-    console.log(message);
     const handleSubmit = () => {
-        // const formData = new FormData();
-        let dataObj: DataObj = {
+        let dataObj: DataObj = {};
 
-        };
         if (currentEvent) {
             dataObj = {
                 "event_id": currentEvent?.id,
                 "title": title,
                 "message": message,
             };
-            // Use property assignment instead of append()
             if (selectedCheckedUser === 'checkedIn') {
                 dataObj.check_in = 1; // Direct assignment
             }
@@ -65,49 +59,38 @@ const SendToApp: React.FC = () => {
             }
         }
 
-        console.log(dataObj); // Check if `check_in` is added correctly
+        // Set loading to true when request starts
+        setLoading(true);
 
-        try {
-            axios.post(`${imageBaseUrl}/api/custom-notification-message`, dataObj, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    "Authorization": `Bearer ${token}`
-                },
-            })
-                .then(res => {
-                    // Check if the response is successful (status 200)
-                    if (res.status === 200) {
-                        // Show success message using SweetAlert
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'The app message was sent successfully!',
-                        }).then((result) => {
-                            // Check if the OK button was clicked
-                            if (result.isConfirmed) {
-                                // Navigate to the '/events/all-attendee' route
-                                window.location.href = "/events/all-attendee";
-                            }
-                        });
-                    }
-                })
-                .catch(error => {
-                    // Show error message if there is any issue
+        axios.post(`${imageBaseUrl}/api/custom-notification-message`, dataObj, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${token}`,
+            },
+        })
+            .then(res => {
+                setLoading(false); // Set loading to false when response is received
+                if (res.status === 200) {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Something went wrong',
-                        text: error.response?.data?.message || 'An error occurred. Please try again.'
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The app message was sent successfully!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/events/all-attendee";
+                        }
                     });
+                }
+            })
+            .catch(error => {
+                setLoading(false); // Set loading to false if there is an error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Something went wrong',
+                    text: error.response?.data?.message || 'An error occurred. Please try again.',
                 });
-        } catch (error) {
-            // Catch any unexpected errors
-            Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong',
-                text: 'An unexpected error occurred.'
             });
-        }
-    }
+    };
 
     if (!currentEvent) {
         return null;
@@ -115,9 +98,14 @@ const SendToApp: React.FC = () => {
 
     return (
         <div>
+            {loading && (
+                <div className="w-full h-screen fixed top-0 left-0 bg-black/50 grid place-content-center">
+                    <span className="loading loading-spinner text-klt_primary-500"></span>
+                </div>
+            )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send In App Message' />
-                <Link to="/events/all-attendee" className="btn btn-error text-white btn-sm">
+                <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
@@ -129,7 +117,6 @@ const SendToApp: React.FC = () => {
                     </div>
 
                     <div className='p-5'>
-
                         {/* Send By */}
                         <div className=''>
                             <h5 className='font-semibold mb-3'>Send By</h5>
@@ -141,8 +128,6 @@ const SendToApp: React.FC = () => {
                                     onChange={handleMethodChange}
                                     className="bg-transparent border-zinc-400"
                                 />
-
-                                {/* <RiWhatsappFill size={24} className='text-green-500' /> */}
                                 <img src={logo} alt="Klout App" width={32} />
                             </label>
                         </div>
@@ -194,28 +179,18 @@ const SendToApp: React.FC = () => {
 
                         {/* App Message */}
                         <h5 className='font-semibold mb-3 mt-10'>Your Message</h5>
-                        <textarea name="message" onChange={(e)=>setMessage(e.target.value)} placeholder="Enter your message here..." className='w-full h-60 p-3' />
-                        {/* <Editor
-                            apiKey="nv4qeg7zimei3mdz8lj1yzl5bakrmw4li6baiikh87f8vksz" // Get your API key from TinyMCE
-                            value={message}
-                            onEditorChange={(content) => setMessage(content)}
-                            initialValue="<p>Please type here...</p>"
-                            init={{
-                                height: 500,
-                                menubar: false,
-                                plugins: [
-                                    "advlist autolink lists link image charmap print preview anchor",
-                                    "searchreplace visualblocks code fullscreen",
-                                    "insertdatetime media table paste code help wordcount",
-                                ],
-                                toolbar:
-                                    "undo redo | formatselect | bold italic backcolor | \
-            alignleft aligncenter alignright alignjustify | \
-            bullist numlist outdent indent | removeformat | help",
-                            }}
-                        /> */}
+                        <textarea name="message" onChange={(e) => setMessage(e.target.value)} placeholder="Enter your message here..." className='w-full h-60 p-3' />
 
-                        <button onClick={handleSubmit} className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>Submit Now</button>
+                        <button onClick={handleSubmit} className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>
+                            Submit Now
+                        </button>
+
+                        {/* Loading Indicator */}
+                        {/* {loading && (
+                            <div className="flex justify-center items-center mt-5">
+                                <div className="loader"></div>
+                            </div>
+                        )} */}
                     </div>
                 </div>
 
@@ -260,7 +235,6 @@ const SendToApp: React.FC = () => {
                             <h4 className='font-bold mb-2'>Description</h4>
                             <p>{currentEvent.description}</p>
                         </div>
-
                     </div>
                 </div>
             </div>

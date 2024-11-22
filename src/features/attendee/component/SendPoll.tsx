@@ -17,6 +17,8 @@ const SendPoll: React.FC = () => {
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now");
+
+    const [loading, setLoading] = useState<boolean>(false);
     // const [currentAttendee] = useSelector((state: RootState)=>state.attendee)
 
     const [link, setLink] = useState('');
@@ -102,6 +104,8 @@ const SendPoll: React.FC = () => {
 
         console.log(dataObj); // Check if `check_in` is added correctly
 
+        setLoading(true);
+
         try {
             axios.post(`${imageBaseUrl}/api/notification-poll`, dataObj, {
                 headers: {
@@ -111,6 +115,7 @@ const SendPoll: React.FC = () => {
             })
                 .then(res => {
                     // Check if the response is successful (status 200)
+                    setLoading(false);
                     if (res.status === 200) {
                         // Show success message using SweetAlert
                         Swal.fire({
@@ -128,6 +133,7 @@ const SendPoll: React.FC = () => {
                 })
                 .catch(error => {
                     // Show error message if there is any issue
+                    setLoading(false);
                     Swal.fire({
                         icon: 'error',
                         title: 'Something went wrong',
@@ -136,6 +142,7 @@ const SendPoll: React.FC = () => {
                 });
         } catch (error) {
             // Catch any unexpected errors
+            setLoading(false);
             Swal.fire({
                 icon: 'error',
                 title: 'Something went wrong',
@@ -153,9 +160,14 @@ const SendPoll: React.FC = () => {
 
     return (
         <div>
+            {loading && (
+                <div className="w-full h-screen fixed top-0 left-0 bg-black/50 grid place-content-center">
+                    <span className="loading loading-spinner text-klt_primary-500"></span>
+                </div>
+            )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send WhatsApp to Attendee' />
-                <Link to="/events/all-attendee" className="btn btn-error text-white btn-sm">
+                <Link to="/events/all-attendee" onClick={()=>dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
