@@ -118,7 +118,7 @@ const Sidebar: React.FC = () => {
             All Reports
           </Link>
         </li>
-        <li>
+        {/* <li>
           <Link
             to="/all-charts"
             onClick={handlePageTitle}
@@ -126,7 +126,7 @@ const Sidebar: React.FC = () => {
           >
             All Charts
           </Link>
-        </li>
+        </li> */}
       </ul>
     </div>
   );

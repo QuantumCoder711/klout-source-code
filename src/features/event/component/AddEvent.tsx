@@ -50,6 +50,8 @@ const AddEvent: React.FC = () => {
     const selectedCountryCode = watch('country');
     const dummyImage = "https://via.placeholder.com/150";
 
+    console.log(token);
+
     // Handle image upload
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];

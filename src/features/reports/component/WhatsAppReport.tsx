@@ -30,7 +30,7 @@ type MessageState = {
 const WhatsAppReport: React.FC = () => {
 
     const [activeTab, setActiveTab] = useState<number>(1);
-    const [selectedTemplate, setSelectedTemplate] = useState('delegate_invitation');
+    const [selectedTemplate, setSelectedTemplate] = useState('event_downloadapp');
     const [allData, setAllData] = useState([]);
     const { user, loading } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID } = useSelector((state: RootState) => (state.events));

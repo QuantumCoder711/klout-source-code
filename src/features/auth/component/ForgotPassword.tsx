@@ -4,11 +4,12 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { login } from '../authSlice';
 import signinBanner from '../../../assets/images/signinbanner.webp';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import typingEffect from '../../../utils/typingEffect';
 import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
-import Loader from '../../../component/Loader';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 type LoginFormInputs = {
     email: string;
@@ -17,6 +18,8 @@ type LoginFormInputs = {
 
 const ForgotPassword: React.FC = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const { token, loading, error } = useSelector((state: RootState) => state.auth);
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 
@@ -28,16 +31,52 @@ const ForgotPassword: React.FC = () => {
     const displayedText = typingEffect(textToType, typingSpeed, deletingSpeed, pauseDuration);
 
     const onSubmit = async (data: LoginFormInputs) => {
-        dispatch(login(data));
+        // Dispatch the login action and prevent default form submission behavior
+        await dispatch(login(data));
+
+        try {
+            await axios.post(`${apiBaseUrl}/api/forgot-password`, {
+                email: data.email,
+            },
+                {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                }).then(res => {
+                    if (res.data.status === "200") {
+                        Swal.fire({
+                            title: "Password Reset Link Sent",
+                            text: "Your password reset link has been sent successfully.",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                        }).then(res => {
+                            console.log(res);
+                            navigate("/login");
+                        })
+                    }
+
+                    else {
+                        Swal.fire({
+                            title: "Error!",
+                            text: res.data.message || "An error occurred.",
+                            icon: "error",
+                            confirmButtonText: "OK",
+                        });
+                    }
+                })
+        } catch (error) {
+
+        }
     };
 
     if (token) {
         return <Navigate to="/" />;
     }
 
-    if(loading) {
-        return <Loader />
-    }
+    // if (loading) {
+    //     return <Loader />;
+    // }
 
     return (
         <div className="flex h-screen">
@@ -80,7 +119,7 @@ const ForgotPassword: React.FC = () => {
                             <button
                                 type="submit"
                                 className="w-full bg-klt_primary-900 text-white py-2 rounded-md"
-                                disabled={loading}
+                                disabled={loading}  // Disable the button when loading
                             >
                                 {loading ? 'Sending...' : 'Send Reset Link'}
                             </button>
@@ -93,7 +132,7 @@ const ForgotPassword: React.FC = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default ForgotPassword;

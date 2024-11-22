@@ -74,12 +74,17 @@ const ViewAgendas: React.FC = () => {
         .then((res) => {
           if (res.data) {
             console.log(currentEvent);
-            setAgendaData(res.data.data);
-            setFilteredAgendaData(res.data.data); // Initialize filtered data
+            
+            // Sort the data in descending order to show the highest position at the top
+            const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
+            
+            setAgendaData(sortedData);
+            setFilteredAgendaData(sortedData); // Initialize filtered data with sorted data
           }
         });
     }
   }, [currentEvent]);
+
 
   console.log(agendaData);
 
@@ -359,6 +364,7 @@ const ViewAgendas: React.FC = () => {
                   <th className="py-3 px-4 text-start text-nowrap">Title</th>
                   <th className="py-3 px-4 text-start text-nowrap">Event Date</th>
                   <th className="py-3 px-4 text-start text-nowrap">Time</th>
+                  <th className="py-3 px-4 text-start text-nowrap">Priority</th>
                   <th className="py-3 px-4 text-start text-nowrap">Action</th>
                 </tr>
               </thead>
@@ -376,6 +382,7 @@ const ViewAgendas: React.FC = () => {
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.title}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.event_date}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' + data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">{data.position}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
                       <Link to={`/events/edit-agenda`} onClick={() => { dispatch(agendaUUID(data.uuid)); dispatch(heading("Edit Agenda")) }} className="text-blue-500 hover:text-blue-700">
                         <FaEdit size={20} />

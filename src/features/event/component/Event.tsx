@@ -135,159 +135,37 @@ const Event: React.FC = () => {
                     </button>
                 </div>
 
-
-
                 {/* Event Table */}
-                < div className="overflow-x-auto bg-white shadow-md rounded-lg">
-                    {/* <thead className=''>
-                        <tr className="bg-gray-200 text-gray-700" style={{ fontSize: '17px' }}>
-                        </tr>
-                    </thead> */}
-                    {/* <div className='flex w-full justify-between bg-gray-200 text-gray-700 px-5 py-6'>
-                        <div className="">Image</div>
-                        <div className="">Title</div>
-                        <div className="">Event Details</div>
-                        <div className="">Attendees Details</div>
-                        <div className="">Actions</div>
-                    </div> */}
+                <div className="overflow-x-auto rounded-lg">
                     {
-                        currentEvents.map((event) => (
-                            <EventRow
-                                uuid={event.uuid}
-                                id={event.id}
-                                image={`${imageBaseUrl}/${event.image}`}
-                                title={event.title}
-                                event_start_date={event.event_start_date}
-                                event_venue_name={event.event_venue_name}
-                                start_minute_time={event.start_minute_time}
-                                start_time={event.start_time}
-                                start_time_type={event.start_time_type}
-                                total_attendee={event.total_attendee}
-                                total_pending_delegate={event.total_pending_delegate}
-                                total_checkedin={event.total_checkedin}
-                                total_checkedin_speaker={event.total_checkedin_speaker}
-                                total_checkedin_sponsor={event.total_checkedin_sponsor}
-                            />
-                        ))
-                    }
-
-                    {/* {
-                        currentEvents.map((event) => (
-                            <div key={event.id} className='w-full py-5 text-sm border-2 border-yellow-400'>
-                                <div className='flex border-2 rounded-xl p-5 justify-between items-center gap-10'>
-                                    <div className='flex items-center gap-5'>
-                                        <img src={`${imageBaseUrl}/${event.image}`} alt={event.title} className='w-96 h-60 object-cover object-center rounded-md' />
-                                        <h5 className='text-lg font-semibold'>{event.title}</h5>
-                                    </div>
-                                    <div className='h-full flex flex-col gap-y-2'>
-                                        <div className='flex items-center gap-2 font-bold min-w-fit'>Date: <p className='font-medium text-zinc-400'>{event.event_start_date}</p></div>
-                                        <div className='flex items-center gap-2 font-bold min-w-fit'>Time: <p className='font-medium text-zinc-400'>{event.start_time}</p></div>
-                                        <div className='flex items-center gap-2 font-bold min-w-fit'>Venue: <p className='font-medium text-zinc-400'>{event.event_venue_name}</p></div>
-                                    </div>
-
-                                    <div className='h-full flex flex-col gap-y-2'>
-                                        <div className='flex items-center gap-2 font-bold'>Total Registrations: <p className='font-medium text-zinc-400'>{event.total_attendee}</p></div>
-                                        <div className='flex items-center gap-2 font-bold'>Total Attendees: <p className='font-medium text-zinc-400'>{event.total_checkedin}</p></div>
-                                        <div className='flex items-center gap-2 font-bold'>Checked In Speakers: <p className='font-medium text-zinc-400'>{event.total_checkedin_speaker}</p></div>
-                                        <div className='flex items-center gap-2 font-bold'>Checked In Sponsors: <p className='font-medium text-zinc-400'>{event.total_checkedin_sponsor}</p></div>
-                                        <div className='flex items-center gap-2 font-bold'>Pending Delegates: <p className='font-medium text-zinc-400'>{event.total_pending_delegate}</p></div>
-                                    </div>
-
-                                    <div className='h-full text-sky-500 font-medium flex flex-col gap-y-2'>
-                                        <div className='text-purple-500'>View Event</div>
-                                        <div className='text-sky-500'>Edit Event</div>
-                                        <div className='text-blue-500'>All Attendees</div>
-                                        <div className='text-green-500'>All Sponsors</div>
-                                        <div className='text-yellow-500'>View Agendas</div>
-                                        <div className='text-red-500'>Delete Event</div>
-                                    </div>
-                                </div>
-
+                        currentEvents.length === 0 ? (
+                            <div className="text-center py-4 mt-10">
+                                No {activeTab === 'upcoming' ? 'Upcoming' : 'Past'} Events
                             </div>
-                        ))
-                    } */}
-                    {/* <div className='w-full flex'>
-                        <h4 className='font-bold'>Image</h4>
-                        <h4 className='font-bold'>Title</h4>
-                        <h4 className='font-bold'>Event Details</h4>
-                        <h4 className='font-bold'>Attendees Details</h4>
-                        <h4 className='font-bold'>Actions</h4>
-                    </div>
-                    {currentEvents.map((event) => (
-                        <div className='w-full border-4 border-red-600 p-10'>
-
-                        </div>
-                    ))
-
-                    } */}
-                    {/* <table className="min-w-full text-left text-sm">
-                        <thead className=''>
-                            <tr className="bg-gray-200 text-gray-700" style={{ fontSize: '17px' }}>
-                                <th className="py-4 px-6">Image</th>
-                                <th className="py-4 px-6">Title</th>
-                                <th className="py-4 px-6">Event Details</th>
-                                <th className="py-4 px-6">Attendees Details</th>
-                                <th className="py-4 px-6">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                currentEvents.length > 0 ? (
-                                    currentEvents.map((event: eventType) => (
-                                        <tr key={event.uuid} className="border-b text-gray-700 text-md font-normal" style={{
-                                            fontSize: '15px'
-                                        }}>
-                                            <td className="py-3 px-6">
-                                                <img
-                                                    src={`${imageBaseUrl}/${event.image}`}
-                                                    alt={event.title}
-                                                    className="w-96 h-60 rounded-lg object-cover"
-                                                />
-                                            </td>
-                                            <td className="py-3 px-6 font-semibold">{event.title}</td>
-                                            <td className="py-3 px-6">
-                                                <span className="font-semibold text-black">Date</span> - {event.event_start_date} <br />
-                                                <span className="font-semibold text-black">Time</span> - {event.start_time + ':' + event.start_minute_time + ' ' + event.start_time_type} <br />
-                                                <span className="font-semibold text-black">Venue</span> - {event.event_venue_name}
-                                            </td>
-                                            <td className="py-3 px-6">
-                                                <span className="font-semibold text-black">Total Registration</span> - {event.total_attendee} <br />
-                                                <span className="font-semibold text-black">Total Attendees </span> - {event.total_checkedin}<br />
-                                                <span className="font-semibold text-black">Checked In Speakers </span> - {event.total_checkedin_speaker} <br />
-                                                <span className="font-semibold text-black">Checked In Sponsors </span> - {event.total_checkedin_sponsor} <br />
-                                                <span className="font-semibold text-black">Pending Delegates </span> - {event.total_pending_delegate}
-                                            </td>
-                                            <td className="py-3 px-6 space-y-2">
-                                                <Link to='/events/view-event/' className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
-                                                    dispatch(eventUUID(event.uuid)); dispatch(heading('Events')); dispatch(heading('Edit Event')); setTimeout(() => {
-                                                    }, 500);
-                                                }}>View Event</Link> <br />
-                                                <button className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
-                                                    dispatch(eventUUID(event.uuid)); dispatch(heading('Edit Event')); setTimeout(() => {
-                                                        navigate('/events/edit-event')
-                                                    }, 500);
-                                                }} >Edit Event</button> <br />
-                                                <Link to='/events/all-attendee' className="text-blue-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
-                                                    dispatch(eventUUID(event.uuid)); dispatch(heading('All Attendee')); setTimeout(() => {
-                                                    }, 500);
-                                                }}>All Attendees</Link> <br />
-                                                <button className="text-green-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Sponsors</button> <br />
-                                                <Link to={"/events/view-agendas"} className="text-yellow-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Agendas</Link> <br />
-                                                <button className="text-red-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={(e) => deleteEvent(e, event.id)}>Delete Event</button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={6} className="text-center text-gray-500 py-4">
-                                            No events found.
-                                        </td>
-                                    </tr>
-                                )
-                            }
-                        </tbody>
-                    </table> */}
+                        ) : (
+                            currentEvents.map((event) => (
+                                <EventRow
+                                    key={event.uuid}
+                                    uuid={event.uuid}
+                                    id={event.id}
+                                    image={`${imageBaseUrl}/${event.image}`}
+                                    title={event.title}
+                                    event_start_date={event.event_start_date}
+                                    event_venue_name={event.event_venue_name}
+                                    start_minute_time={event.start_minute_time}
+                                    start_time={event.start_time}
+                                    start_time_type={event.start_time_type}
+                                    total_attendee={event.total_attendee}
+                                    total_pending_delegate={event.total_pending_delegate}
+                                    total_checkedin={event.total_checkedin}
+                                    total_checkedin_speaker={event.total_checkedin_speaker}
+                                    total_checkedin_sponsor={event.total_checkedin_sponsor}
+                                />
+                            ))
+                        )
+                    }
                 </div>
+
 
                 {/* Pagination */}
                 {currentEvents.length > 1 && <div className="flex justify-end items-center mt-4">

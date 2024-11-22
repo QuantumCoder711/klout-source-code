@@ -21,7 +21,7 @@ type formInputType = {
     end_time: string,
     end_minute_time: string,
     end_time_type: string,
-    position: string;
+    position: number;
     image_path: string | null,
     event_id: string;
 };
@@ -51,6 +51,7 @@ const EditAgenda: React.FC = () => {
                     if (res.data) {
                         const agendaData = res.data.data;
                         setAgendaData(agendaData);
+                        console.log(agendaData);
 
                         // Set the default form values using react-hook-form's setValue
                         setValue('title', agendaData.title);
@@ -121,9 +122,6 @@ const EditAgenda: React.FC = () => {
             // Append event_id
             formData.append("event_id", currentEvent?.id?.toString() ?? "");
 
-            // Clean up any unwanted fields (for example, priority)
-            formData.delete("priority");
-
             // Log the FormData for debugging (FormData can't be logged directly, so you will need to inspect it)
             for (let [key, value] of formData.entries()) {
                 console.log(key, value);
@@ -165,7 +163,7 @@ const EditAgenda: React.FC = () => {
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
     const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-    const priority = Array.from({ length: 100 }, (_, i) => (i + 1).toString().padStart(2, '0'))
+    const priority = Array.from({ length: 100 }, (_, i) => (i + 1))
     const amPm = ['AM', 'PM'];
 
     return (

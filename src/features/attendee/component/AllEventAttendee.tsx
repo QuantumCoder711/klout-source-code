@@ -44,11 +44,17 @@ const AllEventAttendee: React.FC = () => {
         loading: state.events.attendeeLoader
     }));
 
+    const [checkedUsers, setCheckedUsers] = useState<attendeeType[]>([]);
+
     useEffect(() => {
         if (currentEventUUID && token) {
             dispatch(allEventAttendee({ eventuuid: currentEventUUID, token }));
         }
+        setCheckedUsers(eventAttendee.filter((attendee) => attendee.check_in === 1));
+
+        // console.log("Checked Users are: ", checkedUsers);
     }, [currentEventUUID, token]);
+
 
     const [itemsPerPage, setItemsPerPage] = useState<number>(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -67,6 +73,8 @@ const AllEventAttendee: React.FC = () => {
         const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
         return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
     });
+
+    console.log("Checked Users are: ", checkedUsers);
 
     const totalPages = Math.ceil(filteredAttendees.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -184,33 +192,36 @@ const AllEventAttendee: React.FC = () => {
 
     return (
         <>
-        <div className='flex justify-between items-center'>
-            <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
-            <Link to="/" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
-                        <IoMdArrowRoundBack size={20} /> Go Back
-                    </Link>
-        </div>
+            <div className='flex justify-between items-center'>
+                <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
+                <Link to="/" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                    <IoMdArrowRoundBack size={20} /> Go Back
+                </Link>
+            </div>
             <br />
 
             <div className="flex gap-2 mb-4">
                 <Link to="/events/add-attendee" onClick={() => {
                     dispatch(heading('Add Attendee'))
-                }} className="btn btn-secondary text-white btn-sm" >
+                }} className="btn btn-secondary text-white btn-xs" >
                     <FaUserFriends /> Add Attendee
                 </Link>
-                <Link to="/events/send-reminder" onClick={() => { dispatch(heading('Send Reminder')); }} className="btn btn-accent text-white btn-sm">
+                <Link to="/events/send-reminder" onClick={() => { dispatch(heading('Send Reminder')); }} className="btn btn-accent text-white btn-xs">
                     <BsSendFill /> Send Reminder
                 </Link>
-                <Link to="/events/send-invitation" onClick={() => { dispatch(heading('Send Invitation')); }} className="btn hidden btn-primary text-white btn-sm">
+                <Link to="/events/send-invitation" onClick={() => { dispatch(heading('Send Invitation')); }} className="btn hidden btn-primary text-white btn-xs">
                     <FaMessage /> Send Invitation
                 </Link>
-                <Link to="/events/same-day-reminder" onClick={() => { dispatch(heading('Send Same Day Reminder')); }} className="btn btn-warning text-white btn-sm">
+                <Link to="/events/same-day-reminder" onClick={() => { dispatch(heading('Send Same Day Reminder')); }} className="btn btn-warning text-white btn-xs">
                     <BiSolidMessageSquareDots /> Send Same Day Reminder
                 </Link>
-                <Link to="/events/send-poll" onClick={() => { dispatch(heading('Send Poll')); }} className="btn btn-info text-white btn-sm">
+                <Link to="/events/send-poll" onClick={() => { dispatch(heading('Send Poll')); }} className="btn btn-info text-white btn-xs">
                     <FaPoll /> Send Poll
                 </Link>
-                <Link to="/events/pending-user-request" onClick={() => { dispatch(heading("Pending Requests")) }} className="btn btn-error text-white btn-sm">
+                <Link to="/events/send-to-app" onClick={() => { dispatch(heading('Send In App Message')); }} className="btn btn-primary text-white btn-xs">
+                    <FaMessage />Send In App Message
+                </Link>
+                <Link to="/events/pending-user-request" onClick={() => { dispatch(heading("Pending Requests")) }} className="btn btn-error text-white btn-xs">
                     <FaUserClock /> Pending User Request
                 </Link>
                 <button className="btn btn-success btn-outline btn-sm ml-auto" onClick={handleExport}>
@@ -336,6 +347,9 @@ const AllEventAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Check In</th>
+                                    {/* {checkedUsers.length > 0 && ( // Conditionally render "Checked User" column if there are checked users
+                                        <th className="py-3 px-4 text-start text-nowrap">Check In (2)</th>
+                                    )} */}
                                     <th className="py-3 px-4 text-start text-nowrap">Action</th>
                                 </tr>
                             </thead>
@@ -353,6 +367,11 @@ const AllEventAttendee: React.FC = () => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
                                                 {attendee.check_in === 1 ? 'Yes' : 'No'}
                                             </td>
+                                            {/* {checkedUsers.length > 0 && ( // Conditionally render "Checked User" column content
+                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
+                                                    {attendee.check_in === 1 ? 'Yes' : 'No'}
+                                                </td>
+                                            )} */}
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
                                                 <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit />
@@ -374,6 +393,7 @@ const AllEventAttendee: React.FC = () => {
                         </table>
                     )}
                 </div>
+
 
 
                 {/* Pagination */}

@@ -2,47 +2,39 @@ import React, { useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from 'react-router-dom';
-import { RiWhatsappFill } from "react-icons/ri";
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
 import { useDispatch } from 'react-redux';
 import { eventUUID } from '../../event/eventSlice';
 import { heading } from '../../heading/headingSlice';
-import Swal from 'sweetalert2';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import logo from "../../../../public/logo.png";
 
-const SendPoll: React.FC = () => {
+interface DataObj {
+    event_id?: number; // You can mark it optional if it might not always be provided
+    title?: string;
+    message?: string;
+    check_in?: number; // Ensure that check_in is a number, or you can make it a boolean if needed
+}
+
+const SendToApp: React.FC = () => {
     const { token } = useSelector((state: RootState) => state.auth);
-    const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-    const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
+    const [message, setMessage] = useState<string>("");
+    const [title, setTitle] = useState<string>("");
+    const [selectedMethod, setSelectedMethod] = useState<'kloutApp'>("kloutApp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
-    const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now");
-    // const [currentAttendee] = useSelector((state: RootState)=>state.attendee)
-
-    const [link, setLink] = useState('');
-    const [error, setError] = useState('');
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setLink(value);
-
-        // Regular expression to validate a URL
-        const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,6}(\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/;
-        if (value && !urlPattern.test(value)) {
-            setError('Please enter a valid URL');
-        } else {
-            setError('');
-        }
-    };
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
 
     const { currentEvent } = useSelector((state: RootState) => state.events);
 
+    console.log(currentEvent);
+
     // Handle method selection (WhatsApp only now)
     const handleMethodChange = () => {
-        setSelectedMethod('whatsapp');
+        setSelectedMethod('kloutApp');
     };
 
     // Handle selection of user status (All, CheckedIn, Non-CheckedIn)
@@ -50,60 +42,33 @@ const SendPoll: React.FC = () => {
         setSelectedCheckedUser(status);
     };
 
-    // Handle sending time selection (Now or Later)
-    const handleSendTimeChange = (time: 'now' | 'later') => {
-        setSendTime(time);
-    };
-
-    // Handle individual role checkbox change
-    const handleCheckboxChange = (role: string) => {
-        if (role === 'all') {
-            // If "All" is checked, select all roles
-            if (selectedRoles.includes('all')) {
-                setSelectedRoles([]);
-            } else {
-                setSelectedRoles(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-            }
-        } else {
-            // If any individual role is checked/unchecked, update the selected roles
-            if (selectedRoles.includes(role)) {
-                setSelectedRoles(selectedRoles.filter((r) => r !== role));
-            } else {
-                setSelectedRoles([...selectedRoles, role]);
-            }
-        }
-    };
-
+    console.log(currentEvent);
+    console.log(message);
     const handleSubmit = () => {
         // const formData = new FormData();
-        let dataObj = {};
+        let dataObj: DataObj = {
+
+        };
         if (currentEvent) {
             dataObj = {
-                "link": link,
-                "event_id": currentEvent?.uuid,
-                "send_to": 'All',
-                "send_method": "whatsapp",
-                "subject": "",
-                "message": "Template",
-                "start_date": currentEvent?.event_start_date,
-                "delivery_schedule": sendTime,
-                "start_date_time": "01",
-                "start_date_type": "am",
-                "end_date": currentEvent?.event_end_date,
-                "end_date_time": "01",
-                "end_date_type": "pm",
-                "no_of_times": "1",
-                "hour_interval": "1",
-                "status": 1,
-                "check_in": selectedCheckedUser === 'all' ? 2 :
-                    selectedCheckedUser === 'checkedIn' ? 1 : 0
+                "event_id": currentEvent?.id,
+                "title": title,
+                "message": message,
             };
+            // Use property assignment instead of append()
+            if (selectedCheckedUser === 'checkedIn') {
+                dataObj.check_in = 1; // Direct assignment
+            }
+
+            if (selectedCheckedUser === 'nonCheckedIn') {
+                dataObj.check_in = 0; // Direct assignment
+            }
         }
 
         console.log(dataObj); // Check if `check_in` is added correctly
 
         try {
-            axios.post(`${imageBaseUrl}/api/notification-poll`, dataObj, {
+            axios.post(`${imageBaseUrl}/api/custom-notification-message`, dataObj, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${token}`
@@ -116,7 +81,7 @@ const SendPoll: React.FC = () => {
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: 'The poll was sent successfully!',
+                            text: 'The app message was sent successfully!',
                         }).then((result) => {
                             // Check if the OK button was clicked
                             if (result.isConfirmed) {
@@ -144,9 +109,6 @@ const SendPoll: React.FC = () => {
         }
     }
 
-    // Check if all roles are selected
-    const isAllSelected = selectedRoles.length === 6;
-
     if (!currentEvent) {
         return null;
     }
@@ -154,7 +116,7 @@ const SendPoll: React.FC = () => {
     return (
         <div>
             <div className='flex justify-between items-baseline'>
-                <HeadingH2 title='Send WhatsApp to Attendee' />
+                <HeadingH2 title='Send In App Message' />
                 <Link to="/events/all-attendee" className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
@@ -163,52 +125,25 @@ const SendPoll: React.FC = () => {
             <div className='flex gap-5 mt-10 text-black'>
                 <div className='border border-zinc-400 w-4/6 rounded-xl h-fit'>
                     <div className="card-header p-3 border-b border-zinc-400 bg-zinc-200 rounded-t-xl">
-                        <h6 className="m-0 font-bold text-klt_primary-500">Send WhatsApp to Attendee for {currentEvent.title}</h6>
+                        <h6 className="m-0 font-bold text-klt_primary-500">Send App notification to Attendee for {currentEvent.title}</h6>
                     </div>
 
                     <div className='p-5'>
-                        {/* Select Roles */}
-                        <div className='mt-2'>
-                            <h5 className='font-semibold mb-3'>Select Roles</h5>
-                            <div className="flex flex-row text-sm items-center justify-between pl-5">
-                                {/* Checkbox for All Roles */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={isAllSelected}
-                                        onChange={() => handleCheckboxChange('all')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>All</span>
-                                </label>
-
-                                {/* Other checkboxes for individual roles like speaker, delegate, etc. */}
-                                {['speaker', 'delegate', 'sponsor', 'moderator', 'panelist'].map((role) => (
-                                    <label key={role} className="flex items-center space-x-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedRoles.includes(role)}
-                                            onChange={() => handleCheckboxChange(role)}
-                                            className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                        />
-                                        <span>{role.charAt(0).toUpperCase() + role.slice(1)}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
 
                         {/* Send By */}
-                        <div className='mt-10'>
+                        <div className=''>
                             <h5 className='font-semibold mb-3'>Send By</h5>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="radio"
                                     name="sendMethod"
-                                    checked={selectedMethod === 'whatsapp'}
+                                    checked={selectedMethod === 'kloutApp'}
                                     onChange={handleMethodChange}
                                     className="bg-transparent border-zinc-400"
                                 />
-                                <RiWhatsappFill size={24} className='text-green-500' />
+
+                                {/* <RiWhatsappFill size={24} className='text-green-500' /> */}
+                                <img src={logo} alt="Klout App" width={32} />
                             </label>
                         </div>
 
@@ -251,61 +186,34 @@ const SendPoll: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Poll Link */}
-                        <div className='mt-10'>
-                            <label htmlFor="link" className="block text-gray-700 font-semibold">
-                                Link <span className="text-red-500">*</span> {/* Red asterisk */}
-                            </label>
-                            <input
-                                id="link"
-                                type="text"
-                                value={link}
-                                onChange={handleChange}
-                                className="mt-2 p-2 border border-gray-300 rounded-md w-full"
-                                placeholder="Enter your link here"
-                            />
-                            {error && <p className="mt-2 text-red-500 text-sm">{error}</p>}
-                        </div>
-
-                        {/* WhatsApp Message */}
+                        {/* Title */}
                         <div className="mt-10">
-                            <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
-                            <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
-                                <p>
-                                    Hi <strong>User</strong>, <br /> <br />
-                                    Hope you're enjoying the <strong>{currentEvent.title}</strong> 🎉 We'd love for you to take a moment to fill out this quick poll/survery: <strong>link</strong> <br /> <br />
-                                    Thank you for your time! <br />
-                                </p>
-                            </div>
+                            <label htmlFor="Subject" className='block font-semibold'>Title</label>
+                            <input type="text" placeholder='Enter title here' name="Subject" onChange={(e) => setTitle(e.target.value)} id="subject" className='input w-full mt-2' />
                         </div>
 
-                        {/* Send Time: Now or Later */}
-                        <div className='mt-10'>
-                            <h5 className='font-semibold mb-3'>Delivery Schedule</h5>
-                            <div className="flex gap-10 pl-5">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="sendTime"
-                                        checked={sendTime === 'now'}
-                                        onChange={() => handleSendTimeChange('now')}
-                                        className="bg-transparent border-zinc-400"
-                                    />
-                                    <span>Now</span>
-                                </label>
-
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="sendTime"
-                                        checked={sendTime === 'later'}
-                                        onChange={() => handleSendTimeChange('later')}
-                                        className="bg-transparent border-zinc-400"
-                                    />
-                                    <span>Later</span>
-                                </label>
-                            </div>
-                        </div>
+                        {/* App Message */}
+                        <h5 className='font-semibold mb-3 mt-10'>Your Message</h5>
+                        <textarea name="message" onChange={(e)=>setMessage(e.target.value)} placeholder="Enter your message here..." className='w-full h-60 p-3' />
+                        {/* <Editor
+                            apiKey="nv4qeg7zimei3mdz8lj1yzl5bakrmw4li6baiikh87f8vksz" // Get your API key from TinyMCE
+                            value={message}
+                            onEditorChange={(content) => setMessage(content)}
+                            initialValue="<p>Please type here...</p>"
+                            init={{
+                                height: 500,
+                                menubar: false,
+                                plugins: [
+                                    "advlist autolink lists link image charmap print preview anchor",
+                                    "searchreplace visualblocks code fullscreen",
+                                    "insertdatetime media table paste code help wordcount",
+                                ],
+                                toolbar:
+                                    "undo redo | formatselect | bold italic backcolor | \
+            alignleft aligncenter alignright alignjustify | \
+            bullist numlist outdent indent | removeformat | help",
+                            }}
+                        /> */}
 
                         <button onClick={handleSubmit} className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>Submit Now</button>
                     </div>
@@ -360,4 +268,4 @@ const SendPoll: React.FC = () => {
     );
 };
 
-export default SendPoll;
+export default SendToApp;

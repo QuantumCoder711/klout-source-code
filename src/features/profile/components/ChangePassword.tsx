@@ -18,7 +18,6 @@ type ChangePasswordForm = {
 };
 
 const ChangePassword: React.FC = () => {
-
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const navigate = useNavigate();
 
@@ -33,7 +32,6 @@ const ChangePassword: React.FC = () => {
 
     const onSubmit = async (data: ChangePasswordForm) => {
         const formData = new FormData();
-
         formData.append("old_password", data.oldPassword);
         formData.append("password", data.newPassword);
         formData.append("confirm_password", data.confirmPassword);
@@ -42,56 +40,66 @@ const ChangePassword: React.FC = () => {
             title: "Are you sure?",
             icon: "warning",
             showDenyButton: true,
-            text: "You won't be able to revert this!",
+            text: "Do you want to change password?",
             confirmButtonText: "Yes, change it!",
         });
 
         if (result.isConfirmed) {
             try {
                 // Attempt to change the password
-                await axios.post(`${apiBaseUrl}/api/changepassword`, formData, {
+                const res = await axios.post(`${apiBaseUrl}/api/changepassword`, formData, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
 
-                // Show success message
-                const successResult = await Swal.fire({
-                    title: "Password Changed!",
-                    text: "Your password has been changed successfully.",
-                    icon: "success",
+                console.log(res.data.status);
+                if (res.data.status === 200) {
+                    // Show success message
+                    const successResult = await Swal.fire({
+                        title: "Password Changed!",
+                        text: "Your password has been changed successfully.",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                    });
+
+                    if (successResult.isConfirmed) {
+                        await dispatch(heading("Dashboard"));
+                        navigate("/");  // Redirect to home page
+                    }
+                }
+                if (res.data.status === 422) {
+                    console.log(res.data);
+                    Swal.fire({
+                        title: "Error!",
+                        text: res.data.error.password[0] || "An error occurred.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+                if(res.data.status === 401) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: res.data.message || "Something went wrong. Please try again",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+            } catch (error: any) {
+                // Handle error response
+                console.log(error);
+                Swal.fire({
+                    title: "Error!",
+                    text: "An error occurred. Please try again!",
+                    icon: "error",
                     confirmButtonText: "OK",
                 });
-
-                if(successResult.isConfirmed) {
-                    navigate("/");
-                }
-
-            } catch (error: any) {
-                if (error.response && error.response.status === 401) {
-                    // Handle the 401 error (incorrect old password)
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Old password is incorrect.",
-                        icon: "error",
-                        confirmButtonText: "OK",
-                    });
-                } else {
-                    // Generic error handling
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Something went wrong. Please try again.",
-                        icon: "error",
-                        confirmButtonText: "OK",
-                    });
-                }
             }
         }
     };
 
     return (
         <div>
-
             <div className='flex justify-between items-center'>
                 <HeadingH2 title={'Change Password'} />
                 <Link to="/" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
@@ -172,12 +180,10 @@ const ChangePassword: React.FC = () => {
                     </div>
 
                     <hr className='!my-10 border border-zinc-200' />
-
-                    {/* <Link to={"/forgot-password"} className='text-klt_primary-900'>Forgot Password ?</Link> */}
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
 export default ChangePassword;
