@@ -126,7 +126,7 @@ const AddAgenda: React.FC = () => {
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Title */}
                     <label htmlFor="title" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Agenda Name &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <span className=" font-semibold text-green-700 flex justify-between items-center">Agenda Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <input id="title" type="text" className="grow" {...register('title', { required: 'Title is required' })} />
                     </label>
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
@@ -162,7 +162,7 @@ const AddAgenda: React.FC = () => {
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Description */}
                     <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Description &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <span className=" font-semibold text-green-700 flex justify-between items-center">Description <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <textarea id="description" className="grow bg-white outline-none" {...register('description', { required: 'Description is required' })} />
                     </label>
                     {errors.description && <p className="text-red-600">{errors.description.message}</p>}
@@ -173,7 +173,7 @@ const AddAgenda: React.FC = () => {
                         {/* Agenda Start Date */}
                         <label htmlFor="event_date" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className="font-semibold text-green-700 flex justify-between items-center">
-                                Event Date &nbsp; <TiArrowRight className="mt-1" />
+                                Event Date <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
                             </span>
                             <input
                                 value={date}
@@ -201,7 +201,7 @@ const AddAgenda: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* Start Time */}
                         <label className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Start Time &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">Start Time <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <div className="flex gap-2 grow">
                                 <select id="start_time" className="grow bg-white outline-none" {...register('start_time', { required: 'Start hour is required' })}>
                                     <option value="">HH</option>
@@ -231,7 +231,7 @@ const AddAgenda: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* End Time */}
                         <label className="input input-bordered bg-white outline-none text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">End Time &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">End Time <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <div className="flex gap-2 grow">
                                 <select id="end_time" className="grow bg-white outline-none" {...register('end_time', { required: 'End hour is required' })}>
                                     <option value="">HH</option>
@@ -263,7 +263,7 @@ const AddAgenda: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* Priority */}
                         <label className="input input-bordered bg-white outline-none text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Priority &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">Priority <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <select id="priority" className="grow bg-white outline-none" {...register('priority', { required: 'Priority is required' })}>
                                 <option value="">Select</option>
                                 {priority.map((index) => (

@@ -62,7 +62,17 @@ const SendReminder: React.FC = () => {
     };
 
     const handleSubmit = () => {
-        // const formData = new FormData();
+        // Validate that Subject and Message are filled in
+        if (!title || !message) {
+            // Show an error message if either Subject or Message is empty
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Subject and Message are required.',
+            });
+            return;
+        }
+
         let dataObj = {};
         if (currentEvent) {
             dataObj = {
@@ -70,7 +80,7 @@ const SendReminder: React.FC = () => {
                 "send_to": 'All',
                 "send_method": selectedMethod === "whatsapp" ? "Template" : selectedMethod,
                 "subject": title,
-                "message": "Template",
+                "message": message,
                 "start_date": currentEvent?.event_start_date,
                 "delivery_schedule": sendTime,
                 "start_date_time": "01",
@@ -84,71 +94,47 @@ const SendReminder: React.FC = () => {
             };
         }
 
-        console.log(dataObj); // Check if `check_in` is added correctly
-
         setLoading(true);
 
         try {
             axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`,
                 },
             })
                 .then(res => {
-                    // Check if the response is successful (status 200)
                     setLoading(false);
                     if (res.status === 200) {
-                        // Show success message using SweetAlert
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
                             text: 'The invitation was sent successfully!',
                         }).then((result) => {
-                            // Check if the OK button was clicked
                             if (result.isConfirmed) {
-                                // Navigate to the '/events/all-attendee' route
                                 window.location.href = "/events/all-attendee";
                             }
                         });
                     }
                 })
                 .catch(error => {
-                    // Show error message if there is any issue
                     setLoading(false);
                     Swal.fire({
                         icon: 'error',
                         title: 'Something went wrong',
-                        text: error.response?.data?.message || 'An error occurred. Please try again.'
+                        text: error.response?.data?.message || 'An error occurred. Please try again.',
                     });
                 });
         } catch (error) {
-            // Catch any unexpected errors
             setLoading(false);
             Swal.fire({
                 icon: 'error',
                 title: 'Something went wrong',
-                text: 'An unexpected error occurred.'
+                text: 'An unexpected error occurred.',
             });
         }
+    };
 
-
-        //     event_id: eventId,
-        // send_to: null,
-        // send_method: "whatsapp",
-        // subject: "",
-        // message: "",
-        // start_date: currentDate,
-        // delivery_schedule: "now",
-        // start_date_time: "01",
-        // start_date_type: "am",
-        // end_date: currentDate,
-        // end_date_time: "01",
-        // end_date_type: "pm",
-        // no_of_times: "1",
-        // hour_interval: "1",
-        // status: 1,
-    }
 
     if (!currentEvent) {
         return;
@@ -292,13 +278,13 @@ const SendReminder: React.FC = () => {
 
                         {/* Subject Input */}
                         {selectedMethod === "email" && <div className="mt-10">
-                            <label htmlFor="Subject" className='block font-semibold'>Subject</label>
+                            <label htmlFor="Subject" className='block font-semibold'>Subject <span className="text-red-600 ml-1">*</span></label>
                             <input type="text" name="Subject" onChange={(e) => setTitle(e.target.value)} id="subject" className='input w-full mt-2' />
                         </div>}
 
                         {/* Rich Textarea */}
                         {selectedMethod === "email" && <div className="mt-10">
-                            <label htmlFor="Message" className='block font-semibold'>Message</label>
+                            <label htmlFor="Message" className='block font-semibold'>Message <span className="text-red-600 ml-1">*</span></label>
 
                             {/* TinyMCE Editor */}
                             <div className="form-group">

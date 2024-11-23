@@ -42,6 +42,16 @@ const SendToApp: React.FC = () => {
     };
 
     const handleSubmit = () => {
+        if (!title || !message) {
+            // Show an error message if either Subject or Message is empty
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Title and Message are required.',
+            });
+            return;
+        }
+
         let dataObj: DataObj = {};
 
         if (currentEvent) {
@@ -173,12 +183,12 @@ const SendToApp: React.FC = () => {
 
                         {/* Title */}
                         <div className="mt-10">
-                            <label htmlFor="Subject" className='block font-semibold'>Title</label>
+                            <label htmlFor="Subject" className='block font-semibold'>Title  <span className="text-red-500">*</span> </label>
                             <input type="text" placeholder='Enter title here' name="Subject" onChange={(e) => setTitle(e.target.value)} id="subject" className='input w-full mt-2' />
                         </div>
 
                         {/* App Message */}
-                        <h5 className='font-semibold mb-3 mt-10'>Your Message</h5>
+                        <h5 className='font-semibold mb-3 mt-10'>Your Message  <span className="text-red-500">*</span> </h5>
                         <textarea name="message" onChange={(e) => setMessage(e.target.value)} placeholder="Enter your message here..." className='w-full h-60 p-3' />
 
                         <button onClick={handleSubmit} className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>

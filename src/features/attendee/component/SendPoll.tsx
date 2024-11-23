@@ -77,6 +77,14 @@ const SendPoll: React.FC = () => {
     };
 
     const handleSubmit = () => {
+        if(!link) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Poll link is required.',
+            });
+            return;
+        }
         // const formData = new FormData();
         let dataObj = {};
         if (currentEvent) {

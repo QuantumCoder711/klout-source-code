@@ -311,7 +311,7 @@ const AddEventAttendee: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="gap-4">
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="first_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">First Name &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">First Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <input id="first_name" type="text" className="grow" {...register('first_name', { required: 'First Name is required' })} />
             </label>
             {errors.first_name && <p className="text-red-600">{errors.first_name.message}</p>}
@@ -319,7 +319,7 @@ const AddEventAttendee: React.FC = () => {
 
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="last_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">Last Name &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">Last Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <input id="last_name" type="text" className="grow" {...register('last_name', { required: 'Last Name is required' })} />
             </label>
             {errors.last_name && <p className="text-red-600">{errors.last_name.message}</p>}
@@ -342,7 +342,7 @@ const AddEventAttendee: React.FC = () => {
 
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">Email &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">Email <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <input id="email_id" type="email" className="grow" {...register('email_id', { required: 'Email is required' })} />
             </label>
             {errors.email_id && <p className="text-red-600">{errors.email_id.message}</p>}
@@ -381,7 +381,7 @@ const AddEventAttendee: React.FC = () => {
             <div className="flex flex-col gap-3 my-4">
               <label htmlFor="job_title_other" className="input input-bordered bg-white text-black flex items-center gap-2">
                 <span className="font-semibold text-green-700 flex justify-between items-center">
-                  Specify Job Title &nbsp; <TiArrowRight className="mt-1" />
+                  Specify Job Title <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
                 </span>
                 <input
                   id="job_title_other"
@@ -398,7 +398,7 @@ const AddEventAttendee: React.FC = () => {
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="company_name" className="input input-bordered bg-white text-black flex items-center gap-2">
               <span className="font-semibold text-green-700 flex justify-between items-center">
-                Company Name &nbsp; <TiArrowRight className="mt-1" />
+                Company Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
               </span>
               <select
                 id="company_name"
@@ -428,7 +428,7 @@ const AddEventAttendee: React.FC = () => {
             <div className="flex flex-col gap-3 my-4">
               <label htmlFor="company_name_other" className="input input-bordered bg-white text-black flex items-center gap-2">
                 <span className="font-semibold text-green-700 flex justify-between items-center">
-                  Specify Company Name &nbsp; <TiArrowRight className="mt-1" />
+                  Specify Company Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
                 </span>
                 <input
                   id="company_name_other"
@@ -444,7 +444,7 @@ const AddEventAttendee: React.FC = () => {
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="industry" className="input input-bordered bg-white text-black flex items-center gap-2">
               <span className="font-semibold text-green-700 flex justify-between items-center">
-                Industry &nbsp; <TiArrowRight className="mt-1" />
+                Industry <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
               </span>
               <select
                 id="industry"
@@ -474,7 +474,7 @@ const AddEventAttendee: React.FC = () => {
             <div className="flex flex-col gap-3 my-4">
               <label htmlFor="industry_other" className="input input-bordered bg-white text-black flex items-center gap-2">
                 <span className="font-semibold text-green-700 flex justify-between items-center">
-                  Specify Industry &nbsp; <TiArrowRight className="mt-1" />
+                  Specify Industry <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
                 </span>
                 <input
                   id="industry_other"
@@ -490,7 +490,7 @@ const AddEventAttendee: React.FC = () => {
 
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="phone_number" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">Phone Number &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">Phone Number <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <input id="phone_number" type="tel" className="grow" {...register('phone_number', {
                 required: 'Phone Number is required',
                 pattern: {
@@ -550,7 +550,7 @@ const AddEventAttendee: React.FC = () => {
 
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="status" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">Status &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">Status <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <select id="status" className="grow bg-white" {...register('status', { required: 'Status is required' })}>
                 <option value="">Select Status</option>
                 <option value="speaker">Speaker</option>

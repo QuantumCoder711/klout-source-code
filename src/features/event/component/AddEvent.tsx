@@ -68,7 +68,7 @@ const AddEvent: React.FC = () => {
         setCountries(countryList);
     }, []);
 
-    if(!countries) {
+    if (!countries) {
         return <Loader />
     }
 
@@ -207,7 +207,7 @@ const AddEvent: React.FC = () => {
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Title */}
                     <label htmlFor="title" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Event Name &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <span className=" font-semibold text-green-700 flex justify-between items-center">Event Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <input id="title" type="text" className="grow" {...register('title', { required: 'Title is required' })} />
                     </label>
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
@@ -243,7 +243,7 @@ const AddEvent: React.FC = () => {
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Description */}
                     <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Description &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <span className=" font-semibold text-green-700 flex justify-between items-center">Description <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <textarea id="description" className="grow bg-white" {...register('description', { required: 'Description is required' })} />
                     </label>
                     {errors.description && <p className="text-red-600">{errors.description.message}</p>}
@@ -253,7 +253,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* Event Start Date */}
                         <label htmlFor="event_start_date" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Event Start Date &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">Event Start Date <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <input id="event_start_date" type="date" className="grow bg-white" {...register('event_start_date', { required: 'Start date is required' })} />
                         </label>
                         {errors.event_start_date && <p className="text-red-600">{errors.event_start_date.message}</p>}
@@ -262,7 +262,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* Event End Date */}
                         <label htmlFor="event_end_date" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Event End Date &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">Event End Date <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <input id="event_end_date" type="date" className="grow" {...register('event_end_date', { required: 'End date is required' })} />
                         </label>
                         {errors.event_end_date && <p className="text-red-600">{errors.event_end_date.message}</p>}
@@ -273,7 +273,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* Start Time */}
                         <label className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Start Time &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">Start Time <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <div className="flex gap-2 grow">
                                 <select id="start_time" className="grow bg-white" {...register('start_time', { required: 'Start hour is required' })}>
                                     <option value="">HH</option>
@@ -303,7 +303,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* End Time */}
                         <label className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">End Time &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">End Time <span className="text-red-600 ml-1">*</span>&nbsp; <TiArrowRight className='mt-1' /> </span>
                             <div className="flex gap-2 grow">
                                 <select id="end_time" className="grow bg-white" {...register('end_time', { required: 'End hour is required' })}>
                                     <option value="">HH</option>
@@ -338,7 +338,7 @@ const AddEvent: React.FC = () => {
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Venue Name */}
                     <label htmlFor="event_venue_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Name &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <input id="event_venue_name" type="text" className="grow" {...register('event_venue_name', { required: 'Venue name is required' })} />
                     </label>
                     {errors.event_venue_name && <p className="text-red-600">{errors.event_venue_name.message}</p>}
@@ -347,7 +347,7 @@ const AddEvent: React.FC = () => {
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Venue Address */}
                     <label htmlFor="event_venue_address_1" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Address &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Address <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <input id="event_venue_address_1" type="text" className="grow" {...register('event_venue_address_1', { required: 'Address is required' })} />
                     </label>
                     {errors.event_venue_address_1 && <p className="text-red-600">{errors.event_venue_address_1.message}</p>}
@@ -357,7 +357,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* Country */}
                         <label htmlFor="country" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Country &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">Country <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <select id="country" className="grow bg-white" {...register('country', { required: 'Country is required' })} onChange={handleCountryChange}>
                                 <option value="">Select Country</option>
                                 {countries.map((country) => (
@@ -373,7 +373,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* State */}
                         <label htmlFor="state" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">State &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">State <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <select id="state" className="grow bg-white" {...register('state', { required: 'State is required' })} onChange={handleStateChange}>
                                 <option value="">Select State</option>
                                 {states.map((state) => (
@@ -389,7 +389,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* City */}
                         <label htmlFor="city" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">City &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">City <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <select id="city" className="grow bg-white" {...register('city', { required: 'City is required' })}>
                                 <option value="">Select City</option>
                                 {cities.map((city) => (
@@ -405,7 +405,7 @@ const AddEvent: React.FC = () => {
                     <div className='flex flex-col gap-3'>
                         {/* Pincode */}
                         <label htmlFor="pincode" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Pincode &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <span className=" font-semibold text-green-700 flex justify-between items-center">Pincode <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <input id="pincode" type="text" className="grow" {...register('pincode', { required: 'Pincode is required', minLength: { value: 6, message: 'Pincode must be at least 5 characters' } })} />
                         </label>
                         {errors.pincode && <p className="text-red-600">{errors.pincode.message}</p>}
