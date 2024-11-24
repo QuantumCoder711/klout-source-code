@@ -57,6 +57,8 @@ const Profile: React.FC = () => {
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const company_logo: string = user?.company_logo ? `${imageBaseUrl}/${user?.company_logo}` : "";
     const userImage: string = user?.image ? `${imageBaseUrl}/${user?.image}` : "";
+    const [logoUrl, setLogoUrl] = useState<string>(company_logo);
+    const [userUrl, setUserUrl] = useState<string>(userImage);
     const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState(company_logo);
     const [selectedUserImage, setSelectedUserImage] = useState(userImage);
@@ -96,18 +98,20 @@ const Profile: React.FC = () => {
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
         setImage(file)
+        setSelectedImage(file);
         if (file) {
             const imageUrl = URL.createObjectURL(file);
-            setSelectedImage(imageUrl);
+            setLogoUrl(imageUrl);
         }
     };
     // Handle image upload
     const handleUserImageUpload = (e: any) => {
         const file = e.target.files?.[0];
         setImage(file)
+        setSelectedUserImage(file);
         if (file) {
             const imageUrl = URL.createObjectURL(file);
-            setSelectedUserImage(imageUrl);
+            setUserUrl(imageUrl);
         }
     };
 
@@ -119,10 +123,12 @@ const Profile: React.FC = () => {
         });
 
         if (selectedImage !== "") {
+            console.log("Selected Image is: ", selectedImage);
             formData.append("company_logo", selectedImage);
         }
 
         if (selectedUserImage !== "") {
+            console.log("Selected User Image is: ", selectedUserImage);
             formData.append("image", selectedUserImage);
         }
 
@@ -138,7 +144,8 @@ const Profile: React.FC = () => {
             .then((res) => {
                 if (res.data.status === 200) {
                     swal("Success", res.data.message, "success").then(() => {
-                        setEdit(false);
+                        window.location.reload();
+                        // setEdit(false);
                     });
                     // console.log(formData);
                 };
@@ -387,7 +394,7 @@ const Profile: React.FC = () => {
                             {/* Display the uploaded image or dummy image */}
                             <div className="mt-3">
                                 <img
-                                    src={selectedImage || dummyImage}
+                                    src={logoUrl || dummyImage}
                                     alt="Selected Logo"
                                     className="w-32 h-32 object-cover"
                                 />
@@ -412,7 +419,8 @@ const Profile: React.FC = () => {
                             {/* Display the uploaded image or dummy image */}
                             <div className="mt-3">
                                 <img
-                                    src={selectedUserImage || dummyImage}
+                                    // defaultValue={user?.image}
+                                    src={userUrl || dummyImage}
                                     alt="Selected Profile"
                                     className="w-32 h-32 object-cover"
                                 />
