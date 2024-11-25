@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TiArrowRight } from 'react-icons/ti';
 import Loader from '../../../component/Loader';
+import { useNavigate } from 'react-router-dom';
 
 // Define the form data type
 type FormInputType = {
@@ -22,8 +23,8 @@ type FormInputType = {
   employee_size: number;
   company_turn_over: number;
   status: string;
-  event_id: number | undefined;
-  image: File | null;
+  event_id: number|string|null|undefined;
+  image: File;
 };
 
 type ApiType = {
@@ -40,30 +41,41 @@ const EditAttendee = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const dummyImage = "https://via.placeholder.com/150";
 
-  const [selectedImage, setSelectedImage] = useState('');
+  const navigate = useNavigate();
+
+  const [selectedImage, setSelectedImage] = useState<File | string>(dummyImage);
   const { token } = useSelector((state: RootState) => (state.auth));
   const { currentEvent } = useSelector((state: RootState) => (state.events));
-  console.log(currentEvent);
+  // console.log(currentEvent);
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [industries, setIndustries] = useState<ApiType[] | undefined>();
+  const [industries, setIndustries] = useState<ApiType[]>();
   const [selectedIndustry, setSelectedIndustry] = useState<string>(); // Track selected industry
 
+  const [companies, setCompanies] = useState<ApiType[]>();
   const [selectedCompany, setSelectedCompany] = useState<string>(); // Track selected company
-  const [companies, setCompanies] = useState<ApiType[] | undefined>();
 
-  const [jobTitles, setJobTitles] = useState<ApiType[] | undefined>();
+  const [jobTitles, setJobTitles] = useState<ApiType[]>();
   const [selectedJobTitle, setSelectedJobTitle] = useState<string>(); // Track selected job title
+
+  const [status, setStatus] = useState<number|string>();
 
   const { currentAttendeeUUID, loading } = useSelector((state: RootState) => state.attendee);
 
-  console.log(currentAttendeeUUID);
+  // console.log(currentAttendeeUUID);
 
   useEffect(() => {
     axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
     axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
     axios.get(`${apiBaseUrl}/api/get-industries`).then(res => setIndustries(res.data.data));
+  }, []);
+
+
+  useEffect(() => {
+    // axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
+    // axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
+    // axios.get(`${apiBaseUrl}/api/get-industries`).then(res => setIndustries(res.data.data));
 
     axios.post(`${apiBaseUrl}/api/attendees/${currentAttendeeUUID}`, {}, {
       headers: {
@@ -71,7 +83,28 @@ const EditAttendee = () => {
         "Authorization": `Bearer ${token}`
       }
     }).then((res => {
-      const attendeeData = res.data.data;
+      const attendeeData: FormInputType = res.data.data;
+      // console.log("All Attendee Data is: ", attendeeData);
+      console.log("Job Titles are: ", jobTitles);
+      console.log("Companies are: ", companies);
+      console.log("Industries are: ", industries);
+      const jobExist = jobTitles?.filter((job) => job.name == attendeeData.job_title);
+      const companyExist = companies?.filter((company) => company.name == attendeeData.company_name);
+      const industryExist = industries?.filter((industry) => industry.name == attendeeData.industry);
+      // console.log(companyExist);
+
+      if (jobExist?.length === 0) {
+        setSelectedJobTitle("Others");
+      }
+
+      if (companyExist?.length === 0) {
+        setSelectedCompany("Others");
+      }
+
+      if (industryExist?.length === 0) {
+        setSelectedIndustry("Others");
+      }
+
       setValue("first_name", attendeeData.first_name);
       setValue("last_name", attendeeData.last_name);
       setValue("email_id", attendeeData.email_id);
@@ -82,27 +115,32 @@ const EditAttendee = () => {
       setValue("employee_size", attendeeData.employee_size);
       setValue("company_turn_over", attendeeData.company_turn_over);
       setValue("status", attendeeData.status);
-      setSelectedImage(attendeeData.image || dummyImage);
+      setSelectedImage(attendeeData.image);
+      setValue("company_name", attendeeData.company_name);
+      setValue("industry", attendeeData.industry);
+      setValue("job_title", attendeeData.job_title);
 
-      const isJobExists = jobTitles?.some((data: ApiType) => data.name === selectedJobTitle);
-      const isCompanyExists = companies?.some((data: ApiType) => data.name === selectedCompany);
-      const isIndustryExists = industries?.some((data: ApiType) => data.name === selectedIndustry);
-      console.log(isJobExists, isCompanyExists, isIndustryExists);
+      setStatus(attendeeData.status);
 
-      if (!isJobExists) {
-        setSelectedJobTitle("Others");
-      }
+      // const isJobExists = jobTitles?.some((data: ApiType) => data.name === selectedJobTitle);
+      // const isCompanyExists = companies?.some((data: ApiType) => data.name === selectedCompany);
+      // const isIndustryExists = industries?.some((data: ApiType) => data.name === selectedIndustry);
+      // // console.log(isJobExists, isCompanyExists, isIndustryExists);
+
+      // if (!isJobExists) {
+      //   setSelectedJobTitle("Others");
+      // }
 
       // if(!isCompanyExists) {
       //   setSelectedCompany("Others");
       // }
 
       // if (selectedCompany)
-      setSelectedCompany(attendeeData.company_name);
-      setSelectedIndustry(attendeeData.industry);
-      setSelectedJobTitle(attendeeData.job_title);
+      // setSelectedCompany(attendeeData.company_name);
+      // setSelectedIndustry(attendeeData.industry);
+      // setSelectedJobTitle(attendeeData.job_title);
     }));
-  }, []);
+  }, [jobTitles, companies, industries]);
 
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,26 +167,37 @@ const EditAttendee = () => {
       }
     });
 
-    if (selectedImage) {
-      formData.append("image", selectedImage);
-    }
+    // if (selectedImage) {
+    //   formData.append("image", selectedImage);
+    // }
+
+
+
+    // formData.set("job_title", selectedJobTitle);
+    // formData.set("industry", selectedIndustry);
+    // formData.set("company_name", selectedCompany);
 
     if (currentEvent) {
-      // formData.append("event_id", currentEvent.id);
+      formData.append("event_id", currentEvent.id.toString());
     }
 
-    console.log(formData);
+    formData.append("_method", "PUT");
+
+    console.log("Form Data is: ", formData);
 
     axios
-      .post(`${apiBaseUrl}/api/attendees/${currentEvent?.user_id}`, formData, {
+      .post(`${apiBaseUrl}/api/attendees/${currentAttendeeUUID}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${token}`
         },
       })
       .then((res) => {
+        // console.log(res);
         if (res.data.status === 200) {
-          swal("Success", res.data.message, "success");
+          swal("Success", res.data.message, "success").then(_ => {
+            navigate("/events/all-attendee");
+          })
           // console.log(formData);
         };
       });
@@ -201,14 +250,14 @@ const EditAttendee = () => {
             />
           </label>
 
-          <img src={selectedImage || dummyImage} alt="" className='w-full h-60 object-contain' />
+          <img src={selectedImage ? `${apiBaseUrl}/${selectedImage}` : dummyImage} alt="" className='w-full h-60 object-contain' />
         </div>
 
         <div className='flex w-full gap-3'>
           <div className="w-full">
             <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
               <span className="font-semibold text-green-700 flex justify-between items-center">Email &nbsp; <TiArrowRight className='mt-1' /> </span>
-              <input id="email_id" type="email" className="grow" {...register('email_id', { required: 'Email is required' })} />
+              <input id="email_id" className="w-full grow" type="email" {...register('email_id', { required: 'Email is required' })} />
             </label>
             {errors.email_id && <p className="text-red-600">{errors.email_id.message}</p>}
           </div>
@@ -218,20 +267,20 @@ const EditAttendee = () => {
             <div className="w-full">
               <label htmlFor="industry" className="input input-bordered bg-white text-black flex items-center gap-2">
                 <span className="font-semibold text-green-700 flex justify-between items-center">
-                  Industry &nbsp;
-                  <TiArrowRight className="mt-1" />
+                  Industry Name &nbsp; <TiArrowRight className="mt-1" />
                 </span>
                 <select
                   id="industry"
                   className="grow h-full bg-white"
-                  {...register('industry', { required: 'Industry is required' })}
+                  // {...register('industry', { required: 'Company Name is required' })}
+                  {...register('industry')}
                   value={selectedIndustry} // Bind selected value
-                  onChange={(e) => { setSelectedIndustry(e.target.value); }} // Track industry selection
+                  onChange={(e) => { setSelectedIndustry(e.target.value) }} // Track company selection
                 >
                   <option value="">Select an industry</option>
-                  {industries?.map((industry: ApiType) => (
-                    <option key={industry.id} value={industry.name}>
-                      {industry.name}
+                  {companies?.map((company: ApiType) => (
+                    <option key={company.id} value={company.name}>
+                      {company.name}
                     </option>
                   ))}
                   <option value="Others">Others</option> {/* Add "Others" option */}
@@ -239,21 +288,20 @@ const EditAttendee = () => {
               </label>
               {errors.industry && <p className="text-red-600">{errors.industry.message}</p>}
 
-              {/* Conditionally Render Custom Industry Input */}
-              {selectedIndustry === 'Others' && (
+              {/* Conditionally Render Custom Industry Name Input */}
+              {selectedCompany === 'Others' && (
                 <div className='flex flex-col w-full gap-3 my-4'>
-                  <label htmlFor="customIndustry" className="input input-bordered bg-white text-black flex items-center gap-2">
+                  <label htmlFor="customCompanyName" className="input input-bordered bg-white text-black flex items-center gap-2">
                     <span className="font-semibold text-green-700 flex items-center">
-                      Industry &nbsp;
+                      Custom Industry Name &nbsp;
                       <TiArrowRight className='mt-1' />
                     </span>
                     <input
                       id="customIndustry"
+                      // value={selectedCompany}
                       type="text"
-                      // value={customIndustry} // Uncomment if you have a state for custom industry
-                      // onChange={handleCustomIndustryChange} // Handle custom industry change
                       className="grow"
-                      {...register('industry', { required: 'Industry name is required' })} // Field for custom industry
+                      {...register('industry', { required: 'Industry name is required' })}
                     />
                   </label>
                   {errors.industry && <p className="text-red-600">{errors.industry.message}</p>}
@@ -261,7 +309,6 @@ const EditAttendee = () => {
               )}
             </div>
           </div>
-
         </div>
 
         <div className='flex w-full gap-3'>
@@ -275,7 +322,8 @@ const EditAttendee = () => {
                 <select
                   id="company_name"
                   className="grow h-full bg-white"
-                  {...register('company_name', { required: 'Company Name is required' })}
+                  // {...register('company_name', { required: 'Company Name is required' })}
+                  {...register('company_name')}
                   value={selectedCompany} // Bind selected value
                   onChange={(e) => { setSelectedCompany(e.target.value) }} // Track company selection
                 >
@@ -300,7 +348,7 @@ const EditAttendee = () => {
                     </span>
                     <input
                       id="customCompanyName"
-                      defaultValue={selectedCompany}
+                      // value={selectedCompany}
                       type="text"
                       className="grow"
                       {...register('company_name', { required: 'Company name is required' })}
@@ -323,7 +371,8 @@ const EditAttendee = () => {
                 <select
                   id="job_title"
                   className="grow h-full bg-white"
-                  {...register('job_title', { required: 'Job Title is required' })}
+                  // {...register('job_title', { required: 'Job Title is required' })}
+                  {...register('job_title')}
                   value={selectedJobTitle} // Bind selected value
                   onChange={(e) => { setSelectedJobTitle(e.target.value) }} // Track job title selection
                 >
@@ -349,6 +398,7 @@ const EditAttendee = () => {
                     <input
                       id="customJobTitle"
                       type="text"
+                      // value={selected}
                       className="grow"
                       {...register('job_title', { required: 'Job title is required' })}
                     />
@@ -417,14 +467,13 @@ const EditAttendee = () => {
         <div className="w-1/2">
           <label htmlFor="status" className="input input-bordered bg-white text-black flex items-center gap-2">
             <span className="font-semibold text-green-700 flex justify-between items-center">Status &nbsp; <TiArrowRight className='mt-1' /> </span>
-            <select id="status" className="grow bg-white" {...register('status', { required: 'Status is required' })}>
-              <option value="">Select Status</option>
+            <select id="status" className="grow h-full bg-white" {...register('status', { required: 'Status is required' })}>
+              <option value={status}>{status}</option>
               <option value="speaker">Speaker</option>
               <option value="panelist">Panellist</option>
               <option value="sponsor">Sponsor</option>
-              <option value="delegate">Delegate</option>
+              <option value="Delegate">Delegate</option>
               <option value="moderator">Moderator</option>
-              <option value="others">Others</option>
             </select>
           </label>
           {errors.status && <p className="text-red-600">{errors.status.message}</p>}

@@ -92,7 +92,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
 
     return (
-        <div className='p-5 border-b flex items-center justify-between gap-5 rounded-lg'>
+        <div className='p-5 border-b flex items-center bg-white drop-shadow-2xl shadow-sm justify-between gap-5 rounded-lg'>
 
             {/* Displaying Image */}
             <img src={props.image} alt={props.title} className='max-w-60 2xl:max-w-96 w-full h-40 2xl:h-60 object-cover object-center rounded-lg' />

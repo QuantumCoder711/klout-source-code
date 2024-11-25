@@ -30,6 +30,10 @@ type attendeeType = {
     status: string;
     last_name: string;
     check_in: number;
+    check_in_second: number;
+    check_in_third: number;
+    check_in_forth: number;
+    check_in_fifth: number;
     event_name: string;
     id: number;
 };
@@ -38,19 +42,44 @@ const AllEventAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID, eventAttendee, loading } = useSelector((state: RootState) => ({
+    const { currentEventUUID, eventAttendee, loading, currentEvent } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
         eventAttendee: state.events.eventAttendee as attendeeType[],
-        loading: state.events.attendeeLoader
+        loading: state.events.attendeeLoader,
+        currentEvent: state.events
     }));
 
-    const [checkedUsers, setCheckedUsers] = useState<attendeeType[]>([]);
+    console.log(currentEvent, eventAttendee);
+
+    const [dateDifference, setDateDifference] = useState<number>(0);
+
+    // const [checkedUsers2ndDay, setCheckedUsers2ndDay] = useState<attendeeType[]>([]);
+    // const [checkedUsers3rdDay, setCheckedUsers3rdDay] = useState<attendeeType[]>([]);
+    // const [checkedUsers4thDay, setCheckedUsers4thDay] = useState<attendeeType[]>([]);
+    // const [checkedUsers5thDay, setCheckedUsers5thDay] = useState<attendeeType[]>([]);
+
+    // Helper function to calculate the difference in days
+    const calculateDateDifference = (startDate: string, endDate: string): number => {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
+    };
+
 
     useEffect(() => {
         if (currentEventUUID && token) {
             dispatch(allEventAttendee({ eventuuid: currentEventUUID, token }));
         }
-        setCheckedUsers(eventAttendee.filter((attendee) => attendee.check_in === 1));
+
+        if (currentEvent.currentEvent) {
+            setDateDifference(calculateDateDifference(currentEvent.currentEvent?.event_start_date, currentEvent.currentEvent?.event_end_date));
+            // setDateDifference(3);
+            console.log(dateDifference);
+        }
+        // setCheckedUsers2ndDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
+        // setCheckedUsers3rdDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
+        // setCheckedUsers4thDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
+        // setCheckedUsers5thDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
 
         // console.log("Checked Users are: ", checkedUsers);
     }, [currentEventUUID, token]);
@@ -69,12 +98,12 @@ const AllEventAttendee: React.FC = () => {
         const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
         const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
         const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
-        const matchesCheckIn = checkInFilter === '' || attendee.check_in === Number(checkInFilter);
+        const matchesCheckIn = checkInFilter === '' || attendee.check_in === Number(checkInFilter) || attendee.check_in_second === Number(checkInFilter) || attendee.check_in_third === Number(checkInFilter) || attendee.check_in_forth === Number(checkInFilter) || attendee.check_in_fifth === Number(checkInFilter)
         const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
         return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
     });
 
-    console.log("Checked Users are: ", checkedUsers);
+    // console.log("Checked Users are: ", checkedUsers2ndDay);
 
     const totalPages = Math.ceil(filteredAttendees.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -319,9 +348,29 @@ const AllEventAttendee: React.FC = () => {
                         </span>
                         <br />
                         <span className="text-gray-800 font-semibold">
-                            Checked In: {eventAttendee.filter((item) => item.check_in === 1).length}
+                            {/* Checked In: {eventAttendee.filter((item) => item.check_in === 1).length} */}
+
+                            {dateDifference >= 0 && (
+                                <p>Checked In 1st: {eventAttendee.filter((item) => item.check_in === 1).length}</p>
+                            )}
+
+                            {dateDifference >= 1 && (
+                                <p>Checked In 2nd: {eventAttendee.filter((item) => item.check_in_second === 1).length}</p>
+                            )}
+
+                            {dateDifference >= 2 && (
+                                <p>Checked In 3rd: {eventAttendee.filter((item) => item.check_in_third === 1).length}</p>
+                            )}
+
+                            {dateDifference >= 3 && (
+                                <p>Checked In 4th: {eventAttendee.filter((item) => item.check_in_forth === 1).length}</p>
+                            )}
+
+                            {dateDifference >= 4 && (
+                                <p>Checked In 5th: {eventAttendee.filter((item) => item.check_in_fifth === 1).length}</p>
+                            )}
                         </span>
-                        <br />
+
                         <span className="text-gray-800 font-semibold">
                             Search Result: {filteredAttendees.length}
                         </span>
@@ -346,10 +395,20 @@ const AllEventAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Email</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
-                                    <th className="py-3 px-4 text-start text-nowrap">Check In</th>
-                                    {/* {checkedUsers.length > 0 && ( // Conditionally render "Checked User" column if there are checked users
-                                        <th className="py-3 px-4 text-start text-nowrap">Check In (2)</th>
-                                    )} */}
+                                    <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
+
+                                    {dateDifference > 0 && (
+                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (2nd)</th>
+                                    )}
+                                    {dateDifference > 1 && (
+                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (3rd)</th>
+                                    )}
+                                    {dateDifference > 2 && (
+                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (4th)</th>
+                                    )}
+                                    {dateDifference > 3 && (
+                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (5th)</th>
+                                    )}
                                     <th className="py-3 px-4 text-start text-nowrap">Action</th>
                                 </tr>
                             </thead>
@@ -367,11 +426,27 @@ const AllEventAttendee: React.FC = () => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
                                                 {attendee.check_in === 1 ? 'Yes' : 'No'}
                                             </td>
-                                            {/* {checkedUsers.length > 0 && ( // Conditionally render "Checked User" column content
-                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
-                                                    {attendee.check_in === 1 ? 'Yes' : 'No'}
+
+                                            {dateDifference > 0 && (
+                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
+                                                    {attendee.check_in_second === 1 ? 'Yes' : 'No'}
                                                 </td>
-                                            )} */}
+                                            )}
+                                            {dateDifference > 1 && (
+                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
+                                                    {attendee.check_in_third === 1 ? 'Yes' : 'No'}
+                                                </td>
+                                            )}
+                                            {dateDifference > 2 && (
+                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
+                                                    {attendee.check_in_forth === 1 ? 'Yes' : 'No'}
+                                                </td>
+                                            )}
+                                            {dateDifference > 3 && (
+                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
+                                                    {attendee.check_in_fifth === 1 ? 'Yes' : 'No'}
+                                                </td>
+                                            )}
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
                                                 <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit />
@@ -393,7 +468,6 @@ const AllEventAttendee: React.FC = () => {
                         </table>
                     )}
                 </div>
-
 
 
                 {/* Pagination */}
