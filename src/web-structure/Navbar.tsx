@@ -20,6 +20,7 @@ const Navbar: React.FC = () => {
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { user } = useSelector((state: RootState) => state.auth);
 
+  const dummyImage:string = "https://via.placeholder.com/40";
 
   useEffect(() => {
     if (token) {
@@ -66,7 +67,8 @@ const Navbar: React.FC = () => {
           <div className="flex items-center space-x-2 cursor-pointer">
             {/* User Avatar */}
             <img
-              src={`${imageBaseUrl}/${user?.image}` || "https://via.placeholder.com/40"}
+              src={
+                user?.image === null ? dummyImage : `${imageBaseUrl}/${user?.image}`}
               alt="User Avatar"
               className="w-10 h-10 object-contain border-2 border-white rounded-full"
             />

@@ -20,7 +20,7 @@ type formInputType = {
     end_time: string,
     end_minute_time: string,
     end_time_type: string,
-    priority: string;
+    position: number;
     image_path: File | null,
     event_id: string;
 };
@@ -107,7 +107,7 @@ const AddAgenda: React.FC = () => {
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
     const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-    const priority = Array.from({ length: 100 }, (_, i) => (i + 1).toString().padStart(2, '0'))
+    const priority = Array.from({ length: 100 }, (_, i) => (i + 1));
     const amPm = ['AM', 'PM'];
 
     return (
@@ -264,14 +264,14 @@ const AddAgenda: React.FC = () => {
                         {/* Priority */}
                         <label className="input input-bordered bg-white outline-none text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">Priority <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="priority" className="grow bg-white outline-none" {...register('priority', { required: 'Priority is required' })}>
+                            <select id="priority" className="grow bg-white outline-none" {...register('position', { required: 'Priority is required' })}>
                                 <option value="">Select</option>
                                 {priority.map((index) => (
                                     <option key={index} value={index}>{index}</option>
                                 ))}
                             </select>
                         </label>
-                        {errors.priority && <p className="text-red-600">{errors.priority.message}</p>}
+                        {errors.position && <p className="text-red-600">{errors.position.message}</p>}
                     </div>
                 </div>
 

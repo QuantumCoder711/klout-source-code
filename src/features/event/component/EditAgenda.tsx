@@ -163,7 +163,7 @@ const EditAgenda: React.FC = () => {
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
     const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-    const priority = Array.from({ length: 100 }, (_, i) => (i + 1))
+    const priority = Array.from({ length: 100 }, (_, i) => (i + 1));
     const amPm = ['AM', 'PM'];
 
     return (

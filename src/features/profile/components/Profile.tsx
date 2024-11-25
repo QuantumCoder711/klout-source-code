@@ -147,7 +147,6 @@ const Profile: React.FC = () => {
                         window.location.reload();
                         // setEdit(false);
                     });
-                    // console.log(formData);
                 };
             });
 
@@ -158,7 +157,6 @@ const Profile: React.FC = () => {
     }
 
     console.log(user);
-
 
     return (
         <div>
@@ -176,18 +174,20 @@ const Profile: React.FC = () => {
                 {/* Profile Card */}
                 <div className="bg-white p-6 rounded-lg shadow-lg relative">
                     <div className="absolute top-2 right-2">
-                        <img src={`${imageBaseUrl}/${user?.company_logo}`} alt="Company Logo" className="w-16 h-16 rounded-md mx-auto object-contain border border-gray-300" />
+                        <img src={
+                            user?.company_logo === null ? dummyImage : `${imageBaseUrl}/${user?.company_logo}`} alt="Company Logo" className="w-16 h-16 rounded-md mx-auto object-contain border border-gray-300" />
                     </div>
                     <div className="flex items-center space-x-8">
                         {/* Profile Picture */}
                         <div className="flex-shrink-0">
-                            <img src={`${imageBaseUrl}/${user?.image}` || dummyImage} alt="Profile Picture" className="w-80 rounded-lg object-cover" />
+                            <img src={
+                                user?.image === null ? dummyImage : `${imageBaseUrl}/${user?.image}`} alt="Profile Picture" className="w-80 h-60 rounded-lg object-cover" />
                         </div>
 
                         {/* Personal Info */}
                         <div className="space-y-2">
                             <h2 className="text-2xl font-semibold text-gray-800">{user?.first_name + " " + user?.last_name}</h2>
-                            <h3 className="text-lg font-semibold text-gray-800">{user?.company}</h3>
+                            <h3 className="text-lg font-semibold text-gray-800">{user?.company_name}</h3>
                             <p className="text-sm text-gray-600">{user?.designation}</p>
                             <p className="text-gray-500 text-sm">{user?.email}</p>
                             <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
