@@ -63,14 +63,17 @@ const SendReminder: React.FC = () => {
 
     const handleSubmit = () => {
         // Validate that Subject and Message are filled in
-        if (!title || !message) {
-            // Show an error message if either Subject or Message is empty
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Subject and Message are required.',
-            });
-            return;
+        if(selectedMethod == "email"){
+            if (!title || !message) {
+                // Show an error message if either Subject or Message is empty
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Subject and Message are required.',
+                });
+                return;
+        }
+        
         }
 
         let dataObj = {};
@@ -78,9 +81,9 @@ const SendReminder: React.FC = () => {
             dataObj = {
                 "event_id": currentEvent?.uuid,
                 "send_to": 'All',
-                "send_method": selectedMethod === "whatsapp" ? "Template" : selectedMethod,
+                "send_method": selectedMethod === "whatsapp" ? "whatsapp" : selectedMethod,
                 "subject": title,
-                "message": message,
+                "message": selectedMethod === "whatsapp" ? "Template" : message,
                 "start_date": currentEvent?.event_start_date,
                 "delivery_schedule": sendTime,
                 "start_date_time": "01",

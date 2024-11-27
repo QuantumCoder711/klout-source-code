@@ -32,6 +32,7 @@ import SameDayReminder from "./features/attendee/component/SameDayReminder";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import SendPollPage from "./pages/SendPollPage";
 import SendToAppPage from "./pages/SendToAppPage";
+import SendMultipleMessagePage from "./pages/SendMultipleMessagePage";
 
 axios.defaults.withCredentials = false;
 const App: React.FC = () => {
@@ -64,6 +65,7 @@ const App: React.FC = () => {
           <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
           <Route path="/events/send-reminder" element={<SendReminder />} />
           <Route path="/events/send-poll" element={<SendPollPage />} />
+          <Route path="/events/send-multiple-message" element={<SendMultipleMessagePage />} />
           <Route path="/events/send-invitation" element={<SendInvitation />} />
           <Route path="/events/same-day-reminder" element={<SameDayReminder />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />

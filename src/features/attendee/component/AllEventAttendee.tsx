@@ -253,6 +253,9 @@ const AllEventAttendee: React.FC = () => {
                 <Link to="/events/pending-user-request" onClick={() => { dispatch(heading("Pending Requests")) }} className="btn btn-error text-white btn-xs">
                     <FaUserClock /> Pending User Request
                 </Link>
+                <Link to="/events/send-multiple-message" onClick={() => { dispatch(heading('Send Template Message')); }} className="btn btn-accent text-white btn-xs">
+                    <BsSendFill /> Send Template Message
+                </Link>
                 <button className="btn btn-success btn-outline btn-sm ml-auto" onClick={handleExport}>
                     <FaFileExcel /> Export Data
                 </button>
