@@ -33,6 +33,11 @@ import ChangePasswordPage from "./pages/ChangePasswordPage";
 import SendPollPage from "./pages/SendPollPage";
 import SendToAppPage from "./pages/SendToAppPage";
 import SendMultipleMessagePage from "./pages/SendMultipleMessagePage";
+import SesssionReminderPage from "./pages/SessionReminderPage";
+import Day2ReminderPage from "./pages/Day2ReminderPage";
+import ReminderBoothVisitPage from "./pages/ReminderBoothVisitPage";
+import DayTwoSameDayReminderPage from "./pages/DayTwoSameDayReminderPage";
+import ThankYouMessagePage from "./pages/ThankYouMessagePage";
 
 axios.defaults.withCredentials = false;
 const App: React.FC = () => {
@@ -66,7 +71,12 @@ const App: React.FC = () => {
           <Route path="/events/send-reminder" element={<SendReminder />} />
           <Route path="/events/send-poll" element={<SendPollPage />} />
           <Route path="/events/send-multiple-message" element={<SendMultipleMessagePage />} />
+          <Route path="/events/session-reminder" element={<SesssionReminderPage />} />
+          <Route path="/events/day-two-reminder" element={<Day2ReminderPage />} />
+          <Route path="/events/reminder-to-visit-booth" element={<ReminderBoothVisitPage />} />
+          <Route path="/events/day_two_same_day_reminder" element={<DayTwoSameDayReminderPage />} />
           <Route path="/events/send-invitation" element={<SendInvitation />} />
+          <Route path="/events/thank-you-message" element={<ThankYouMessagePage />} />
           <Route path="/events/same-day-reminder" element={<SameDayReminder />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />
           <Route path="/all-sponsors" element={<AllSponsorPage />} />

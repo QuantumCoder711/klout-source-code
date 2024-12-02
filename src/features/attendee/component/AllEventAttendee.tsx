@@ -229,7 +229,7 @@ const AllEventAttendee: React.FC = () => {
             </div>
             <br />
 
-            <div className="flex gap-2 mb-4">
+            <div className="flex items-center flex-wrap gap-2 mb-4">
                 <Link to="/events/add-attendee" onClick={() => {
                     dispatch(heading('Add Attendee'))
                 }} className="btn btn-secondary text-white btn-xs" >
@@ -253,8 +253,23 @@ const AllEventAttendee: React.FC = () => {
                 <Link to="/events/pending-user-request" onClick={() => { dispatch(heading("Pending Requests")) }} className="btn btn-error text-white btn-xs">
                     <FaUserClock /> Pending User Request
                 </Link>
-                <Link to="/events/send-multiple-message" onClick={() => { dispatch(heading('Send Template Message')); }} className="btn btn-accent text-white btn-xs">
+                <Link to="/events/send-multiple-message" onClick={() => { dispatch(heading('Send Template Message')); }} className="btn bg-orange-500 hover:bg-orange-600 text-white btn-xs">
                     <BsSendFill /> Send Template Message
+                </Link>
+                <Link to="/events/session-reminder" onClick={() => { dispatch(heading('Session Reminder')); }} className="btn bg-fuchsia-500 hover:bg-fuchsia-600 text-white btn-xs">
+                    <BsSendFill /> Session Reminder
+                </Link>
+                <Link to="/events/day-two-reminder" onClick={() => { dispatch(heading('Day 2 Reminder')); }} className="btn bg-emerald-500 hover:bg-emerald-600 text-white btn-xs">
+                    <BsSendFill /> Day Two Reminder
+                </Link>
+                <Link to="/events/reminder-to-visit-booth" onClick={() => { dispatch(heading('Reminder Visit Booth')); }} className="btn bg-indigo-500 hover:bg-indigo-600 text-white btn-xs">
+                    <BsSendFill /> Reminder Visit Booth
+                </Link>
+                <Link to="/events/day_two_same_day_reminder" onClick={() => { dispatch(heading('Day Two Same Day Reminder')); }} className="btn bg-purple-500 hover:bg-purple-600 text-white btn-xs">
+                    <BsSendFill /> Day Two Same Day Reminder
+                </Link>
+                <Link to="/events/thank-you-message" onClick={() => { dispatch(heading('Thank You Message')); }} className="btn bg-rose-500 hover:bg-rose-600 text-white btn-xs">
+                    <BsSendFill /> Thank You Message
                 </Link>
                 <button className="btn btn-success btn-outline btn-sm ml-auto" onClick={handleExport}>
                     <FaFileExcel /> Export Data

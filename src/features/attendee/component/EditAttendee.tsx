@@ -256,7 +256,7 @@ const EditAttendee = () => {
         <div className='flex w-full gap-3'>
           <div className="w-full">
             <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">Email &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex items-center">Email &nbsp; <TiArrowRight className='ml-1' /> </span>
               <input id="email_id" className="w-full grow" type="email" {...register('email_id', { required: 'Email is required' })} />
             </label>
             {errors.email_id && <p className="text-red-600">{errors.email_id.message}</p>}
@@ -271,16 +271,16 @@ const EditAttendee = () => {
                 </span>
                 <select
                   id="industry"
-                  className="grow h-full bg-white"
+                  className="grow w-full bg-white"
                   // {...register('industry', { required: 'Company Name is required' })}
                   {...register('industry')}
                   value={selectedIndustry} // Bind selected value
                   onChange={(e) => { setSelectedIndustry(e.target.value) }} // Track company selection
                 >
                   <option value="">Select an industry</option>
-                  {companies?.map((company: ApiType) => (
-                    <option key={company.id} value={company.name}>
-                      {company.name}
+                  {industries?.map((industry: ApiType) => (
+                    <option key={industry.id} value={industry.name}>
+                      {industry.name}
                     </option>
                   ))}
                   <option value="Others">Others</option> {/* Add "Others" option */}
@@ -289,7 +289,7 @@ const EditAttendee = () => {
               {errors.industry && <p className="text-red-600">{errors.industry.message}</p>}
 
               {/* Conditionally Render Custom Industry Name Input */}
-              {selectedCompany === 'Others' && (
+              {selectedIndustry === 'Others' && (
                 <div className='flex flex-col w-full gap-3 my-4'>
                   <label htmlFor="customCompanyName" className="input input-bordered bg-white text-black flex items-center gap-2">
                     <span className="font-semibold text-green-700 flex items-center">

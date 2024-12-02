@@ -205,7 +205,7 @@ const EditAgenda: React.FC = () => {
                     {/* Display the uploaded image or dummy image */}
                     <div className="w-full">
                         <img
-                            src={selectedImage || dummyImage}
+                            src={selectedImage ? `${apiBaseUrl}/${selectedImage}`: dummyImage}
                             alt="Selected Banner"
                             className="w-full h-60 object-contain"
                         />
