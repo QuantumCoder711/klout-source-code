@@ -53,7 +53,7 @@ const AddEvent: React.FC = () => {
     const [states, setStates] = useState<any[]>([]);
     const [cities, setCities] = useState<any[]>([]);
     const [selectedImage, setSelectedImage] = useState('');
-    const [_, setImage] = useState<File | null>(null);
+    const [image, setImage] = useState<File | null>(null);
     const [eventBannerImage, setEventBannerImage] = useState<File | null>(null);
     const selectedCountryCode = watch('country');
     const dummyImage = "https://via.placeholder.com/150";
@@ -74,6 +74,8 @@ const AddEvent: React.FC = () => {
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
         setEventBannerImage(file);
+        console.log("The selected image is: ", eventBannerImage);
+        console.log(eventBannerImage);
         if (file) {
             const imageUrl = URL.createObjectURL(file);
             setSelectedImage(imageUrl);
@@ -133,10 +135,15 @@ const AddEvent: React.FC = () => {
         console.log(eventStartDate);
     };
 
-
     const captureAsImage = async () => {
         if (eventDetailsRef.current) {
-            const canvas = await html2canvas(eventDetailsRef.current);
+            const canvas = await html2canvas(eventDetailsRef.current, {
+                logging: true, // Enable logging for debugging
+                useCORS: true, // Allow cross-origin images
+                allowTaint: true, // Allow tainting, which might let it capture more images
+                x: 0, // Adjust the x-position to fix capture area
+                y: 0, // Adjust the y-position to fix capture area
+            });
             const imgData = canvas.toDataURL('image/png'); // Convert canvas to base64 image
 
             const base64Data = imgData.replace(/^data:image\/png;base64,/, "");
@@ -199,7 +206,8 @@ const AddEvent: React.FC = () => {
             setImage(capturedImage); // State update for later usage
 
             // Check if image is provided
-            if (!capturedImage && eventCreate) {
+            console.log("Captured Image and Event Banner Image is: ", capturedImage, eventBannerImage);
+            if (!(capturedImage instanceof File) && !(eventBannerImage instanceof File)) {
                 Swal.fire({
                     title: 'Error',
                     text: 'Please upload an image before submitting the event.',
@@ -225,7 +233,7 @@ const AddEvent: React.FC = () => {
                 formData.append('image', capturedImage);
             }
 
-            if(eventBannerImage) {
+            if (eventBannerImage) {
                 formData.append("image", eventBannerImage);
             }
 
@@ -272,77 +280,6 @@ const AddEvent: React.FC = () => {
             <h2 className='text-black text-2xl font-semibold ps-5'>Add Details to create new event</h2>
             {/* <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
             <form onSubmit={handleSubmit(onSubmit)} className="gap-4">
-                {eventCreate && <>
-                    <div className="flex border-2 border-green-500">
-                        <div id='bannerDiv' ref={eventDetailsRef} style={{
-                            backgroundImage: `url(${templateImage})`,
-                            color: textColor,
-                            height: "350px",
-                            width: "350px",
-                            backgroundSize: 'cover', // Ensures the image covers the div
-                            backgroundPosition: 'center', // Centers the background image
-                            backgroundRepeat: 'no-repeat', // Prevents repeating the background image
-                        }} className='mx-auto shadow-lg bg-white rounded-md border border-gray-300'>
-                            {/* <p className="text-center text-3xl font-bold mb-4">{eventName}</p> */}
-                            <div className='flex flex-col space-y-4 relative h-full'>
-
-                                <div className='flex justify-between items-center'>
-                                    {eventStartDate && (
-                                        <div className='flex justify-center items-center w-full'>
-                                            <span className='shadow-lg bg-white/20 backdrop-blur-lg rounded-b-full p-3 w-full'>
-                                                <p className='ml-1 mt-3 text-center font-["Outfit"] font-normal text-xl'>{eventStartDate}</p>
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                                {(user?.company_logo && eventStartDate && eventName) && <div className='ml-3'>
-                                    <img src={`${apiBaseUrl}/${user?.company_logo}`} width={144} alt="Logo" />
-                                </div>}
-
-                                <p className="text-center font-bold mb-4 text-5xl tracking-wide font-['Outfit'] absolute top-1/2 -translate-y-1/2 w-full text-wrap h-fit">{eventName}</p>
-                            </div>
-                        </div>
-
-                        {/* Images and Text Color Div */}
-                        <div className='flex flex-col mb-4 gap-3'>
-                            <div className=''>
-                                <h3 className='font-semibold mb-2'>Select Template Image</h3>
-                                <div className='flex gap-3'>
-                                    <img onClick={() => setTemplateImage(Bg1)} src={Bg1} alt="Background 1" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
-                                    <img onClick={() => setTemplateImage(Bg2)} src={Bg2} alt="Background 2" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
-                                    <img onClick={() => setTemplateImage(Bg3)} src={Bg3} alt="Background 3" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
-                                </div>
-                            </div>
-
-
-                            {/* Set here the template image when selected */}
-                            <span className="text-center my-2">Or</span>
-                            <div className=''>
-                                <h3 className='font-semibold mb-2'>Upload Template Image</h3>
-                                <input
-                                    id="image"
-                                    type="file"
-                                    accept="image/*"
-                                    className="grow"
-                                    onChange={handleCustomTemplate}
-                                />
-                            </div>
-
-                            <div className='mt-4'>
-                                <h3 className="font-semibold mb-2">Select Text Color</h3>
-                                <input
-                                    type="color"
-                                    name="textColors"
-                                    id="textColorPicker"
-                                    value={textColor}
-                                    onChange={(e) => setTextColor(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <button onClick={() => {setEventCreate(false); setEventBannerImage(null)}} className='block mt-3 bg-orange-500 hover:bg-orange-600 btn mx-auto text-center text-white'>Upload Image</button>
-                </>
-                }
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Title */}
                     <label htmlFor="title" className="input input-bordered bg-white text-black flex items-center gap-2">
@@ -378,7 +315,7 @@ const AddEvent: React.FC = () => {
                             />
                         </label>
                         <span className='block text-center'>Or</span>
-                        <button onClick={() => {setEventCreate(true); setEventBannerImage(null);}} className='btn hover:bg-orange-600 w-fit mx-auto bg-orange-500 p-3 text-white'>Create Event Banner</button>
+                        <button onClick={() => { setEventCreate(true); setEventBannerImage(null); }} className='btn hover:bg-orange-600 w-fit mx-auto bg-orange-500 p-3 text-white'>Create Event Banner</button>
                     </div>
 
                     {/* Display the uploaded image or dummy image */}
@@ -573,7 +510,79 @@ const AddEvent: React.FC = () => {
                     {errors.google_map_link && <p className="text-red-600">{errors.google_map_link.message}</p>}
                 </div>
 
-                <div className="col-span-3 flex justify-center mt-4">
+                {eventCreate && <>
+                    <div className="flex">
+                        <div id='bannerDiv' ref={eventDetailsRef} style={{
+                            backgroundImage: `url(${templateImage})`,
+                            color: textColor,
+                            height: "350px",
+                            width: "350px",
+                            backgroundSize: 'cover', // Ensures the image covers the div
+                            backgroundPosition: 'center', // Centers the background image
+                            backgroundRepeat: 'no-repeat', // Prevents repeating the background image
+                        }} className='mx-auto shadow-lg bg-white rounded-md border border-gray-300'>
+                            {/* <p className="text-center text-3xl font-bold mb-4">{eventName}</p> */}
+                            <div className='flex flex-col space-y-4 relative h-full'>
+
+                                <div className='flex justify-between items-center'>
+                                    {eventStartDate && (
+                                        <div className='flex justify-center items-center w-full'>
+                                            <span className='shadow-lg bg-white/20 backdrop-blur-lg rounded-b-full p-3 w-full'>
+                                                <p className='ml-1 mt-3 text-center font-["Outfit"] font-normal text-xl'>{eventStartDate}</p>
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                                {(user?.company_logo && eventStartDate && eventName) && <div className='ml-3 relative z-50'>
+                                    <img src={`${apiBaseUrl}/${user?.company_logo}`} width={144} alt="Logo" className=''/>
+                                </div>}
+
+                                <p className="text-center font-bold mb-4 text-5xl tracking-wide font-['Outfit'] absolute top-1/2 -translate-y-1/2 w-full text-wrap h-fit">{eventName}</p>
+                            </div>
+                        </div>
+
+                        {/* Images and Text Color Div */}
+                        <div className='flex flex-col mb-4 gap-3'>
+                            <div className=''>
+                                <h3 className='font-semibold mb-2'>Select Template Image</h3>
+                                <div className='flex gap-3'>
+                                    <img onClick={() => setTemplateImage(Bg1)} src={Bg1} alt="Background 1" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
+                                    <img onClick={() => setTemplateImage(Bg2)} src={Bg2} alt="Background 2" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
+                                    <img onClick={() => setTemplateImage(Bg3)} src={Bg3} alt="Background 3" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
+                                </div>
+                            </div>
+
+
+                            {/* Set here the template image when selected */}
+                            <span className="text-center my-2">Or</span>
+                            <div className=''>
+                                <h3 className='font-semibold mb-2'>Upload Template Image</h3>
+                                <input
+                                    id="image"
+                                    type="file"
+                                    accept="image/*"
+                                    className="grow"
+                                    onChange={handleCustomTemplate}
+                                />
+                            </div>
+
+                            <div className='mt-4'>
+                                <h3 className="font-semibold mb-2">Select Text Color</h3>
+                                <input
+                                    type="color"
+                                    name="textColors"
+                                    id="textColorPicker"
+                                    value={textColor}
+                                    onChange={(e) => setTextColor(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <button onClick={() => { setEventCreate(false); setEventBannerImage(null) }} className='block mt-3 bg-orange-500 hover:bg-orange-600 btn mx-auto text-center text-white'>Upload Event Image</button>
+                </>
+                }
+
+                <div className="col-span-3 flex justify-center mt-10">
                     <button type="submit" className="btn btn-primary">Add Event</button>
                 </div>
             </form>

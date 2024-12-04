@@ -59,7 +59,7 @@ const ViewEvent: React.FC = () => {
                     <img
                         src={`${imageBaseUrl}/${currentEvent.image}`}
                         alt={currentEvent.title}
-                        className="w-full rounded-lg shadow-md object-cover"
+                        className="rounded-lg shadow-md"
                         style={{ height: '400px', minHeight: '300px', maxHeight: '450px', objectFit: "cover" }} // Adjusted for better appearance
                     />
                 </div>
