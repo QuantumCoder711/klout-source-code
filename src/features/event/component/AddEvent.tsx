@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-// import html2canvas from "html2canvas";
 import html2canvas from 'html2canvas-pro';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Country, State, City } from 'country-state-city';
@@ -12,7 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Loader from '../../../component/Loader';
 import Bg1 from "/background.jpg";
-// import Bg1 from "/bg1.jpg";
 import Bg2 from "/bg2.jpeg";
 import Bg3 from "/bg3.jpg";
 
