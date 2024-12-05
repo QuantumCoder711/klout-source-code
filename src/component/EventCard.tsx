@@ -19,13 +19,12 @@ type eventCardProps = {
     eventId: number,
 }
 
-
 const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, imageAlt, eventuuid, eventId }) => {
 
     const dispatch = useDispatch();
     const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const { token } = useSelector((state: RootState) => (state.auth));
-    // const id = useSelector((state: RootState) => state.events.currentEvent?.id);
+    const today = new Date().toISOString().slice(0, 10);
 
     const handleClick = (eventuuid: string) => {
         console.log("Hello", eventuuid);
@@ -85,7 +84,8 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
                     style={{ height: '200px', width: '100%', objectFit: 'cover' }}
                 />
             </figure>
-            <div className="card-body p-3 text-black bg-white rounded-bl-lg rounded-br-lg">
+            <div className="card-body relative p-3 text-black bg-white rounded-bl-lg rounded-br-lg">
+                {today===date && <span className='text-xs font-bold  absolute right-1 top-1 px-1 rounded border text-red-600 border-red-600 flex items-center gap-1'>Live <span className='w-2 h-2 rounded-full bg-red-600 liveBlink'/></span>}
                 <h2 className="card-title">{title}</h2>
                 <p className="inline-flex gap-2 items-start"><MdMyLocation className="text-2xl" /> {venue}</p>
                 <p className="font-semibold inline-flex gap-2 items-center"><MdDateRange className="text-2xl" /> {date}</p>

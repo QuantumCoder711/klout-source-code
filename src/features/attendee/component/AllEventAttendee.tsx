@@ -230,51 +230,133 @@ const AllEventAttendee: React.FC = () => {
             <br />
 
             <div className="flex items-center flex-wrap gap-2 mb-4">
-                <Link to="/events/add-attendee" onClick={() => {
-                    dispatch(heading('Add Attendee'))
-                }} className="btn btn-secondary text-white btn-xs" >
+                <Link
+                    to="/events/add-attendee"
+                    onClick={() => { dispatch(heading('Add Attendee')) }}
+                    className="btn btn-secondary text-white btn-xs"
+                    title="Add a new attendee"
+                >
                     <FaUserFriends /> Add Attendee
                 </Link>
-                <Link to="/events/send-reminder" onClick={() => { dispatch(heading('Send Reminder')); }} className="btn btn-accent text-white btn-xs">
+
+                <Link
+                    to="/events/send-reminder"
+                    onClick={() => { dispatch(heading('Send Reminder')); }}
+                    className="btn btn-accent text-white btn-xs"
+                    title="Send a reminder to attendees"
+                >
                     <BsSendFill /> Send Reminder
                 </Link>
-                <Link to="/events/send-invitation" onClick={() => { dispatch(heading('Send Invitation')); }} className="btn hidden btn-primary text-white btn-xs">
+
+                <Link
+                    to="/events/send-invitation"
+                    onClick={() => { dispatch(heading('Send Invitation')); }}
+                    className="btn hidden btn-primary text-white btn-xs"
+                    title="Send an invitation to attendees"
+                >
                     <FaMessage /> Send Invitation
                 </Link>
-                <Link to="/events/same-day-reminder" onClick={() => { dispatch(heading('Send Same Day Reminder')); }} className="btn btn-warning text-white btn-xs">
+
+                <Link
+                    to="/events/same-day-reminder"
+                    onClick={() => { dispatch(heading('Send Same Day Reminder')); }}
+                    className="btn btn-warning text-white btn-xs"
+                    title="Send a same day reminder"
+                >
                     <BiSolidMessageSquareDots /> Send Same Day Reminder
                 </Link>
-                <Link to="/events/send-poll" onClick={() => { dispatch(heading('Send Poll')); }} className="btn btn-info text-white btn-xs">
+
+                <Link
+                    to="/events/send-poll"
+                    onClick={() => { dispatch(heading('Send Poll')); }}
+                    className="btn btn-info text-white btn-xs"
+                    title="Send a poll to attendees"
+                >
                     <FaPoll /> Send Poll
                 </Link>
-                <Link to="/events/send-to-app" onClick={() => { dispatch(heading('Send In App Message')); }} className="btn btn-primary text-white btn-xs">
-                    <FaMessage />Send In App Message
+
+                <Link
+                    to="/events/send-to-app"
+                    onClick={() => { dispatch(heading('Send In App Message')); }}
+                    className="btn btn-primary text-white btn-xs"
+                    title="Send an in-app message"
+                >
+                    <FaMessage /> Send In App Message
                 </Link>
-                <Link to="/events/pending-user-request" onClick={() => { dispatch(heading("Pending Requests")) }} className="btn btn-error text-white btn-xs">
+
+                <Link
+                    to="/events/pending-user-request"
+                    onClick={() => { dispatch(heading("Pending Requests")) }}
+                    className="btn btn-error text-white btn-xs"
+                    title="View pending user requests"
+                >
                     <FaUserClock /> Pending User Request
                 </Link>
-                <Link to="/events/send-multiple-message" onClick={() => { dispatch(heading('Send Template Message')); }} className="btn bg-orange-500 hover:bg-orange-600 text-white btn-xs">
+
+                <Link
+                    to="/events/send-multiple-message"
+                    onClick={() => { dispatch(heading('Send Template Message')); }}
+                    className="btn bg-orange-500 hover:bg-orange-600 text-white btn-xs"
+                    title="Send template message to multiple users"
+                >
                     <BsSendFill /> Send Template Message
                 </Link>
-                <Link to="/events/session-reminder" onClick={() => { dispatch(heading('Session Reminder')); }} className="btn bg-fuchsia-500 hover:bg-fuchsia-600 text-white btn-xs">
+
+                <Link
+                    to="/events/session-reminder"
+                    onClick={() => { dispatch(heading('Session Reminder')); }}
+                    className="btn bg-fuchsia-500 hover:bg-fuchsia-600 text-white btn-xs"
+                    title="Send a session reminder"
+                >
                     <BsSendFill /> Session Reminder
                 </Link>
-                <Link to="/events/day-two-reminder" onClick={() => { dispatch(heading('Day 2 Reminder')); }} className="btn bg-emerald-500 hover:bg-emerald-600 text-white btn-xs">
+
+                <Link
+                    to="/events/day-two-reminder"
+                    onClick={() => { dispatch(heading('Day 2 Reminder')); }}
+                    className="btn bg-emerald-500 hover:bg-emerald-600 text-white btn-xs"
+                    title="Send a Day 2 reminder"
+                >
                     <BsSendFill /> Day Two Reminder
                 </Link>
-                <Link to="/events/reminder-to-visit-booth" onClick={() => { dispatch(heading('Reminder Visit Booth')); }} className="btn bg-indigo-500 hover:bg-indigo-600 text-white btn-xs">
+
+                <Link
+                    to="/events/reminder-to-visit-booth"
+                    onClick={() => { dispatch(heading('Reminder Visit Booth')); }}
+                    className="btn bg-indigo-500 hover:bg-indigo-600 text-white btn-xs"
+                    title="Send reminder to visit booth"
+                >
                     <BsSendFill /> Reminder Visit Booth
                 </Link>
-                <Link to="/events/day_two_same_day_reminder" onClick={() => { dispatch(heading('Day Two Same Day Reminder')); }} className="btn bg-purple-500 hover:bg-purple-600 text-white btn-xs">
+
+                <Link
+                    to="/events/day_two_same_day_reminder"
+                    onClick={() => { dispatch(heading('Day Two Same Day Reminder')); }}
+                    className="btn bg-purple-500 hover:bg-purple-600 text-white btn-xs"
+                    title="Send Day 2 same day reminder"
+                >
                     <BsSendFill /> Day Two Same Day Reminder
                 </Link>
-                <Link to="/events/thank-you-message" onClick={() => { dispatch(heading('Thank You Message')); }} className="btn bg-rose-500 hover:bg-rose-600 text-white btn-xs">
+
+                <Link
+                    to="/events/thank-you-message"
+                    onClick={() => { dispatch(heading('Thank You Message')); }}
+                    className="btn bg-rose-500 hover:bg-rose-600 text-white btn-xs"
+                    title="Send a thank you message"
+                >
                     <BsSendFill /> Thank You Message
                 </Link>
-                <button className="btn btn-success btn-outline btn-sm ml-auto" onClick={handleExport}>
+
+                <button
+                    className="btn btn-success btn-outline btn-sm ml-auto"
+                    onClick={handleExport}
+                    title="Export attendee data"
+                >
                     <FaFileExcel /> Export Data
                 </button>
-            </div >
+            </div>
+
+
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-between flex-col-reverse min-[1440px]:flex-row gap-5 items-center">
                     {/* Search inputs */}

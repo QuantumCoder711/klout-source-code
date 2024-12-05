@@ -272,6 +272,16 @@ const DayTwoSameDayReminder: React.FC = () => {
                             </div>
                         </div>
 
+                        {/* WhatsApp Message */}
+                        <div className="mt-10">
+                            <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
+                            <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
+                                <p>
+                                    Hi "<strong>firstname</strong>", just a reminder for our event "<strong>Event-Title</strong>". We're excited to welcome you to this exclusive event. "<strong>Event-Date-Time</strong>". <br /> <br /> To ensure a smooth check-in experience, please download the Klout Club app in advance. You can download it here <a href="https://onelink.to/r3fzb9" className='font-bold'>https://onelink.to/r3fzb9</a>
+                                </p>
+                            </div>
+                        </div>
+
                         {/* Poll Link */}
                         {/* <div className='mt-10'>
                             <label htmlFor="link" className="block text-gray-700 font-semibold">

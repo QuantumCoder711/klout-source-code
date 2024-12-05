@@ -32,3 +32,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     height: 16px;
     border-radius: 50%; /* Make it circular */
 }
+
+.liveBlink {
+  animation: blink 1s alternate infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

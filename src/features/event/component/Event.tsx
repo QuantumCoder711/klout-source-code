@@ -9,6 +9,22 @@ import { heading } from '../../../features/heading/headingSlice';
 import EventRow from '../../../component/EventRow';
 import Loader from '../../../component/Loader';
 
+type eventType = {
+    title: string,
+    image: string,
+    event_start_date: string,
+    uuid: string,
+    event_venue_name: string,
+    total_checkedin: number,
+    total_attendee: number,
+    total_checkedin_speaker: number,
+    total_checkedin_sponsor: number,
+    total_pending_delegate: number,
+    start_time: string,
+    start_minute_time: string,
+    start_time_type: string,
+    id: number
+}
 
 const Event: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -18,35 +34,19 @@ const Event: React.FC = () => {
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 
-    type eventType = {
-        title: string,
-        image: string,
-        event_start_date: string,
-        uuid: string,
-        event_venue_name: string,
-        total_checkedin: number,
-        total_attendee: number,
-        total_checkedin_speaker: number,
-        total_checkedin_sponsor: number,
-        total_pending_delegate: number,
-        start_time: string,
-        start_minute_time: string,
-        start_time_type: string,
-        id: number
-    }
-
     // Get events data from the store
     const { events, loading } = useSelector((state: RootState) => state.events);
 
-    const today: Date = new Date();
+    const today = new Date().toISOString().slice(0, 10);;
+
     const pastEvents = events.filter((event: eventType) => {
-        const eventDate: Date = new Date(event.event_start_date);
-        return eventDate < today;
+        const eventDate = event.event_start_date;
+        return eventDate <= today;
     });
 
     const upcomingEvents = events.filter((event: eventType) => {
-        const eventDate: Date = new Date(event.event_start_date);
-        return eventDate > today;
+        const eventDate = event.event_start_date;
+        return eventDate >= today;
     });
 
     const handleTabChange = (tab: 'upcoming' | 'past') => {
