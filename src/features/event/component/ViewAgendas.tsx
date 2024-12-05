@@ -286,14 +286,13 @@ const ViewAgendas: React.FC = () => {
         >
           <FaFileImport size={14} /> Import Agenda
         </button>
-
-
       </div>
+
       <dialog id="my_modal_2" className="modal">
-        <div className="modal-box">
+        <div className="modal-box flex flex-col gap-4">
           <h3 className="font-bold text-lg">Please select an event</h3>
 
-          <ul className="mt-5 space-y-5 max-h-96">
+          <ul className="max-h-96 overflow-scroll">
             {events.map((event) => {
               // Only render if event.id is not equal to currentEvent.id
               if (event.id === currentEvent.id) {
@@ -302,7 +301,7 @@ const ViewAgendas: React.FC = () => {
 
               return (
                 <li key={event.id}>
-                  <label className="flex items-center justify-between">
+                  <label className="flex items-center justify-between p-3 rounded-sm hover:bg-neutral-200 cursor-pointer">
                     {/* Display the event title */}
                     {event.title}
                     <input
@@ -326,10 +325,9 @@ const ViewAgendas: React.FC = () => {
             })}
           </ul>
 
-
           {button && <button
             onClick={handleImportAgenda}
-            className="btn mt-5 mx-auto btn-info w-fit flex items-center text-white btn-sm"
+            className="btn mx-auto btn-info w-fit flex items-center text-white btn-sm"
           >
             <FaFileImport size={14} /> Import Agenda
           </button>}

@@ -41,7 +41,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             .then(res => {
                 if (res.data.status === 200) {
                     //   setLoading(false)
-                    const url = imageBaseUrl + res.data.data.pdf_path;
+                    const url = imageBaseUrl + "/" + res.data.data.pdf_path;
                     window.open(url, '_blank');
 
                 }
