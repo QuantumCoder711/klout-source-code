@@ -53,7 +53,7 @@ const AddEvent: React.FC = () => {
     const [states, setStates] = useState<any[]>([]);
     const [cities, setCities] = useState<any[]>([]);
     const [selectedImage, setSelectedImage] = useState('');
-    const [image, setImage] = useState<File | null>(null);
+    const [, setImage] = useState<File | null>(null);
     const [eventBannerImage, setEventBannerImage] = useState<File | null>(null);
     const selectedCountryCode = watch('country');
     const dummyImage = "https://via.placeholder.com/150";
@@ -64,10 +64,11 @@ const AddEvent: React.FC = () => {
     const [eventName, setEventName] = useState<string>("");
     const [templateImage, setTemplateImage] = useState<string | Blob>(Bg1);
     const [textColor, setTextColor] = useState<string>("#FFFFFF");
+    const [textSize, setTextSize] = useState<number>(48);
     const [eventStartDate, setEventStartDate] = useState<string>("");
-    const [eventEndDate, setEventEndDate] = useState<string>("");
-    const [eventVenueName, setEventVenueName] = useState<string>("");
-    const [eventCity, setEventCity] = useState<string>("");
+    const [, setEventEndDate] = useState<string>("");
+    const [, setEventVenueName] = useState<string>("");
+    const [, setEventCity] = useState<string>("");
 
 
     // Handle image upload
@@ -298,36 +299,6 @@ const AddEvent: React.FC = () => {
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
                 </div>
 
-
-                {!eventCreate && <div className='flex flex-row-reverse gap-3'>
-                    {/* Image Upload */}
-                    <div className='flex flex-col gap-3'>
-                        <label htmlFor="image" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">
-                                Banner Image &nbsp; <TiArrowRight className='mt-1' />
-                            </span>
-                            <input
-                                id="image"
-                                type="file"
-                                accept="image/*"
-                                className="grow"
-                                onChange={handleImageUpload}
-                            />
-                        </label>
-                        <span className='block text-center'>Or</span>
-                        <button onClick={() => { setEventCreate(true); setEventBannerImage(null); }} className='btn hover:bg-orange-600 w-fit mx-auto bg-orange-500 p-3 text-white'>Create Event Banner</button>
-                    </div>
-
-                    {/* Display the uploaded image or dummy image */}
-                    <div className="mt-3 w-full">
-                        <img
-                            src={selectedImage || dummyImage}
-                            alt="Selected Banner"
-                            className="w-full h-60 object-cover"
-                        />
-                    </div>
-                </div>}
-
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Description */}
                     <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
@@ -419,10 +390,6 @@ const AddEvent: React.FC = () => {
                     </div>
                 </div>
 
-
-
-
-
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Venue Name */}
                     <label htmlFor="event_venue_name" className="input input-bordered bg-white text-black flex items-center gap-2">
@@ -510,6 +477,39 @@ const AddEvent: React.FC = () => {
                     {errors.google_map_link && <p className="text-red-600">{errors.google_map_link.message}</p>}
                 </div>
 
+                {!eventCreate && <div className='flex flex-row-reverse items-center gap-3'>
+                    {/* Image Upload */}
+                    <div className='flex flex-col gap-3'>
+                        <label htmlFor="image" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Banner Image &nbsp; <TiArrowRight className='mt-1' />
+                            </span>
+                            <input
+                                id="image"
+                                type="file"
+                                accept="image/*"
+                                className="grow"
+                                onChange={handleImageUpload}
+                            />
+                        </label>
+                        <span className='block text-center'>Or</span>
+                        <button onClick={() => { setEventCreate(true); setEventBannerImage(null); }} className='btn hover:bg-orange-600 w-fit mx-auto bg-orange-500 p-3 text-white'>Create Event Banner</button>
+                    </div>
+
+                    {/* Display the uploaded image or dummy image */}
+                    <div className="mt-3 w-full">
+                        <img
+                            src={selectedImage || dummyImage}
+                            alt="Selected Banner"
+                            style={{
+                                height: "350px",
+                                width: "350px",
+                            }}
+                            className="rounded-md object-cover"
+                        />
+                    </div>
+                </div>}
+
                 {eventCreate && <>
                     <div className="flex">
                         <div id='bannerDiv' ref={eventDetailsRef} style={{
@@ -533,16 +533,20 @@ const AddEvent: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
-                                {(user?.company_logo && eventStartDate && eventName) && <div className='ml-3 relative z-50'>
-                                    <img src={`${apiBaseUrl}/${user?.company_logo}`} width={144} alt="Logo" className=''/>
-                                </div>}
 
-                                <p className="text-center font-bold mb-4 text-5xl tracking-wide font-['Outfit'] absolute top-1/2 -translate-y-1/2 w-full text-wrap h-fit">{eventName}</p>
+                                <p
+                                    style={{ fontSize: `${textSize}px`, lineHeight: `${textSize * 1.1}px`, fontFamily: "Outfit" }}
+                                    className="text-center font-bold mb-4 tracking-wide absolute top-1/2 -translate-y-1/2 w-full text-wrap h-fit">
+                                    {eventName}
+                                </p>
+                                {(user?.company_logo && eventStartDate && eventName) && <div className='ml-3 absolute bottom-2 right-2 z-50'>
+                                    <img src={`${apiBaseUrl}/${user?.company_logo}`} width={144} alt="Logo" className='' />
+                                </div>}
                             </div>
                         </div>
 
-                        {/* Images and Text Color Div */}
-                        <div className='flex flex-col mb-4 gap-3'>
+                        {/* Images, Font and Text Color Div */}
+                        <div className='flex flex-col justify-between gap-3'>
                             <div className=''>
                                 <h3 className='font-semibold mb-2'>Select Template Image</h3>
                                 <div className='flex gap-3'>
@@ -554,7 +558,7 @@ const AddEvent: React.FC = () => {
 
 
                             {/* Set here the template image when selected */}
-                            <span className="text-center my-2">Or</span>
+                            <span className="text-center">Or</span>
                             <div className=''>
                                 <h3 className='font-semibold mb-2'>Upload Template Image</h3>
                                 <input
@@ -566,7 +570,7 @@ const AddEvent: React.FC = () => {
                                 />
                             </div>
 
-                            <div className='mt-4'>
+                            <div className=''>
                                 <h3 className="font-semibold mb-2">Select Text Color</h3>
                                 <input
                                     type="color"
@@ -574,6 +578,19 @@ const AddEvent: React.FC = () => {
                                     id="textColorPicker"
                                     value={textColor}
                                     onChange={(e) => setTextColor(e.target.value)}
+                                />
+                            </div>
+
+                            <div className=''>
+                                <h3 className="font-semibold mb-2">Text Size</h3>
+                                {/* <input type="range" min="16" max="96" value={textSize} className="range range-primary p-1 h-4 " /> */}
+                                <input
+                                    type="range"
+                                    min="16"
+                                    max="96"
+                                    value={textSize}
+                                    className="range range-primary p-1 h-4"
+                                    onChange={(e) => setTextSize(Number(e.target.value))}
                                 />
                             </div>
                         </div>

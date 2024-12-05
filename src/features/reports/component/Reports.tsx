@@ -8,7 +8,6 @@ import Loader from '../../../component/Loader';
 
 const Reports: React.FC = () => {
 
-
   const { events, loading } = useSelector((state: RootState) => state.events);
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 

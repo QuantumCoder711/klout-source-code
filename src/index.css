@@ -14,3 +14,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 5px;
     cursor: pointer;
 }
+
+.range::-webkit-slider-thumb {
+    width: 16px;  /* Make the thumb smaller */
+    height: 16px;
+    border-radius: 50%; /* Make it circular */
+}
+
+  .range::-moz-range-thumb {
+    width: 16px;  /* Make the thumb smaller */
+    height: 16px;
+    border-radius: 50%; /* Make it circular */
+}
+
+  .range::-ms-thumb {
+    width: 16px;  /* Make the thumb smaller */
+    height: 16px;
+    border-radius: 50%; /* Make it circular */
+}
