@@ -23,7 +23,7 @@ const Sidebar: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-56 flex-shrink-0 bg-klt_primary-900 text-white">
+    <div className="h-screen w-40 xl:w-56 flex-shrink-0 bg-klt_primary-900 text-white">
       {
         user?.company_logo &&
         <div className="border-b border-white">

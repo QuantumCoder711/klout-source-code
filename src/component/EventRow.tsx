@@ -92,16 +92,16 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
 
     return (
-        <div className='p-5 border-b flex items-center bg-white drop-shadow-2xl shadow-sm justify-between gap-5 rounded-lg'>
+        <div className='p-5 overflow-scroll border-b flex items-center bg-white mb-3 justify-between gap-5 rounded-lg'>
 
             {/* Displaying Image */}
             <img src={props.image} alt={props.title} className='max-w-60 2xl:max-w-96 w-full h-40 2xl:h-60 object-cover object-center rounded-lg' />
 
             {/* Title */}
-            <h3 className='text-lg font-semibold max-w-[236px]'>{props.title}</h3>
+            <h3 className='text-lg font-semibold w-[236px] max-w-[236px]'>{props.title}</h3>
 
             {/* Date, Time and Venue */}
-            <div className='flex flex-col gap-2 text-sm 2xl:text-base'>
+            <div className='flex flex-col gap-2 text-sm w-[160px] 2xl:text-base'>
                 <div>
                     <span className="font-semibold text-black">Date</span> - {props.event_start_date}
                 </div>
@@ -114,7 +114,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             </div>
 
             {/* Event Joiners Info */}
-            <div className='h-full flex flex-col gap-y-2 min-w-48 text-sm 2xl:text-base'>
+            <div className='h-full flex flex-col gap-y-2 min-w-40 text-sm 2xl:text-base'>
                 <div className='flex items-center gap-2 font-semibold'>Total Registrations: <p className='font-medium'>{props.total_attendee}</p></div>
                 <div className='flex items-center gap-2 font-semibold'>Total Attendees: <p className='font-medium'>{props.total_checkedin}</p></div>
                 <div className='flex items-center gap-2 font-semibold'>Checked In Speakers: <p className='font-medium'>{props.total_checkedin_speaker}</p></div>

@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar in Webkit browsers */
+::-webkit-scrollbar {
+  display: none;
+}
+
+html, body {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Outfit";
+}
+
+/* Hide scrollbar in Firefox */
+html {
+  scrollbar-width: none;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator {
     background-color: rgb(224, 84, 107);
     /* Icon background */

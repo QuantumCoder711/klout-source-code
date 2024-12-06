@@ -114,7 +114,8 @@ const Dashboard: React.FC = () => {
 
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"> */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5 mb-8">
         {
           upcomingEvents.length > 0 ?
             upcomingEvents.map((upcomingEvent: eventType) => {
@@ -144,7 +145,8 @@ const Dashboard: React.FC = () => {
 
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"> */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5 mb-8">
         {
           pastEvents.length > 0 ?
             pastEvents.map((pastEvent: eventType) => {

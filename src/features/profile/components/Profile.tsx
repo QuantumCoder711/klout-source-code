@@ -62,7 +62,6 @@ const Profile: React.FC = () => {
     const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState(company_logo);
     const [selectedUserImage, setSelectedUserImage] = useState(userImage);
-    const [, setImage] = useState(null);
     const [jobTitle, setJobTitles] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [, setCustomCompanyName] = useState<string>(user?.company_name || '');
@@ -70,8 +69,6 @@ const Profile: React.FC = () => {
     const [selectedCompany, setSelectedCompany] = useState<string>();
     const [selectedDesignation, setSelectedDesignation] = useState<string | null>();
     const dummyImage = "https://via.placeholder.com/150";
-
-    console.log(token);
 
     useEffect(() => {
         axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data || []));
@@ -97,7 +94,7 @@ const Profile: React.FC = () => {
     // Handle image upload
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
-        setImage(file)
+        // setImage(file)
         setSelectedImage(file);
         if (file) {
             const imageUrl = URL.createObjectURL(file);
@@ -107,7 +104,7 @@ const Profile: React.FC = () => {
     // Handle image upload
     const handleUserImageUpload = (e: any) => {
         const file = e.target.files?.[0];
-        setImage(file)
+        // setImage(file)
         setSelectedUserImage(file);
         if (file) {
             const imageUrl = URL.createObjectURL(file);
@@ -132,8 +129,6 @@ const Profile: React.FC = () => {
             formData.append("image", selectedUserImage);
         }
 
-        console.log(formData);
-
         axios
             .post(`${apiBaseUrl}/api/updateprofile`, formData, {
                 headers: {
@@ -152,11 +147,15 @@ const Profile: React.FC = () => {
 
     }
 
+    useEffect(() => {
+        setLogoUrl(company_logo);
+        setUserUrl(userImage);
+    }, [company_logo, userImage]);
+
+
     if (loading) {
         return <Loader />
     }
-
-    console.log(user);
 
     return (
         <div>
@@ -396,7 +395,7 @@ const Profile: React.FC = () => {
                                 <img
                                     src={logoUrl || dummyImage}
                                     alt="Selected Logo"
-                                    className="w-32 h-32 object-cover"
+                                    className="w-32 h-32 object-contain"
                                 />
                             </div>
                         </div>
@@ -422,7 +421,7 @@ const Profile: React.FC = () => {
                                     // defaultValue={user?.image}
                                     src={userUrl || dummyImage}
                                     alt="Selected Profile"
-                                    className="w-32 h-32 object-cover"
+                                    className="w-32 h-32 object-contain"
                                 />
                             </div>
                         </div>

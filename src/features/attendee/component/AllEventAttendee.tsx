@@ -30,10 +30,15 @@ type attendeeType = {
     status: string;
     last_name: string;
     check_in: number;
+    check_in_time: string;
     check_in_second: number;
+    check_in_second_time: string;
     check_in_third: number;
+    check_in_third_time: string;
     check_in_forth: number;
+    check_in_forth_time: string;
     check_in_fifth: number;
+    check_in_fifth_time: string;
     event_name: string;
     id: number;
 };
@@ -53,11 +58,6 @@ const AllEventAttendee: React.FC = () => {
 
     const [dateDifference, setDateDifference] = useState<number>(0);
 
-    // const [checkedUsers2ndDay, setCheckedUsers2ndDay] = useState<attendeeType[]>([]);
-    // const [checkedUsers3rdDay, setCheckedUsers3rdDay] = useState<attendeeType[]>([]);
-    // const [checkedUsers4thDay, setCheckedUsers4thDay] = useState<attendeeType[]>([]);
-    // const [checkedUsers5thDay, setCheckedUsers5thDay] = useState<attendeeType[]>([]);
-
     // Helper function to calculate the difference in days
     const calculateDateDifference = (startDate: string, endDate: string): number => {
         const start = new Date(startDate);
@@ -76,10 +76,6 @@ const AllEventAttendee: React.FC = () => {
             // setDateDifference(3);
             console.log(dateDifference);
         }
-        // setCheckedUsers2ndDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
-        // setCheckedUsers3rdDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
-        // setCheckedUsers4thDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
-        // setCheckedUsers5thDay(eventAttendee.filter((attendee) => attendee.check_in === 1));
 
         // console.log("Checked Users are: ", checkedUsers);
     }, [currentEventUUID, token]);
@@ -485,6 +481,123 @@ const AllEventAttendee: React.FC = () => {
                             <Loader /> {/* Display the loader component */}
                         </div>
                     ) : (
+                        // <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
+                        //     <thead>
+                        //         <tr className="bg-klt_primary-500 text-white">
+                        //             <th className="py-3 px-4 text-start text-nowrap">#</th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Name</th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Designation</th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Company</th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Email</th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Role</th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
+                        //             <th className="py-3 px-4 text-start text-nowrap">Check In Time<br /> (1st) </th>
+
+                        //             {dateDifference > 0 && (
+                        //                 <><th className="py-3 px-4 text-start text-nowrap">Check In <br /> (2nd)</th>
+                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (2nd)</th>
+                        //                 </>
+                        //             )}
+                        //             {dateDifference > 1 && (
+                        //                 <>
+                        //                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (3rd)</th>
+                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (3rd)</th>
+                        //                 </>
+                        //             )}
+                        //             {dateDifference > 2 && (
+                        //                 <>
+                        //                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (4th)</th>
+                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (4th)</th>
+                        //                 </>
+                        //             )}
+                        //             {dateDifference > 3 && (
+                        //                 <>
+                        //                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (5th)</th>
+                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (5th)</th>
+                        //                 </>
+                        //             )}
+                        //             <th className="py-3 px-4 text-start text-nowrap">Action</th>
+                        //         </tr>
+                        //     </thead>
+                        //     <tbody>
+                        //         {currentAttendees.length > 0 ? (
+                        //             currentAttendees.map((attendee, index) => (
+                        //                 <tr key={attendee.uuid}>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
+                        //                         {attendee.check_in === 1 ? 'Yes' : 'No'}
+                        //                     </td>
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
+                        //                         {attendee.check_in_time ? attendee.check_in_time : '-'}
+                        //                     </td>
+
+                        //                     {dateDifference > 0 && (
+                        //                         <>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_second === 1 ? 'Yes' : 'No'}
+                        //                             </td>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_second_time ? attendee.check_in_second_time : '-'}
+                        //                             </td>
+                        //                         </>
+                        //                     )}
+                        //                     {dateDifference > 1 && (
+                        //                         <>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_third === 1 ? 'Yes' : 'No'}
+                        //                             </td>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_third_time ? attendee.check_in_third_time : '-'}
+                        //                             </td>
+                        //                         </>
+                        //                     )}
+                        //                     {dateDifference > 2 && (
+                        //                         <>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_forth === 1 ? 'Yes' : 'No'}
+                        //                             </td>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_forth_time ? attendee.check_in_forth_time : '-'}
+                        //                             </td>
+                        //                         </>
+                        //                     )}
+                        //                     {dateDifference > 3 && (
+                        //                         <>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_fifth === 1 ? 'Yes' : 'No'}
+                        //                             </td>
+                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
+                        //                                 {attendee.check_in_fifth_time ? attendee.check_in_fifth_time : '-'}
+                        //                             </td>
+                        //                         </>
+                        //                     )}
+                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
+                        //                         <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
+                        //                             <FaEdit />
+                        //                         </Link>
+                        //                         <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">
+                        //                             <MdDelete />
+                        //                         </button>
+                        //                     </td>
+                        //                 </tr>
+                        //             ))
+                        //         ) : (
+                        //             <tr>
+                        //                 <td colSpan={9} className="py-4 text-center text-gray-600">
+                        //                     No attendees found.
+                        //                 </td>
+                        //             </tr>
+                        //         )}
+                        //     </tbody>
+                        // </table>
+
                         <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
                             <thead>
                                 <tr className="bg-klt_primary-500 text-white">
@@ -496,18 +609,31 @@ const AllEventAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Check In Time<br /> (1st) </th>
 
                                     {dateDifference > 0 && (
-                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (2nd)</th>
+                                        <>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (2nd)</th>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (2nd)</th>
+                                        </>
                                     )}
                                     {dateDifference > 1 && (
-                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (3rd)</th>
+                                        <>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (3rd)</th>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (3rd)</th>
+                                        </>
                                     )}
                                     {dateDifference > 2 && (
-                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (4th)</th>
+                                        <>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (4th)</th>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (4th)</th>
+                                        </>
                                     )}
                                     {dateDifference > 3 && (
-                                        <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (5th)</th>
+                                        <>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (5th)</th>
+                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (5th)</th>
+                                        </>
                                     )}
                                     <th className="py-3 px-4 text-start text-nowrap">Action</th>
                                 </tr>
@@ -526,26 +652,86 @@ const AllEventAttendee: React.FC = () => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
                                                 {attendee.check_in === 1 ? 'Yes' : 'No'}
                                             </td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
+                                                {attendee.check_in_time ? (
+                                                    <>
+                                                        {/* Date part */}
+                                                        {attendee.check_in_time.split(' ')[0]} <br />
+                                                        {/* Time part in bold */}
+                                                        <span style={{ fontWeight: 'bold' }}>
+                                                            {attendee.check_in_time.split(' ')[1]}
+                                                        </span>
+                                                    </>
+                                                ) : '-'}
+                                            </td>
 
                                             {dateDifference > 0 && (
-                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
-                                                    {attendee.check_in_second === 1 ? 'Yes' : 'No'}
-                                                </td>
+                                                <>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_second === 1 ? 'Yes' : 'No'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_second_time ? (
+                                                            <>
+                                                                {attendee.check_in_second_time.split(' ')[0]} <br />
+                                                                <span style={{ fontWeight: 'bold' }}>
+                                                                    {attendee.check_in_second_time.split(' ')[1]}
+                                                                </span>
+                                                            </>
+                                                        ) : '-'}
+                                                    </td>
+                                                </>
                                             )}
                                             {dateDifference > 1 && (
-                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
-                                                    {attendee.check_in_third === 1 ? 'Yes' : 'No'}
-                                                </td>
+                                                <>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_third === 1 ? 'Yes' : 'No'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_third_time ? (
+                                                            <>
+                                                                {attendee.check_in_third_time.split(' ')[0]} <br />
+                                                                <span style={{ fontWeight: 'bold' }}>
+                                                                    {attendee.check_in_third_time.split(' ')[1]}
+                                                                </span>
+                                                            </>
+                                                        ) : '-'}
+                                                    </td>
+                                                </>
                                             )}
                                             {dateDifference > 2 && (
-                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
-                                                    {attendee.check_in_forth === 1 ? 'Yes' : 'No'}
-                                                </td>
+                                                <>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_forth === 1 ? 'Yes' : 'No'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_forth_time ? (
+                                                            <>
+                                                                {attendee.check_in_forth_time.split(' ')[0]} <br />
+                                                                <span style={{ fontWeight: 'bold' }}>
+                                                                    {attendee.check_in_forth_time.split(' ')[1]}
+                                                                </span>
+                                                            </>
+                                                        ) : '-'}
+                                                    </td>
+                                                </>
                                             )}
                                             {dateDifference > 3 && (
-                                                <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
-                                                    {attendee.check_in_fifth === 1 ? 'Yes' : 'No'}
-                                                </td>
+                                                <>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_fifth === 1 ? 'Yes' : 'No'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
+                                                        {attendee.check_in_fifth_time ? (
+                                                            <>
+                                                                {attendee.check_in_fifth_time.split(' ')[0]} <br />
+                                                                <span style={{ fontWeight: 'bold' }}>
+                                                                    {attendee.check_in_fifth_time.split(' ')[1]}
+                                                                </span>
+                                                            </>
+                                                        ) : '-'}
+                                                    </td>
+                                                </>
                                             )}
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
                                                 <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
@@ -566,6 +752,7 @@ const AllEventAttendee: React.FC = () => {
                                 )}
                             </tbody>
                         </table>
+
                     )}
                 </div>
 

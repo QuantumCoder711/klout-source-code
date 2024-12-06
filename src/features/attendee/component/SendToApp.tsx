@@ -9,7 +9,7 @@ import { eventUUID } from '../../event/eventSlice';
 import { heading } from '../../heading/headingSlice';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import logo from "../../../../public/logo.png";
+import logo from "/logo.png";
 
 interface DataObj {
     event_id?: number; // You can mark it optional if it might not always be provided
