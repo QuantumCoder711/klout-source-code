@@ -26,7 +26,9 @@ type attendeeType = {
     job_title: string;
     company_name: string;
     email_id: string;
+    alternate_email: string;
     phone_number: string;
+    alternate_mobile_number: string;
     status: string;
     last_name: string;
     check_in: number;
@@ -40,6 +42,7 @@ type attendeeType = {
     check_in_fifth: number;
     check_in_fifth_time: string;
     event_name: string;
+    not_invited: boolean;
     id: number;
 };
 
@@ -53,8 +56,6 @@ const AllEventAttendee: React.FC = () => {
         loading: state.events.attendeeLoader,
         currentEvent: state.events
     }));
-
-    console.log(currentEvent, eventAttendee);
 
     const [dateDifference, setDateDifference] = useState<number>(0);
 
@@ -108,6 +109,7 @@ const AllEventAttendee: React.FC = () => {
     // const [currentAttendees, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
 
     const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
+    console.log(currentAttendees)
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -606,7 +608,9 @@ const AllEventAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Designation</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Company</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Email</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Alternate Email</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Alternate Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
                                     <th className="py-3 px-4 text-start text-nowrap">Check In Time<br /> (1st) </th>
@@ -640,14 +644,21 @@ const AllEventAttendee: React.FC = () => {
                             </thead>
                             <tbody>
                                 {currentAttendees.length > 0 ? (
-                                    currentAttendees.map((attendee, index) => (
-                                        <tr key={attendee.uuid}>
+                                    currentAttendees.map((attendee: attendeeType, index) => (
+                                        <tr key={attendee.uuid}
+                                            // style={{
+                                            //     backgroundColor: attendee.not_invited === "1" ? 'yellow' : '', // Convert conditional class to style here
+                                            // }}
+                                            className={`${attendee.not_invited ? "bg-yellow-100" : ""}`}
+                                            >
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_email === "" ? attendee.alternate_email : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number === "" ? attendee.alternate_mobile_number : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
                                                 {attendee.check_in === 1 ? 'Yes' : 'No'}
