@@ -54,8 +54,10 @@ const AllEventAttendee: React.FC = () => {
         currentEventUUID: state.events.currentEventUUID,
         eventAttendee: state.events.eventAttendee as attendeeType[],
         loading: state.events.attendeeLoader,
-        currentEvent: state.events
+        currentEvent: state.events,
     }));
+
+    const qrCode = `${apiBaseUrl}/${currentEvent?.currentEvent?.qr_code}`;
 
     const [dateDifference, setDateDifference] = useState<number>(0);
 
@@ -213,6 +215,17 @@ const AllEventAttendee: React.FC = () => {
         });
     }
 
+    const showQRCode = () => {
+        Swal.fire({
+            title: 'QR Code',
+            text: 'Here is your QR code',
+            imageUrl: qrCode,
+            imageHeight: "300px",
+            imageWidth: "300px",
+            confirmButtonText: 'OK'
+        });
+    }
+
     if (loading) {
         return <Loader />
     }
@@ -221,9 +234,13 @@ const AllEventAttendee: React.FC = () => {
         <>
             <div className='flex justify-between items-center'>
                 <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
-                <Link to="/" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
-                    <IoMdArrowRoundBack size={20} /> Go Back
-                </Link>
+
+                <div className='flex items-center gap-3'>
+                    <button onClick={showQRCode} className='btn-sm bg-amber-400 hover:bg-amber-500 btn'>QR Code</button>
+                    <Link to="/" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                        <IoMdArrowRoundBack size={20} /> Go Back
+                    </Link>
+                </div>
             </div>
             <br />
 
@@ -650,7 +667,7 @@ const AllEventAttendee: React.FC = () => {
                                             //     backgroundColor: attendee.not_invited === "1" ? 'yellow' : '', // Convert conditional class to style here
                                             // }}
                                             className={`${attendee.not_invited ? "bg-yellow-100" : ""}`}
-                                            >
+                                        >
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>

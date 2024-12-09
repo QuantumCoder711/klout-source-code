@@ -64,7 +64,7 @@ const AddEvent: React.FC = () => {
     const [textColor, setTextColor] = useState<string>("#FFFFFF");
     const [textSize, setTextSize] = useState<number>(48);
     const [eventStartDate, setEventStartDate] = useState<string>("");
-    const [, setEventEndDate] = useState<string>("");
+    const [eventEndDate, setEventEndDate] = useState<string>("");
     const [, setEventVenueName] = useState<string>("");
     const [, setEventCity] = useState<string>("");
 
@@ -169,8 +169,29 @@ const AddEvent: React.FC = () => {
         return null; // If eventDetailsRef.current is not available, return null
     };
 
+    // Convert eventStartDate to YYYY-MM-DD format
+    const formatDate = (dateString:string) => {
+        return new Date(dateString).getTime(); // Convert to string format in milliseconds
+    };
+
     // onSubmit function to handle form submission
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
+
+        const startDate = formatDate(eventStartDate);
+        const endDate = formatDate(eventEndDate);
+
+        console.log(startDate, endDate);
+
+        if (startDate > endDate) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Event start date cannot be bigger than end date',
+                icon: 'error',
+                confirmButtonText: 'Ok',
+            });
+            return;
+        }
+
         // Step 1: Show confirmation dialog to ask if the user wants to submit the event
         const result = await Swal.fire({
             title: 'Do you want to add this event?',
