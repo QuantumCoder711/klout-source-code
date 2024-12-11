@@ -311,7 +311,7 @@ const EditAgenda: React.FC = () => {
                 </div>
 
                 <div className="col-span-3 flex justify-center mt-4">
-                    <button type="submit" className="btn btn-primary">Edit Agenda</button>
+                    <button type="submit" className="px-4 py-2 rounded-md bg-klt_primary-900 text-white mx-auto w-fit mt-3">Edit Agenda</button>
                 </div>
             </form>
         </div>

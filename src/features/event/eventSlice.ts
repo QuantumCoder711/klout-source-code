@@ -17,6 +17,7 @@ type eventType = {
     end_time: string,
     end_time_type: string,
     image: string,
+    video_url: string;
     event_venue_name: string,
     event_venue_address_1: string,
     event_venue_address_2: string,

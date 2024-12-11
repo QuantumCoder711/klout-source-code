@@ -3,14 +3,10 @@ import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import { allEventAttendee } from '../../event/eventSlice';
-import { FaEdit, FaUserFriends, FaUserClock, FaFileExcel } from 'react-icons/fa';
+import { FaEdit, FaFileExcel, FaEye, FaUserFriends } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { attendeeUUID } from '../attendeeSlice';
 import { Link } from 'react-router-dom';
-import { BsSendFill } from 'react-icons/bs';
-import { FaMessage } from 'react-icons/fa6';
-import { BiSolidMessageSquareDots } from 'react-icons/bi';
-import { FaPoll } from "react-icons/fa";
 import HeadingH2 from '../../../component/HeadingH2';
 import * as XLSX from 'xlsx';  // Import the xlsx library
 import { heading } from '../../heading/headingSlice';
@@ -43,12 +39,17 @@ type attendeeType = {
     check_in_fifth_time: string;
     event_name: string;
     not_invited: boolean;
+    image: string;
     id: number;
 };
 
 const AllEventAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    // const dummyImage = "https://via.placeholder.com/150";
+
+    const [selectedAction, setSelectedAction] = useState('');
+
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, eventAttendee, loading, currentEvent } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
@@ -68,7 +69,6 @@ const AllEventAttendee: React.FC = () => {
         return (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
     };
 
-
     useEffect(() => {
         if (currentEventUUID && token) {
             dispatch(allEventAttendee({ eventuuid: currentEventUUID, token }));
@@ -76,8 +76,6 @@ const AllEventAttendee: React.FC = () => {
 
         if (currentEvent.currentEvent) {
             setDateDifference(calculateDateDifference(currentEvent.currentEvent?.event_start_date, currentEvent.currentEvent?.event_end_date));
-            // setDateDifference(3);
-            console.log(dateDifference);
         }
 
         // console.log("Checked Users are: ", checkedUsers);
@@ -93,16 +91,64 @@ const AllEventAttendee: React.FC = () => {
     const [roleFilter, setRoleFilter] = useState('');
 
     // Filter attendees based on the search terms
-    const filteredAttendees = eventAttendee.filter((attendee) => {
-        const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
-        const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
-        const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
-        const matchesCheckIn = checkInFilter === '' || attendee.check_in === Number(checkInFilter) || attendee.check_in_second === Number(checkInFilter) || attendee.check_in_third === Number(checkInFilter) || attendee.check_in_forth === Number(checkInFilter) || attendee.check_in_fifth === Number(checkInFilter)
-        const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
-        return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
-    });
+    // const filteredAttendees = eventAttendee.filter((attendee) => {
+    //     const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
+    //     const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
+    //     const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
+    //     const matchesCheckIn = checkInFilter === '' || attendee.check_in === Number(checkInFilter) || attendee.check_in_second === Number(checkInFilter) || attendee.check_in_third === Number(checkInFilter) || attendee.check_in_forth === Number(checkInFilter) || attendee.check_in_fifth === Number(checkInFilter)
+    //     const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
+    //     return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
+    // });
+
+    // Filter attendees based on the search terms
+    const filteredAttendees = eventAttendee
+        .filter((attendee) => {
+            const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
+            const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
+            const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
+            const matchesCheckIn = checkInFilter === '' ||
+                attendee.check_in === Number(checkInFilter) ||
+                attendee.check_in_second === Number(checkInFilter) ||
+                attendee.check_in_third === Number(checkInFilter) ||
+                attendee.check_in_forth === Number(checkInFilter) ||
+                attendee.check_in_fifth === Number(checkInFilter);
+            const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
+            return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
+        })
+        // .sort((a, b) => new Date(b.check_in_time) - new Date(a.check_in_time)); // Sort in descending order
+        // Ensure check_in_time is parsed as a Date object for comparison
+        .sort((a, b) => {
+            const dateTimeA = new Date(a.check_in_time).getTime(); // Convert Date to timestamp (number)
+            const dateTimeB = new Date(b.check_in_time).getTime(); // Convert Date to timestamp (number)
+
+            return dateTimeB - dateTimeA; // Descending order
+        });
+
+
+
+
+    const actionLinks: { [key: string]: string } = {
+        'Add Attendee': '/events/add-attendee',
+        'Send Reminder': '/events/send-reminder',
+        'Send Invitation': '/events/send-invitation',
+        'Send Same Day Reminder': '/events/same-day-reminder',
+        'Send Poll': '/events/send-poll',
+        'Send In App Message': '/events/send-to-app',
+        'Pending Requests': '/events/pending-user-request',
+        'Send Template Message': '/events/send-multiple-message',
+        'Session Reminder': '/events/session-reminder',
+        'Day Two Reminder': '/events/day-two-reminder',
+        'Reminder Visit Booth': '/events/reminder-to-visit-booth',
+        'Day Two Same Day Reminder': '/events/day_two_same_day_reminder',
+        'Thank You Message': '/events/thank-you-message',
+    };
+
 
     // console.log("Checked Users are: ", checkedUsers2ndDay);
+
+    useEffect(() => {
+        console.log(filteredAttendees)
+    }, [checkInFilter]);
 
     const totalPages = Math.ceil(filteredAttendees.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -111,7 +157,7 @@ const AllEventAttendee: React.FC = () => {
     // const [currentAttendees, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
 
     const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
-    console.log(currentAttendees)
+    console.log(currentAttendees);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -127,6 +173,15 @@ const AllEventAttendee: React.FC = () => {
             'Mobile': attendee.phone_number,
             'Role': attendee.status,
             'Check In': attendee.check_in === 1 ? 'Yes' : 'No',
+            "Check In Time": attendee.check_in_time,
+            'Check In 2nd': attendee.check_in_second === 2 ? 'Yes' : 'No',
+            "Check In Time 2nd": attendee.check_in_second_time,
+            'Check In 3rd': attendee.check_in_third === 3 ? 'Yes' : 'No',
+            "Check In Time 3rd": attendee.check_in_third_time,
+            'Check In 4th': attendee.check_in_forth === 4 ? 'Yes' : 'No',
+            "Check In Time 4th": attendee.check_in_forth_time,
+            'Check In 5th': attendee.check_in_fifth === 5 ? 'Yes' : 'No',
+            "Check In Time 5th": attendee.check_in_fifth_time,
             'Event Name': attendee.event_name,
         }));
 
@@ -215,6 +270,13 @@ const AllEventAttendee: React.FC = () => {
         });
     }
 
+    const handleChange = (e: any) => {
+        const action = e.target.value;
+        // const setPageHeading =  Object.keys(action).find(key => actionLinks[key] === action);
+        // console.log(setPageHeading);
+        setSelectedAction(action);
+    };
+
     const showQRCode = () => {
         Swal.fire({
             title: 'QR Code',
@@ -226,6 +288,48 @@ const AllEventAttendee: React.FC = () => {
         });
     }
 
+
+    const showImage = (
+        img: string,
+        firstName: string,
+        lastName: string,
+        email: string,
+        jobTitle: string,
+        companyName: string,
+        phoneNumber: string,
+        alternateEmail: string,
+        status: string
+    ) => {
+        const agendaImage = `${apiBaseUrl}/${img}`;
+
+        Swal.fire({
+            title: `${firstName} ${lastName}`,
+            // width: "600px",
+            text: email,
+            imageUrl: img === "" ? agendaImage : img,  // Use provided image or fallback
+            imageHeight: "300px",
+            imageWidth: "300px",
+            html: `
+                <div style="display: flex; font-size: 14px; gap: 64px; justify-content: center">
+                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px">
+                <div style="width:fit; text-align: left;"><strong>Job Title:</strong> ${jobTitle}</div>
+                <div style="width:fit; text-align: left;"><strong>Email:</strong> ${email}</div>
+                <div style="width:fit; text-align: left;"><strong>Company:</strong> ${companyName}</div>
+                </div>
+    
+                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px">
+                <div style="width:fit; text-align: left;"><strong>Phone:</strong> ${phoneNumber}</div>
+                <div style="width:fit; text-align: left;"><strong>Alternate Email:</strong> ${alternateEmail || '-'}</div>
+                <div style="width:fit; text-align: left;"><strong>Status:</strong> ${status}</div>
+                </div>
+                </div>
+            `,
+            confirmButtonText: 'OK'
+        });
+    }
+
+
+
     if (loading) {
         return <Loader />
     }
@@ -236,14 +340,14 @@ const AllEventAttendee: React.FC = () => {
                 <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
 
                 <div className='flex items-center gap-3'>
-                    <button onClick={showQRCode} className='btn-sm bg-amber-400 hover:bg-amber-500 btn'>QR Code</button>
-                    <Link to="/" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                    <button onClick={showQRCode} className='btn-sm text-white bg-amber-400 hover:bg-amber-500 btn'>QR Code</button>
+                    <Link to="/" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>
             </div>
             <br />
-
+            {/* 
             <div className="flex items-center flex-wrap gap-2 mb-4">
                 <Link
                     to="/events/add-attendee"
@@ -369,6 +473,76 @@ const AllEventAttendee: React.FC = () => {
                 >
                     <FaFileExcel /> Export Data
                 </button>
+            </div> */}
+
+            <div className='flex justify-between items-baseline mb-3'>
+
+                <div className="relative inline-block right-0 text-right">
+                    {/* Dropdown Select */}
+                    <select
+                        onChange={handleChange}
+                        value={selectedAction}
+                        className="p-2 rounded border border-black/50"
+                        aria-label="Select action"
+                    >
+                        <option value="" disabled>
+                            Choose Message Template
+                        </option>
+                        <option value="Send Reminder">Send Reminder</option>
+                        <option value="Send Invitation">Send Invitation</option>
+                        <option value="Send Same Day Reminder">Send Same Day Reminder</option>
+                        <option value="Send Poll">Send Poll</option>
+                        <option value="Send In App Message">Send In App Message</option>
+                        <option value="Send Template Message">Send Template Message</option>
+                        <option value="Session Reminder">Session Reminder</option>
+                        <option value="Day 2 Reminder">Day Two Reminder</option>
+                        <option value="Reminder Visit Booth">Reminder Visit Booth</option>
+                        <option value="Day Two Same Day Reminder">Day Two Same Day Reminder</option>
+                        <option value="Thank You Message">Thank You Message</option>
+                    </select>
+
+                    {/* Conditionally Render 'Go' Button */}
+                    {selectedAction && (
+                        <Link
+
+                            onClick={() => dispatch(heading(selectedAction))} // You can dispatch action as per your need}
+                            to={actionLinks[selectedAction]} // Dynamically set the link based on selected action
+                            className="px-4 py-2 rounded-md text-white ml-3 bg-blue-500"
+                        >
+                            Go
+                        </Link>
+                    )}
+                </div>
+
+                <div className='flex gap-3 items-center'>
+                    <Link
+                        to="/events/add-attendee"
+                        onClick={() => { dispatch(heading('Add Attendee')) }}
+                        className="btn bg-klt_primary-900 hover:bg-klt_primary-800 text-white btn-sm"
+                        title="Add a new attendee"
+                    >
+                        <FaUserFriends /> Add Attendee
+                    </Link>
+
+
+                    <Link
+                        to="/events/pending-user-request"
+                        onClick={() => { dispatch(heading("Pending Requests")) }}
+                        className="btn bg-klt_primary-900 hover:bg-klt_primary-800 text-white btn-sm"
+                        title="Add a new attendee"
+                    >
+                        <FaUserFriends /> Pending User Requests
+                    </Link>
+
+                    <button
+                        className="btn btn-success hover:!text-white btn-outline btn-sm ml-auto"
+                        onClick={handleExport}
+                        title="Export attendee data"
+                    >
+                        <FaFileExcel /> Export Data
+                    </button>
+                </div>
+
             </div>
 
 
@@ -395,7 +569,7 @@ const AllEventAttendee: React.FC = () => {
                         </div>
                         <input
                             type="text"
-                            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+                            className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
                             placeholder="Search by name"
                             value={searchName}
                             onChange={(e) => {
@@ -405,7 +579,7 @@ const AllEventAttendee: React.FC = () => {
                         />
                         <input
                             type="text"
-                            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+                            className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
                             placeholder="Search by company"
                             value={searchCompany}
                             onChange={(e) => {
@@ -415,7 +589,7 @@ const AllEventAttendee: React.FC = () => {
                         />
                         <input
                             type="text"
-                            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+                            className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
                             placeholder="Search by designation"
                             value={searchDesignation}
                             onChange={(e) => {
@@ -426,7 +600,7 @@ const AllEventAttendee: React.FC = () => {
 
                         {/* Check-in filter */}
                         <select
-                            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+                            className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
                             value={checkInFilter}
                             onChange={(e) => {
                                 setCheckInFilter(e.target.value);
@@ -440,7 +614,7 @@ const AllEventAttendee: React.FC = () => {
 
                         {/* Role filter */}
                         <select
-                            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+                            className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
                             value={roleFilter}
                             onChange={(e) => {
                                 setRoleFilter(e.target.value);
@@ -500,122 +674,6 @@ const AllEventAttendee: React.FC = () => {
                             <Loader /> {/* Display the loader component */}
                         </div>
                     ) : (
-                        // <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
-                        //     <thead>
-                        //         <tr className="bg-klt_primary-500 text-white">
-                        //             <th className="py-3 px-4 text-start text-nowrap">#</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Name</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Designation</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Company</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Email</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Role</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Check In Time<br /> (1st) </th>
-
-                        //             {dateDifference > 0 && (
-                        //                 <><th className="py-3 px-4 text-start text-nowrap">Check In <br /> (2nd)</th>
-                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (2nd)</th>
-                        //                 </>
-                        //             )}
-                        //             {dateDifference > 1 && (
-                        //                 <>
-                        //                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (3rd)</th>
-                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (3rd)</th>
-                        //                 </>
-                        //             )}
-                        //             {dateDifference > 2 && (
-                        //                 <>
-                        //                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (4th)</th>
-                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (4th)</th>
-                        //                 </>
-                        //             )}
-                        //             {dateDifference > 3 && (
-                        //                 <>
-                        //                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (5th)</th>
-                        //                     <th className="py-3 px-4 text-start text-nowrap">Time and Date <br /> (5th)</th>
-                        //                 </>
-                        //             )}
-                        //             <th className="py-3 px-4 text-start text-nowrap">Action</th>
-                        //         </tr>
-                        //     </thead>
-                        //     <tbody>
-                        //         {currentAttendees.length > 0 ? (
-                        //             currentAttendees.map((attendee, index) => (
-                        //                 <tr key={attendee.uuid}>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
-                        //                         {attendee.check_in === 1 ? 'Yes' : 'No'}
-                        //                     </td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
-                        //                         {attendee.check_in_time ? attendee.check_in_time : '-'}
-                        //                     </td>
-
-                        //                     {dateDifference > 0 && (
-                        //                         <>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_second === 1 ? 'Yes' : 'No'}
-                        //                             </td>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_second_time ? attendee.check_in_second_time : '-'}
-                        //                             </td>
-                        //                         </>
-                        //                     )}
-                        //                     {dateDifference > 1 && (
-                        //                         <>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_third === 1 ? 'Yes' : 'No'}
-                        //                             </td>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_third_time ? attendee.check_in_third_time : '-'}
-                        //                             </td>
-                        //                         </>
-                        //                     )}
-                        //                     {dateDifference > 2 && (
-                        //                         <>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_forth === 1 ? 'Yes' : 'No'}
-                        //                             </td>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_forth_time ? attendee.check_in_forth_time : '-'}
-                        //                             </td>
-                        //                         </>
-                        //                     )}
-                        //                     {dateDifference > 3 && (
-                        //                         <>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_fifth === 1 ? 'Yes' : 'No'}
-                        //                             </td>
-                        //                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
-                        //                                 {attendee.check_in_fifth_time ? attendee.check_in_fifth_time : '-'}
-                        //                             </td>
-                        //                         </>
-                        //                     )}
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
-                        //                         <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
-                        //                             <FaEdit />
-                        //                         </Link>
-                        //                         <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">
-                        //                             <MdDelete />
-                        //                         </button>
-                        //                     </td>
-                        //                 </tr>
-                        //             ))
-                        //         ) : (
-                        //             <tr>
-                        //                 <td colSpan={9} className="py-4 text-center text-gray-600">
-                        //                     No attendees found.
-                        //                 </td>
-                        //             </tr>
-                        //         )}
-                        //     </tbody>
-                        // </table>
 
                         <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
                             <thead>
@@ -630,7 +688,9 @@ const AllEventAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Alternate Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
-                                    <th className="py-3 px-4 text-start text-nowrap">Check In Time<br /> (1st) </th>
+                                    <th className="py-3 px-4 text-start text-nowrap flex gap-3">Check In Time<br /> (1st)
+                                        {/* <span className='flex flex-col justify-between'><IoMdArrowDropup className='scale-105 cursor-pointer'/> <IoMdArrowDropup className='rotate-180 scale-105 cursor-pointer'/></span>  */}
+                                    </th>
 
                                     {dateDifference > 0 && (
                                         <>
@@ -761,7 +821,23 @@ const AllEventAttendee: React.FC = () => {
                                                     </td>
                                                 </>
                                             )}
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-2">
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-2">
+                                                <span
+                                                    onClick={() => showImage(
+                                                        attendee.image,
+                                                        attendee.first_name,
+                                                        attendee.last_name,
+                                                        attendee.email_id,
+                                                        attendee.job_title,
+                                                        attendee.company_name,
+                                                        attendee.phone_number,
+                                                        attendee.alternate_email,
+                                                        attendee.status
+                                                    )}
+                                                    className='w-6 h-6 p-1 cursor-pointer bg-zinc-100 hover:bg-zinc-200 rounded-full grid place-content-center'>
+                                                    <FaEye className='text-black/70' />
+                                                </span>
+
                                                 <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit />
                                                 </Link>

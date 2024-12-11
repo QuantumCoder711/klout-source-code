@@ -24,7 +24,7 @@ type FormInputType = {
   company_turn_over: number;
   status: string;
   event_id: number;
-  image: File | undefined;
+  image: File | null;
   excel_file: File | null;
 };
 
@@ -42,6 +42,7 @@ const AddEventAttendee: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState('');
+  const [image, setImage] = useState<Blob|null>(null);
   const { token } = useSelector((state: RootState) => (state.auth));
   const { currentEventUUID } = useSelector((state: RootState) => (state.events));
   // const { currentAttendeeUUID } = useSelector((state: RootState) => (state.attende));
@@ -84,7 +85,10 @@ const AddEventAttendee: React.FC = () => {
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
+      const imageBlob = new Blob([file], { type: file.type });
+      setImage(imageBlob);
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
       setValue("image", file); // storing it in the form
@@ -113,6 +117,10 @@ const AddEventAttendee: React.FC = () => {
 
     if (currentEventUUID) {
       formData.append("event_id", currentEventUUID);
+    }
+
+    if (image) {
+      formData.append("image", image);
     }
 
     console.log(formData);
@@ -351,7 +359,7 @@ const AddEventAttendee: React.FC = () => {
           <div className="flex flex-col gap-3 my-4">
             <label htmlFor="job_title" className="input input-bordered bg-white text-black flex items-center gap-2">
               <span className="font-semibold text-green-700 flex justify-between items-center">
-                Job Title &nbsp; <TiArrowRight className="mt-1" />
+                Job Title <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
               </span>
               <select
                 id="job_title"
@@ -565,7 +573,7 @@ const AddEventAttendee: React.FC = () => {
           </div>
 
           <div className="col-span-3 flex justify-center mt-4">
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="px-4 py-2 rounded-md bg-klt_primary-900 text-white mx-auto w-fit">
               Submit
             </button>
           </div>

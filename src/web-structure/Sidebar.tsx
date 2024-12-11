@@ -5,10 +5,19 @@ import { useDispatch } from "react-redux";
 import { heading } from "../features/heading/headingSlice";
 import { RootState } from "../redux/store";
 import { useSelector } from "react-redux";
+import { MdDashboard, MdOutlinePhotoSizeSelectActual } from "react-icons/md";
+import { MdEmojiEvents } from "react-icons/md";
+import { FaUsers } from "react-icons/fa6";
+import { GoSponsorTiers } from "react-icons/go";
+import { TbReportAnalytics } from "react-icons/tb";
+import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
+import { TbBorderAll } from "react-icons/tb";
+import { FaPlus } from "react-icons/fa";
 
 const Sidebar: React.FC = () => {
   const dispatch = useDispatch();
   const [showEvents, setShowEvents] = useState(false);
+  const [collapse, setCollapse] = useState<boolean>(true);
 
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 
@@ -23,51 +32,76 @@ const Sidebar: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-40 xl:w-56 flex-shrink-0 bg-klt_primary-900 text-white">
-      {
-        user?.company_logo &&
-        <div className="border-b border-white">
-          <img className="p-4 mx-auto h-[72px]" src={`${imageBaseUrl}/${user.company_logo}`} alt={user.company_name} />
+    <div className={`relative h-screen ${collapse ? "w-44 xl:w-56" : "w-fit pt-[72px]"} flex-shrink-0 bg-klt_primary-900 text-white`}>
+      {collapse && <span>
+        {
+          user?.company_logo &&
+          <div className="border-b border-white">
+            <img className="p-4 mx-auto h-[72px]" src={`${imageBaseUrl}/${user.company_logo}`} alt={user.company_name} />
+          </div>
+        }
+        {!user?.company_logo && <div
+          className="px-4 py-5 text-2xl font-bold border-b border-white-500"
+          style={{ marginBottom: "30px" }}
+        >
+          KLOUT CLUB
         </div>
-      }
-      {!user?.company_logo && <div
-        className="px-4 py-5 text-2xl font-bold border-b border-white-500"
-        style={{ marginBottom: "30px" }}
-      >
-        KLOUT CLUB
-      </div>}
+        }
+      </span>}
+
+      <div onClick={() => setCollapse(prev => !prev)} className="bg-white w-8 h-8 rounded-full absolute grid place-content-center top-1/2 -bottom-1/2 -translate-y-1/2 -right-4 shadow-lg cursor-pointer">
+        <MdKeyboardDoubleArrowLeft className={`${!collapse ? "rotate-180" : "rotate-0"} size-7 text-black`} />
+      </div>
       <ul className="my-5 space-y-2">
         <li>
-          <Link to="/" onClick={handlePageTitle} className="py-3 px-5 block rounded font-semibold">
-            Dashboard
+          <Link to="/" onClick={handlePageTitle} className="p-5 flex items-center gap-3 rounded font-semibold">
+            <MdDashboard className="size-6" />
+            {collapse &&
+              <span>
+                Dashboard
+              </span>
+            }
           </Link>
         </li>
         <li>
           <button
             onClick={toggleEventsMenu}
-            className="py-3 px-5 rounded w-full text-left flex items-center justify-between"
+            className="p-5 rounded w-full text-left flex items-center justify-between"
           >
-            <span className="font-semibold">Events</span>
-            {showEvents ? <FaChevronUp /> : <FaChevronDown />}
+            <div className="flex gap-3 items-center">
+              <MdEmojiEvents className="size-7" />
+              {collapse && <span className="font-semibold">Events</span>}
+            </div>
+            {(showEvents && collapse) ? <FaChevronUp /> : <FaChevronDown />}
           </button>
           {showEvents && (
-            <ul className="mx-4 bg-klt_primary-100 rounded">
+            <ul className={`${collapse ? "mx-4" : "mx-3"} bg-klt_primary-100 rounded`}>
               <li>
                 <Link
                   to="/events"
                   onClick={handlePageTitle}
-                  className="hover:bg-klt_primary-400 pl-4 py-2 block rounded"
+                  className="hover:bg-klt_primary-400 p-5 block rounded"
                 >
-                  All Events
+                  <div className="flex gap-3 items-center">
+                    <TbBorderAll className="size-5" />
+                    {collapse && <span>
+                      All Events
+                    </span>}
+                  </div>
                 </Link>
               </li>
               <li>
                 <Link
                   to="/events/add-event"
                   onClick={handlePageTitle}
-                  className="hover:bg-klt_primary-400 pl-4 py-2 block rounded"
+                  className="hover:bg-klt_primary-400 p-5 block rounded"
                 >
-                  Add Event
+                  <div className="flex gap-3 items-center">
+                    <FaPlus className="size-5" />
+                    {collapse && <span>
+                      Add Event
+                    </span>}
+                  </div>
                 </Link>
               </li>
             </ul>
@@ -77,25 +111,35 @@ const Sidebar: React.FC = () => {
           <Link
             to="/all-attendees"
             onClick={handlePageTitle}
-            className="py-3 px-5 block rounded font-semibold"
+            className="p-5 block rounded font-semibold"
           >
-            All Attendees
+            <div className="flex gap-3 items-center">
+              <FaUsers className="size-6" />
+              {collapse && <span>
+                All Attendees
+              </span>}
+            </div>
           </Link>
         </li>
         <li>
           <Link
             to="/all-sponsors"
             onClick={handlePageTitle}
-            className="py-3 px-5 block rounded font-semibold"
+            className="p-5 block rounded font-semibold"
           >
-            All Sponsors
+            <div className="flex items-center gap-3">
+              <GoSponsorTiers className="size-6" />
+              {collapse && <span>
+                All Sponsors
+              </span>}
+            </div>
           </Link>
         </li>
         {/* <li>
           <Link
             to="/settings"
             onClick={handlePageTitle}
-            className="py-3 px-5 block rounded font-semibold"
+            className="p-5 block rounded font-semibold"
           >
             Settings
           </Link>
@@ -104,7 +148,7 @@ const Sidebar: React.FC = () => {
           <Link
             to="/profile"
             onClick={handlePageTitle}
-            className="py-3 px-5 block rounded font-semibold"
+            className="p-5 block rounded font-semibold"
           >
             Profile
           </Link>
@@ -113,20 +157,39 @@ const Sidebar: React.FC = () => {
           <Link
             to="/all-reports"
             onClick={handlePageTitle}
-            className="py-3 px-5 block rounded font-semibold"
+            className="p-5 block rounded font-semibold"
           >
-            All Reports
+            <div className="flex items-center gap-3 ">
+              <TbReportAnalytics className="size-6" />
+              {collapse && <span>
+                All Reports
+              </span>}
+            </div>
           </Link>
         </li>
         {/* <li>
           <Link
             to="/all-charts"
             onClick={handlePageTitle}
-            className="py-3 px-5 block rounded font-semibold"
+            className="p-5 block rounded font-semibold"
           >
             All Charts
           </Link>
         </li> */}
+        <li>
+          <Link
+            to="/photos"
+            onClick={handlePageTitle}
+            className="p-5 block rounded font-semibold"
+          >
+            <div className="flex items-center gap-3 ">
+              <MdOutlinePhotoSizeSelectActual className="size-6" />
+              {collapse && <span>
+                Photos
+              </span>}
+            </div>
+          </Link>
+        </li>
       </ul>
     </div>
   );

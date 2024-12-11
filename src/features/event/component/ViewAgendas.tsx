@@ -14,6 +14,7 @@ import { heading } from '../../heading/headingSlice';
 import Swal from 'sweetalert2';
 import Loader from '../../../component/Loader';
 import { FaFileImport } from "react-icons/fa6";
+import { FaEye } from "react-icons/fa";
 
 // Define the AgendaType interface
 type AgendaType = {
@@ -37,15 +38,13 @@ type AgendaType = {
 
 const ViewAgendas: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const dummyImage = "https://via.placeholder.com/150";
+
   const { token } = useSelector((state: RootState) => (state.auth));
   const [agendaData, setAgendaData] = useState<AgendaType[]>([]); // Fix agendaData to be an array
   const [filteredAgendaData, setFilteredAgendaData] = useState<AgendaType[]>([]); // To store filtered data
   const [filterTitle, setFilterTitle] = useState(""); // State for the filter input
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-  const currentEventId = useSelector((state: RootState) => state.events);
-
-  console.log(currentEventId);
 
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { events, loading } = useSelector((state: RootState) => state.events);
@@ -54,8 +53,6 @@ const ViewAgendas: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
 
   const [button, setButton] = useState<boolean>(false);
-
-  console.log("Total Events are: ", events);
 
   const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
 
@@ -74,19 +71,16 @@ const ViewAgendas: React.FC = () => {
         .then((res) => {
           if (res.data) {
             console.log(currentEvent);
-            
+
             // Sort the data in descending order to show the highest position at the top
             const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
-            
+
             setAgendaData(sortedData);
             setFilteredAgendaData(sortedData); // Initialize filtered data with sorted data
           }
         });
     }
   }, [currentEvent]);
-
-
-  console.log(agendaData);
 
   const deleteAgenda = async (uuid: string) => {
     const result = await Swal.fire({
@@ -254,6 +248,32 @@ const ViewAgendas: React.FC = () => {
     }
   };
 
+  const showImage = (imgBase:string, agendaTitle:string, agendaDescription:string, eventDate:string, startTime:string, endTime:string, startMinuteTime:string, endTimeType:string, endMinuteTime:string, position:number, startTimeType:string) => {
+    const agendaImage = `${apiBaseUrl}/${imgBase}`;
+
+    Swal.fire({
+      title: agendaTitle,
+      text: agendaDescription,
+      imageUrl: agendaImage || dummyImage,
+      imageHeight: "300px",
+      imageWidth: "300px",
+      confirmButtonText: 'OK',
+      html: `
+                <div style="display: flex; font-size: 16px; padding-top: 12px; gap: 64px; justify-content: center">
+                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px">
+                <div style="width:fit; text-align: left;"><strong>Start Time:</strong> ${startTime + ':' + startMinuteTime + ' ' + startTimeType.toUpperCase() + ' '}</div>
+                <div style="width:fit; text-align: left;"><strong>Event Date:</strong> ${eventDate}</div>
+                </div>
+    
+                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px">
+                <div style="width:fit; text-align: left;"><strong>End Time:</strong> ${endTime + ':' + endMinuteTime + ' ' + endTimeType.toUpperCase() + ' '}</div>
+                <div style="width:fit; text-align: left;"><strong>Priority:</strong> ${position}</div>
+                </div>
+                </div>
+            `,
+    });
+  }
+
 
   if (loading) {
     return <Loader />
@@ -381,7 +401,10 @@ const ViewAgendas: React.FC = () => {
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.event_date}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' + data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.position}</td>
-                    <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
+                    <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-3">
+                      <span onClick={()=>showImage(data.image_path, data.title, data.description, data.event_date, data.start_time, data.end_time, data.start_minute_time, data.end_time_type, data.end_minute_time, data.position, data.start_time_type)} className='w-6 h-6 p-1 cursor-pointer bg-zinc-100 hover:bg-zinc-200 rounded-full grid place-content-center'>
+                        <FaEye className='text-black/70'/>
+                      </span>
                       <Link to={`/events/edit-agenda`} onClick={() => { dispatch(agendaUUID(data.uuid)); dispatch(heading("Edit Agenda")) }} className="text-blue-500 hover:text-blue-700">
                         <FaEdit size={20} />
                       </Link>

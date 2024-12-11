@@ -4,6 +4,9 @@ import { fetchExistingEvent } from '../eventSlice';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import Loader from '../../../component/Loader';
 import { useSelector } from 'react-redux';
+import { IoMdArrowRoundBack } from 'react-icons/io';
+import { Link } from 'react-router-dom';
+import { heading } from '../../heading/headingSlice';
 
 const ViewEvent: React.FC = () => {
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
@@ -48,8 +51,13 @@ const ViewEvent: React.FC = () => {
     return (
         <div className="p-6 pt-0">
             {/* Heading */}
-            <div className="mb-4">
+            <div className="mb-4 flex justify-between items-center">
                 <HeadingH2 title={currentEvent.title} />
+                <div className='flex items-center gap-3'>
+                    <Link to="/events/" onClick={() => dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
+                        <IoMdArrowRoundBack size={20} /> Go Back
+                    </Link>
+                </div>
             </div>
 
 

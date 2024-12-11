@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import HeadingH2 from '../../../component/HeadingH2';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
@@ -110,30 +109,30 @@ const Event: React.FC = () => {
     return (
         <>
 
-            <div className="p-6">
+            <div className="px-6">
 
                 {/* Heading */}
-                <div className="flex justify-between items-center">
-                    <HeadingH2 title="All Events" />
+                <div className="flex justify-between items-center mb-6">
+                    {/* Tab Buttons */}
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => handleTabChange('upcoming')}
+                            className={`px-2 py-1 text-sm rounded ${activeTab === 'upcoming' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
+                        >
+                            Upcoming Events
+                        </button>
+                        <button
+                            onClick={() => handleTabChange('past')}
+                            className={`px-2 py-1 text-sm rounded ${activeTab === 'past' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
+                        >
+                            Past Events
+                        </button>
+                    </div>
                     <Link to='/events/add-event' onClick={handleHeading} className="btn btn-secondary text-white btn-sm"><MdAdd /> Create New Event</Link>
                 </div>
 
 
-                {/* Tab Buttons */}
-                <div className="flex gap-4 mt-4 mb-6">
-                    <button
-                        onClick={() => handleTabChange('upcoming')}
-                        className={`px-4 py-2 rounded ${activeTab === 'upcoming' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
-                    >
-                        Upcoming Events
-                    </button>
-                    <button
-                        onClick={() => handleTabChange('past')}
-                        className={`px-4 py-2 rounded ${activeTab === 'past' ? 'bg-klt_primary-900 text-white' : 'bg-gray-300 text-gray-700'}`}
-                    >
-                        Past Events
-                    </button>
-                </div>
+
 
                 {/* Event Table */}
                 <div className="overflow-x-auto rounded-lg">
@@ -147,6 +146,7 @@ const Event: React.FC = () => {
                                 <EventRow
                                     key={event.uuid}
                                     uuid={event.uuid}
+                                    date={event.event_start_date}
                                     id={event.id}
                                     image={`${imageBaseUrl}/${event.image}`}
                                     title={event.title}

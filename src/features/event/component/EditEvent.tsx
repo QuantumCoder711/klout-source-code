@@ -34,7 +34,8 @@ type formInputType = {
     feedback: number,
     status: number,
     google_map_link: string,
-    _method: string
+    video_url: string;
+    _method: string;
 };
 
 type eventType = {
@@ -53,12 +54,12 @@ type eventType = {
     event_venue_name: string,
     event_venue_address_1: string,
     google_map_link: string,
+    video_url: string;
     country: string,
     state: string,
     city: string,
-    pincode: string
+    pincode: string;
 }
-
 
 
 const EditEvent: React.FC = () => {
@@ -129,7 +130,13 @@ const EditEvent: React.FC = () => {
         setCities(City.getCitiesOfState(selectedCountryCode, selectedState));
     };
 
-    if(loading) {
+    const extractVideoId = (url: string): string | null => {
+        const regex = /[?&]v=([^&]+)/;  // Regular expression to match the video ID
+        const match = url.match(regex);
+        return match ? match[1] : null; // Return the video ID or null if not found
+    };
+
+    if (loading) {
         return <Loader />
     }
 
@@ -154,8 +161,19 @@ const EditEvent: React.FC = () => {
 
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
-                formData.append(key, value as string);
+                if (key === "video_url" && typeof value === "string") {
+                    // If the key is video_url, extract the video ID
+                    const videoId = extractVideoId(value);
+                    if (videoId) {
+                        formData.append(key, videoId); // Append the video ID to FormData
+                    }
+                }
+                else {
+                    formData.append(key, value as string);
+                }
             });
+
+            console.log(formData);
 
             // Append the image only if it exists
             if (image) {
@@ -209,7 +227,7 @@ const EditEvent: React.FC = () => {
             }
         }
     };
-    
+
 
 
 
@@ -221,7 +239,6 @@ const EditEvent: React.FC = () => {
     return (
 
         <div className='p-6 pt-3'>
-            <h2 className='text-black text-2xl font-semibold ps-5'>Add Details to create new event</h2>
             {/* <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
             <form onSubmit={handleSubmit(onSubmit)} className="gap-4">
                 <div className='flex flex-col gap-3 my-4'>
@@ -429,7 +446,6 @@ const EditEvent: React.FC = () => {
                     </div>
                 </div>
 
-
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Google Map Link */}
                     <label htmlFor="google_map_link" className="input input-bordered bg-white text-black flex items-center gap-2">
@@ -437,6 +453,15 @@ const EditEvent: React.FC = () => {
                         <input id="google_map_link" defaultValue={currentEvent.google_map_link} type="url" className="grow" {...register('google_map_link', { required: false, pattern: { value: /^https?:\/\//, message: 'Link must start with http or https' } })} />
                     </label>
                     {errors.google_map_link && <p className="text-red-600">{errors.google_map_link.message}</p>}
+                </div>
+
+                <div className='flex flex-col gap-3 my-4'>
+                    {/* Google Map Link */}
+                    <label htmlFor="video_url" className="input input-bordered bg-white text-black flex items-center gap-2">
+                        <span className="font-semibold text-green-700 flex justify-between items-center">Live Youtube Video Link &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <input id="video_url" defaultValue={currentEvent.video_url} className="grow" {...register('video_url')} />
+                    </label>
+                    {errors.video_url && <p className="text-red-600">{errors.video_url.message}</p>}
                 </div>
 
                 <div className="col-span-3 flex justify-center mt-4">

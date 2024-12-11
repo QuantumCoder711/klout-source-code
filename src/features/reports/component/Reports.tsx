@@ -1,5 +1,5 @@
 import React from 'react';
-import HeadingH2 from '../../../component/HeadingH2';
+
 import ReportCard from './ReportCard';
 // import {messageData} from "../temp/dummyData";
 import { useSelector } from 'react-redux';
@@ -17,11 +17,6 @@ const Reports: React.FC = () => {
 
   return (
     <div>
-
-      {/* Heading  */}
-      <div className="mb-6 flex justify-between items-center">
-        <HeadingH2 title='All Reports' />
-      </div>
 
       {/* For displaying all reports */}
       <div className='grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5'>

@@ -63,7 +63,7 @@ const SendReminder: React.FC = () => {
 
     const handleSubmit = () => {
         // Validate that Subject and Message are filled in
-        if(selectedMethod == "email"){
+        if (selectedMethod == "email") {
             if (!title || !message) {
                 // Show an error message if either Subject or Message is empty
                 Swal.fire({
@@ -72,8 +72,8 @@ const SendReminder: React.FC = () => {
                     text: 'Subject and Message are required.',
                 });
                 return;
-        }
-        
+            }
+
         }
 
         let dataObj = {};
@@ -99,6 +99,45 @@ const SendReminder: React.FC = () => {
 
         setLoading(true);
 
+        // try {
+        //     axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
+        //         headers: {
+        //             "Content-Type": "multipart/form-data",
+        //             "Authorization": `Bearer ${token}`,
+        //         },
+        //     })
+        //         .then(res => {
+        //             setLoading(false);
+        //             if (res.status === 200) {
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Success',
+        //                     text: 'The invitation was sent successfully!',
+        //                 }).then((result) => {
+        //                     if (result.isConfirmed) {
+        //                         window.location.href = "/events/all-attendee";
+        //                     }
+        //                 });
+        //             }
+        //         })
+        //         .catch(error => {
+        //             setLoading(false);
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Something went wrong',
+        //                 text: error.response?.data?.message || 'An error occurred. Please try again.',
+        //             });
+        //         });
+        // } catch (error) {
+        //     console.log("The error is: ", error);
+        //     setLoading(false);
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Something went wrong',
+        //         text: 'An unexpected error occurred.',
+        //     });
+        // }
+
         try {
             axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
                 headers: {
@@ -122,13 +161,36 @@ const SendReminder: React.FC = () => {
                 })
                 .catch(error => {
                     setLoading(false);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Something went wrong',
-                        text: error.response?.data?.message || 'An error occurred. Please try again.',
-                    });
+
+                    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+                        // Handle timeout error
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'The invitation was sent successfully!',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/events/all-attendee";
+                            }
+                        });
+                    } else if (error.response) {
+                        // Handle other errors with a response
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Something went wrong',
+                            text: error.response?.data?.message || 'An error occurred. Please try again.',
+                        });
+                    } else {
+                        // Handle other errors without a response
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Network Error',
+                            text: 'An unexpected error occurred. Please check your connection and try again.',
+                        });
+                    }
                 });
         } catch (error) {
+            console.log("The error is: ", error);
             setLoading(false);
             Swal.fire({
                 icon: 'error',
@@ -136,6 +198,7 @@ const SendReminder: React.FC = () => {
                 text: 'An unexpected error occurred.',
             });
         }
+
     };
 
 

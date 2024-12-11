@@ -38,6 +38,8 @@ import Day2ReminderPage from "./pages/Day2ReminderPage";
 import ReminderBoothVisitPage from "./pages/ReminderBoothVisitPage";
 import DayTwoSameDayReminderPage from "./pages/DayTwoSameDayReminderPage";
 import ThankYouMessagePage from "./pages/ThankYouMessagePage";
+import PhotosPage from "./pages/PhotosPage";
+// import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
 const App: React.FC = () => {
@@ -81,6 +83,7 @@ const App: React.FC = () => {
           <Route path="/all-attendees" element={<AllAttendeePage />} />
           <Route path="/all-sponsors" element={<AllSponsorPage />} />
           <Route path="/all-reports" element={<AllReports />} />
+          <Route path="/photos" element={<PhotosPage />} />
           <Route path="/all-charts" element={<AllCharts />} />
           <Route path="/all-reports/whatsapp-report" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
           <Route path="/all-reports/mail-report" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}

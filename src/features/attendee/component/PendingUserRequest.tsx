@@ -66,7 +66,6 @@ const PendingUserRequest: React.FC = () => {
             dispatch(fetchAllPendingUserRequests({ eventuuid: currentEventUUID, token, user_id }));
         }
 
-        console.log("Pending Requrests are: ", pendingRequests);
     }, [currentEventUUID, token, dispatch]);
     // eventuuid: currentEventUUID, token
 
@@ -236,7 +235,6 @@ const PendingUserRequest: React.FC = () => {
         );
     });
 
-    console.log("Requests: ", requests);
 
     // Calculate the data to display for the current page
     // Calculate total pages
@@ -328,13 +326,13 @@ const PendingUserRequest: React.FC = () => {
             {/* table filters and pagination wrapper div */}
             <div className='bg-white p-6 rounded-lg shadow-md mt-3'>
                 <div className='mt-4'>
-                    <div className='flex justify-between items-baseline'>
+                    <div className='flex justify-between items-baseline flex-wrap gap-3'>
                         {/* Filters */}
                         <div className='space-x-3 flex'>
                             {/* Filter by first name */}
                             <input
                                 type="text"
-                                className="border border-gray-500 rounded-md p-2 max-w-96 bg-white outline-none text-black"
+                                className="border border-gray-500 rounded-md px-2 max-w-96 bg-white outline-none text-black"
                                 placeholder="Search by First Name"
                                 value={firstNameFilter}
                                 onChange={(e) => setFirstNameFilter(e.target.value)}
@@ -342,7 +340,7 @@ const PendingUserRequest: React.FC = () => {
                             {/* filter by email */}
                             <input
                                 type="text"
-                                className="border border-gray-500 rounded-md p-2 max-w-96 bg-white outline-none text-black"
+                                className="border border-gray-500 rounded-md px-2 max-w-96 bg-white outline-none text-black"
                                 placeholder="Search by Email"
                                 value={emailFilter}
                                 onChange={(e) => setEmailFilter(e.target.value)}
@@ -350,12 +348,11 @@ const PendingUserRequest: React.FC = () => {
                             {/* filter by company */}
                             <input
                                 type="text"
-                                className="border border-gray-500 rounded-md p-2 max-w-96 bg-white outline-none text-black"
+                                className="border border-gray-500 rounded-md px-2 max-w-96 bg-white outline-none text-black"
                                 placeholder="Search by company"
                                 value={companyFilter}
                                 onChange={(e) => setCompanyFilter(e.target.value)}
                             />
-
 
                             <button className="btn bg-klt_primary-500 h-full w-fit px-6 py-2 flex items-center text-white btn-sm">
                                 <FaDownload size={20} /> Download Excel

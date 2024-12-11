@@ -13,6 +13,7 @@ import Loader from '../../../component/Loader';
 import Bg1 from "/background.jpg";
 import Bg2 from "/bg2.jpeg";
 import Bg3 from "/bg3.jpg";
+import Bg4 from "/bg4.jpg";
 
 type formInputType = {
     title: string,
@@ -58,6 +59,8 @@ const AddEvent: React.FC = () => {
 
     const eventDetailsRef = useRef<HTMLDivElement>(null);
 
+    const companyLogo: string = `${apiBaseUrl}/${user?.company_logo}`;
+
     const [eventCreate, setEventCreate] = useState<Boolean>(false);
     const [eventName, setEventName] = useState<string>("");
     const [templateImage, setTemplateImage] = useState<string | Blob>(Bg1);
@@ -73,8 +76,7 @@ const AddEvent: React.FC = () => {
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
         setEventBannerImage(file);
-        console.log("The selected image is: ", eventBannerImage);
-        console.log(eventBannerImage);
+
         if (file) {
             const imageUrl = URL.createObjectURL(file);
             setSelectedImage(imageUrl);
@@ -127,18 +129,15 @@ const AddEvent: React.FC = () => {
             year: 'numeric',
         });
 
-        console.log(formatted);
-
         setEventStartDate(formatted);
-
-        console.log(eventStartDate);
     };
 
     const captureAsImage = async () => {
+
         if (eventDetailsRef.current) {
             const canvas = await html2canvas(eventDetailsRef.current, {
-                logging: true, // Enable logging for debugging
                 useCORS: true, // Allow cross-origin images
+                logging: true, // Enable logging for debugging
                 allowTaint: true, // Allow tainting, which might let it capture more images
                 x: 0, // Adjust the x-position to fix capture area
                 y: 0, // Adjust the y-position to fix capture area
@@ -170,7 +169,7 @@ const AddEvent: React.FC = () => {
     };
 
     // Convert eventStartDate to YYYY-MM-DD format
-    const formatDate = (dateString:string) => {
+    const formatDate = (dateString: string) => {
         return new Date(dateString).getTime(); // Convert to string format in milliseconds
     };
 
@@ -179,8 +178,6 @@ const AddEvent: React.FC = () => {
 
         const startDate = formatDate(eventStartDate);
         const endDate = formatDate(eventEndDate);
-
-        console.log(startDate, endDate);
 
         if (startDate > endDate) {
             Swal.fire({
@@ -205,8 +202,6 @@ const AddEvent: React.FC = () => {
         if (result.isConfirmed) {
             // Capture image and check if it was successful
             const imageCaptured = await captureAsImage();
-
-            console.log("The captured image is: ", imageCaptured);
 
             // Check if the image was captured successfully
             if (!imageCaptured && eventCreate) {
@@ -297,7 +292,7 @@ const AddEvent: React.FC = () => {
     return (
 
         <div className='p-6 pt-3'>
-            <h2 className='text-black text-2xl font-semibold ps-5'>Add Details to create new event</h2>
+            {/* <h2 className='text-black text-2xl font-semibold ps-5'>Add Details to create new event</h2> */}
             {/* <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
             <form onSubmit={handleSubmit(onSubmit)} className="gap-4">
                 <div className='flex flex-col gap-3 my-4'>
@@ -512,7 +507,7 @@ const AddEvent: React.FC = () => {
                             />
                         </label>
                         <span className='block text-center'>Or</span>
-                        <button onClick={() => { setEventCreate(true); setEventBannerImage(null); }} className='btn hover:bg-orange-600 w-fit mx-auto bg-orange-500 p-3 text-white'>Create Event Banner</button>
+                        <button onClick={() => { setEventCreate(true); setEventBannerImage(null); }} className='px-4 py-2 rounded-md hover:bg-orange-600 w-fit mx-auto bg-orange-500 p-3 text-white'>Create Event Banner</button>
                     </div>
 
                     {/* Display the uploaded image or dummy image */}
@@ -559,7 +554,18 @@ const AddEvent: React.FC = () => {
                                     {eventName}
                                 </p>
                                 {(user?.company_logo && eventStartDate && eventName) && <div className='ml-3 absolute bottom-2 right-2 z-50'>
-                                    <img src={`${apiBaseUrl}/${user?.company_logo}`} width={144} alt="Logo" className='' />
+                                    <div
+                                        style={{
+                                            // backgroundImage: `url(${Bg4})`,
+                                            backgroundImage: `url(${companyLogo})`,
+                                            color: textColor,
+                                            height: "50px",
+                                            width: "100px",
+                                            backgroundSize: 'contain', // Ensures the image covers the div
+                                            backgroundPosition: 'center', // Centers the background image
+                                            backgroundRepeat: 'no-repeat',
+                                        }}
+                                        className='' />
                                 </div>}
                             </div>
                         </div>
@@ -572,6 +578,7 @@ const AddEvent: React.FC = () => {
                                     <img onClick={() => setTemplateImage(Bg1)} src={Bg1} alt="Background 1" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
                                     <img onClick={() => setTemplateImage(Bg2)} src={Bg2} alt="Background 2" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
                                     <img onClick={() => setTemplateImage(Bg3)} src={Bg3} alt="Background 3" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
+                                    <img onClick={() => setTemplateImage(Bg4)} src={Bg4} alt="Background 4" className='rounded-md cursor-pointer w-20 h-20 object-cover object-center' />
                                 </div>
                             </div>
 
@@ -614,12 +621,12 @@ const AddEvent: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    <button onClick={() => { setEventCreate(false); setEventBannerImage(null) }} className='block mt-3 bg-orange-500 hover:bg-orange-600 btn mx-auto text-center text-white'>Upload Event Image</button>
+                    <button onClick={() => { setEventCreate(false); setEventBannerImage(null) }} className='block mt-3 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-md mx-auto text-center text-white'>Upload Event Image</button>
                 </>
                 }
 
                 <div className="col-span-3 flex justify-center mt-10">
-                    <button type="submit" className="btn btn-primary">Add Event</button>
+                    <button type="submit" className="px-4 py-2 rounded-md bg-klt_primary-900 text-white mx-auto w-fit">Add Event</button>
                 </div>
             </form>
         </div>

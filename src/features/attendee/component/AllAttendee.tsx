@@ -105,7 +105,7 @@ const AllAttendee: React.FC = () => {
               </label>
               <select
                 id="itemsPerPage"
-                className="border border-gray-500 rounded-md p-2 bg-white outline-none"
+                className="border border-gray-500 rounded-md px-2 py-1 bg-white outline-none"
                 value={itemsPerPage}
                 onChange={(e) => setItemsPerPage(Number(e.target.value))}
               >
@@ -117,7 +117,7 @@ const AllAttendee: React.FC = () => {
             </div>
             <input
               type="text"
-              className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+              className="border border-gray-500 rounded-md p-2 h-full bg-white outline-none text-black"
               placeholder="Search by name"
               value={searchName}
               onChange={(e) => {
@@ -127,7 +127,7 @@ const AllAttendee: React.FC = () => {
             />
             <input
               type="text"
-              className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+              className="border border-gray-500 rounded-md p-2 h-full bg-white outline-none text-black"
               placeholder="Search by company"
               value={searchCompany}
               onChange={(e) => {
@@ -137,7 +137,7 @@ const AllAttendee: React.FC = () => {
             />
             <input
               type="text"
-              className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+              className="border border-gray-500 rounded-md p-2 h-full bg-white outline-none text-black"
               placeholder="Search by designation"
               value={searchDesignation}
               onChange={(e) => {
@@ -147,7 +147,7 @@ const AllAttendee: React.FC = () => {
             />
             <input
               type="text"
-              className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+              className="border border-gray-500 rounded-md p-2 h-full bg-white outline-none text-black"
               placeholder="Search by email"
               value={searchEmail}
               onChange={(e) => {
@@ -157,7 +157,7 @@ const AllAttendee: React.FC = () => {
             />
             <input
               type="text"
-              className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+              className="border border-gray-500 rounded-md p-2 h-full bg-white outline-none text-black"
               placeholder="Search by phone"
               value={searchPhone}
               onChange={(e) => {

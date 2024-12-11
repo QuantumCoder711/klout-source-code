@@ -22,6 +22,7 @@ interface EventRowProps {
     start_time?: string,
     start_minute_time?: string,
     start_time_type?: string,
+    date: string,
     id?: number
 }
 
@@ -29,6 +30,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+    const today = new Date().toISOString().slice(0, 10);
 
     const { token } = useSelector((state: RootState) => (state.auth));
 
@@ -90,9 +92,15 @@ const EventRow: React.FC<EventRowProps> = (props) => {
         }
     }
 
+    console.log(today, props.date);
+
 
     return (
-        <div className='p-5 overflow-scroll border-b flex items-center bg-white mb-3 justify-between gap-5 rounded-lg'>
+        <div className='p-5 overflow-scroll relative border-b flex items-center bg-white mb-3 justify-between gap-5 rounded-lg'>
+
+            {today === props.date && <div className='p-2 absolute left-0 right-0 mx-auto w-fit top-2'>
+                <span className='text-xs font-bold  absolute right-1 top-1 px-1 rounded border text-red-600 border-red-600 flex items-center gap-1'>Live <span className='w-2 h-2 rounded-full bg-red-600 liveBlink' /></span>
+            </div>}
 
             {/* Displaying Image */}
             <img src={props.image} alt={props.title} className='max-w-60 2xl:max-w-96 w-full h-40 2xl:h-60 object-cover object-center rounded-lg' />
