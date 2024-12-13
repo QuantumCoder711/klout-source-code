@@ -39,6 +39,7 @@ import ReminderBoothVisitPage from "./pages/ReminderBoothVisitPage";
 import DayTwoSameDayReminderPage from "./pages/DayTwoSameDayReminderPage";
 import ThankYouMessagePage from "./pages/ThankYouMessagePage";
 import PhotosPage from "./pages/PhotosPage";
+import ChartsData from "./features/charts/ChartsData";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -85,6 +86,7 @@ const App: React.FC = () => {
           <Route path="/all-reports" element={<AllReports />} />
           <Route path="/photos" element={<PhotosPage />} />
           <Route path="/all-charts" element={<AllCharts />} />
+          <Route path="/all-charts/event-chart" element={<ChartsData />} />
           <Route path="/all-reports/whatsapp-report" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
           <Route path="/all-reports/mail-report" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
         </Route>

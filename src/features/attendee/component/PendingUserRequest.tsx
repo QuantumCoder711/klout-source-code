@@ -59,7 +59,7 @@ const PendingUserRequest: React.FC = () => {
 
     const event_id: string | undefined = currentEvent?.uuid;
 
-    const [requests, setRequests] = useState<PendingRequestType[]>();
+    const [, setRequests] = useState<PendingRequestType[]>();
 
     useEffect(() => {
         if (currentEventUUID && token && user_id) {

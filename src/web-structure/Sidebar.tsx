@@ -13,6 +13,7 @@ import { TbReportAnalytics } from "react-icons/tb";
 import { MdKeyboardDoubleArrowLeft } from "react-icons/md";
 import { TbBorderAll } from "react-icons/tb";
 import { FaPlus } from "react-icons/fa";
+import { IoPieChartSharp } from "react-icons/io5";
 
 const Sidebar: React.FC = () => {
   const dispatch = useDispatch();
@@ -32,7 +33,7 @@ const Sidebar: React.FC = () => {
   }
 
   return (
-    <div className={`relative h-screen ${collapse ? "w-44 xl:w-56" : "w-fit pt-[72px]"} flex-shrink-0 bg-klt_primary-900 text-white`}>
+    <div className={`relative min-h-screen ${collapse ? "w-44 xl:w-56" : "w-fit pt-[72px]"} flex-shrink-0 bg-klt_primary-900 text-white`}>
       {collapse && <span>
         {
           user?.company_logo &&
@@ -52,7 +53,7 @@ const Sidebar: React.FC = () => {
       <div onClick={() => setCollapse(prev => !prev)} className="bg-white w-8 h-8 rounded-full absolute grid place-content-center top-1/2 -bottom-1/2 -translate-y-1/2 -right-4 shadow-lg cursor-pointer">
         <MdKeyboardDoubleArrowLeft className={`${!collapse ? "rotate-180" : "rotate-0"} size-7 text-black`} />
       </div>
-      <ul className="my-5 space-y-2">
+      <ul className="my-5 space-y-2 h-[80vh] overflow-y-scroll">
         <li>
           <Link to="/" onClick={handlePageTitle} className="p-5 flex items-center gap-3 rounded font-semibold">
             <MdDashboard className="size-6" />
@@ -163,6 +164,21 @@ const Sidebar: React.FC = () => {
               <TbReportAnalytics className="size-6" />
               {collapse && <span>
                 All Reports
+              </span>}
+            </div>
+          </Link>
+        </li>
+
+        <li>
+          <Link
+            to="/all-charts"
+            onClick={handlePageTitle}
+            className="p-5 block rounded font-semibold"
+          >
+            <div className="flex items-center gap-3 ">
+              <IoPieChartSharp className="size-5" />
+              {collapse && <span>
+                All Charts
               </span>}
             </div>
           </Link>

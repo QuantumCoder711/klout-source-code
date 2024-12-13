@@ -3,7 +3,7 @@ import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import { allEventAttendee } from '../../event/eventSlice';
-import { FaEdit, FaFileExcel, FaEye, FaUserFriends } from 'react-icons/fa';
+import { FaEdit, FaFileExcel, FaEye, FaUserFriends, FaUserClock, FaPoll } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { attendeeUUID } from '../attendeeSlice';
 import { Link } from 'react-router-dom';
@@ -14,6 +14,9 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import Loader from '../../../component/Loader';
 import { IoMdArrowRoundBack } from 'react-icons/io';
+import { BsSendFill } from 'react-icons/bs';
+import { FaMessage } from 'react-icons/fa6';
+import { BiSolidMessageSquareDots } from 'react-icons/bi';
 
 type attendeeType = {
     uuid: string;
@@ -48,7 +51,7 @@ const AllEventAttendee: React.FC = () => {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     // const dummyImage = "https://via.placeholder.com/150";
 
-    const [selectedAction, setSelectedAction] = useState('');
+    // const [selectedAction, setSelectedAction] = useState('');
 
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, eventAttendee, loading, currentEvent } = useSelector((state: RootState) => ({
@@ -127,21 +130,21 @@ const AllEventAttendee: React.FC = () => {
 
 
 
-    const actionLinks: { [key: string]: string } = {
-        'Add Attendee': '/events/add-attendee',
-        'Send Reminder': '/events/send-reminder',
-        'Send Invitation': '/events/send-invitation',
-        'Send Same Day Reminder': '/events/same-day-reminder',
-        'Send Poll': '/events/send-poll',
-        'Send In App Message': '/events/send-to-app',
-        'Pending Requests': '/events/pending-user-request',
-        'Send Template Message': '/events/send-multiple-message',
-        'Session Reminder': '/events/session-reminder',
-        'Day Two Reminder': '/events/day-two-reminder',
-        'Reminder Visit Booth': '/events/reminder-to-visit-booth',
-        'Day Two Same Day Reminder': '/events/day_two_same_day_reminder',
-        'Thank You Message': '/events/thank-you-message',
-    };
+    // const actionLinks: { [key: string]: string } = {
+    //     'Add Attendee': '/events/add-attendee',
+    //     'Send Reminder': '/events/send-reminder',
+    //     'Send Invitation': '/events/send-invitation',
+    //     'Send Same Day Reminder': '/events/same-day-reminder',
+    //     'Send Poll': '/events/send-poll',
+    //     'Send In App Message': '/events/send-to-app',
+    //     'Pending Requests': '/events/pending-user-request',
+    //     'Send Template Message': '/events/send-multiple-message',
+    //     'Session Reminder': '/events/session-reminder',
+    //     'Day Two Reminder': '/events/day-two-reminder',
+    //     'Reminder Visit Booth': '/events/reminder-to-visit-booth',
+    //     'Day Two Same Day Reminder': '/events/day_two_same_day_reminder',
+    //     'Thank You Message': '/events/thank-you-message',
+    // };
 
 
     // console.log("Checked Users are: ", checkedUsers2ndDay);
@@ -270,12 +273,12 @@ const AllEventAttendee: React.FC = () => {
         });
     }
 
-    const handleChange = (e: any) => {
-        const action = e.target.value;
-        // const setPageHeading =  Object.keys(action).find(key => actionLinks[key] === action);
-        // console.log(setPageHeading);
-        setSelectedAction(action);
-    };
+    // const handleChange = (e: any) => {
+    //     const action = e.target.value;
+    //     // const setPageHeading =  Object.keys(action).find(key => actionLinks[key] === action);
+    //     // console.log(setPageHeading);
+    //     setSelectedAction(action);
+    // };
 
     const showQRCode = () => {
         Swal.fire({
@@ -347,7 +350,7 @@ const AllEventAttendee: React.FC = () => {
                 </div>
             </div>
             <br />
-            {/* 
+            
             <div className="flex items-center flex-wrap gap-2 mb-4">
                 <Link
                     to="/events/add-attendee"
@@ -473,76 +476,6 @@ const AllEventAttendee: React.FC = () => {
                 >
                     <FaFileExcel /> Export Data
                 </button>
-            </div> */}
-
-            <div className='flex justify-between items-baseline mb-3'>
-
-                <div className="relative inline-block right-0 text-right">
-                    {/* Dropdown Select */}
-                    <select
-                        onChange={handleChange}
-                        value={selectedAction}
-                        className="p-2 rounded border border-black/50"
-                        aria-label="Select action"
-                    >
-                        <option value="" disabled>
-                            Choose Message Template
-                        </option>
-                        <option value="Send Reminder">Send Reminder</option>
-                        <option value="Send Invitation">Send Invitation</option>
-                        <option value="Send Same Day Reminder">Send Same Day Reminder</option>
-                        <option value="Send Poll">Send Poll</option>
-                        <option value="Send In App Message">Send In App Message</option>
-                        <option value="Send Template Message">Send Template Message</option>
-                        <option value="Session Reminder">Session Reminder</option>
-                        <option value="Day 2 Reminder">Day Two Reminder</option>
-                        <option value="Reminder Visit Booth">Reminder Visit Booth</option>
-                        <option value="Day Two Same Day Reminder">Day Two Same Day Reminder</option>
-                        <option value="Thank You Message">Thank You Message</option>
-                    </select>
-
-                    {/* Conditionally Render 'Go' Button */}
-                    {selectedAction && (
-                        <Link
-
-                            onClick={() => dispatch(heading(selectedAction))} // You can dispatch action as per your need}
-                            to={actionLinks[selectedAction]} // Dynamically set the link based on selected action
-                            className="px-4 py-2 rounded-md text-white ml-3 bg-blue-500"
-                        >
-                            Go
-                        </Link>
-                    )}
-                </div>
-
-                <div className='flex gap-3 items-center'>
-                    <Link
-                        to="/events/add-attendee"
-                        onClick={() => { dispatch(heading('Add Attendee')) }}
-                        className="btn bg-klt_primary-900 hover:bg-klt_primary-800 text-white btn-sm"
-                        title="Add a new attendee"
-                    >
-                        <FaUserFriends /> Add Attendee
-                    </Link>
-
-
-                    <Link
-                        to="/events/pending-user-request"
-                        onClick={() => { dispatch(heading("Pending Requests")) }}
-                        className="btn bg-klt_primary-900 hover:bg-klt_primary-800 text-white btn-sm"
-                        title="Add a new attendee"
-                    >
-                        <FaUserFriends /> Pending User Requests
-                    </Link>
-
-                    <button
-                        className="btn btn-success hover:!text-white btn-outline btn-sm ml-auto"
-                        onClick={handleExport}
-                        title="Export attendee data"
-                    >
-                        <FaFileExcel /> Export Data
-                    </button>
-                </div>
-
             </div>
 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import Charts from '../features/charts/components/charts';
+import Charts from '../features/charts/charts';
 
 const AllCharts:React.FC = () => {
   return (
