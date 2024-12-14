@@ -194,14 +194,14 @@ const Sidebar: React.FC = () => {
         </li> */}
         <li>
           <Link
-            to="/photos"
+            to="/all-photos"
             onClick={handlePageTitle}
             className="p-5 block rounded font-semibold"
           >
             <div className="flex items-center gap-3 ">
               <MdOutlinePhotoSizeSelectActual className="size-6" />
               {collapse && <span>
-                Photos
+                All Photos
               </span>}
             </div>
           </Link>

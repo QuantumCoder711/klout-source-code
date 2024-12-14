@@ -14,7 +14,7 @@ const DonutChart:React.FC<DonutChartProps> = (props) => {
     const data = {
         labels: ["Yes", "No"],
         datasets: [{
-            label: ["Users"],
+            label: "Users",
             data: [props.checkedInUsers, props.nonCheckedInUsers],
             backgroundColor: ["#07845e", "#fbbf24"],
             borderColor: ["white"]
