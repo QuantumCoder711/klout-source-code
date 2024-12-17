@@ -23,7 +23,7 @@ type FormInputType = {
   employee_size: number;
   company_turn_over: number;
   status: string;
-  event_id: number|string|null|undefined;
+  event_id: number | string | null | undefined;
   image: File;
 };
 
@@ -43,8 +43,9 @@ const EditAttendee = () => {
 
   const navigate = useNavigate();
 
-  const [selectedImage, setSelectedImage] = useState<File | string>(dummyImage);
   const { token } = useSelector((state: RootState) => (state.auth));
+  const [selectedImage, setSelectedImage] = useState<string>("");
+  const [attendeeImage, setAttendeeImage] = useState<string>(dummyImage);
   const { currentEvent } = useSelector((state: RootState) => (state.events));
   // console.log(currentEvent);
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
@@ -59,7 +60,7 @@ const EditAttendee = () => {
   const [jobTitles, setJobTitles] = useState<ApiType[]>();
   const [selectedJobTitle, setSelectedJobTitle] = useState<string>(); // Track selected job title
 
-  const [status, setStatus] = useState<number|string>();
+  const [status, setStatus] = useState<number | string>();
 
   const { currentAttendeeUUID, loading } = useSelector((state: RootState) => state.attendee);
 
@@ -115,10 +116,12 @@ const EditAttendee = () => {
       setValue("employee_size", attendeeData.employee_size);
       setValue("company_turn_over", attendeeData.company_turn_over);
       setValue("status", attendeeData.status);
-      setSelectedImage(attendeeData.image);
       setValue("company_name", attendeeData.company_name);
       setValue("industry", attendeeData.industry);
       setValue("job_title", attendeeData.job_title);
+      if (attendeeData.image) {
+        setAttendeeImage(`${apiBaseUrl}/${attendeeData.image}`);
+      }
 
       setStatus(attendeeData.status);
 
@@ -250,7 +253,8 @@ const EditAttendee = () => {
             />
           </label>
 
-          <img src={selectedImage ? `${apiBaseUrl}/${selectedImage}` : dummyImage} alt="" className='w-full h-60 object-contain' />
+          <img src={selectedImage || attendeeImage} alt="" className='w-full h-60 object-contain rounded-sm' />
+
         </div>
 
         <div className='flex w-full gap-3'>

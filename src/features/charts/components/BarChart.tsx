@@ -4,10 +4,14 @@ import { Bar } from "react-chartjs-2";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const BarChart: React.FC = () => {
+interface BarChartProps {
+    hours: string[];
+}
+
+const BarChart: React.FC<BarChartProps> = (props) => {
 
     const data = {
-        labels: ["Monday", "Tuesday", "Wednesday"],
+        labels: props.hours,
         datasets: [{
             label: "369",
             data: [3, 6, 9],

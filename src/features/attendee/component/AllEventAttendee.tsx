@@ -49,7 +49,7 @@ type attendeeType = {
 const AllEventAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    // const dummyImage = "https://via.placeholder.com/150";
+    const dummyImage = "https://via.placeholder.com/150";
 
     // const [selectedAction, setSelectedAction] = useState('');
 
@@ -305,11 +305,17 @@ const AllEventAttendee: React.FC = () => {
     ) => {
         const agendaImage = `${apiBaseUrl}/${img}`;
 
+        if(img === " ") {
+            img = "";
+        }
+
+        console.log(img);
+
         Swal.fire({
             title: `${firstName} ${lastName}`,
             // width: "600px",
             text: email,
-            imageUrl: img === "" ? agendaImage : img,  // Use provided image or fallback
+            imageUrl: img ? agendaImage : dummyImage,  // Use provided image or fallback
             imageHeight: "300px",
             imageWidth: "300px",
             html: `
