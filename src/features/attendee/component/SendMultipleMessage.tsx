@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from 'react-router-dom';
@@ -13,34 +13,34 @@ import axios from 'axios';
 
 const SendMultipleMessage: React.FC = () => {
     const { token } = useSelector((state: RootState) => state.auth);
-    const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
+    // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now");
 
     const [loading, setLoading] = useState<boolean>(false);
-    // const [currentAttendee] = useSelector((state: RootState)=>state.attendee)
-
-    // const [link, setLink] = useState('abc');
-    // const [error, setError] = useState('');
-
-    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const value = e.target.value;
-    //     setLink(value);
-
-    //     // Regular expression to validate a URL
-    //     const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]{2,6}(\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/;
-    //     if (value && !urlPattern.test(value)) {
-    //         setError('Please enter a valid URL');
-    //     } else {
-    //         setError('');
-    //     }
-    // };
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
 
     const { currentEvent } = useSelector((state: RootState) => state.events);
+    // const [dateDifference, setDateDifference] = useState<number>(0);
+
+    // const calculateDateDifference = (startDate: string, endDate: string): number => {
+    //     const start = new Date(startDate);
+    //     const end = new Date(endDate);
+    //     return (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
+    // };
+
+    // useEffect(() => {
+
+    //     if (currentEvent) {
+    //         setDateDifference(calculateDateDifference(currentEvent.event_start_date, currentEvent.event_end_date));
+    //     }
+
+    //     // console.log("Checked Users are: ", checkedUsers);
+    // }, [currentEvent, token]);
+
 
     // Handle method selection (WhatsApp only now)
     const handleMethodChange = () => {
@@ -55,25 +55,6 @@ const SendMultipleMessage: React.FC = () => {
     // Handle sending time selection (Now or Later)
     const handleSendTimeChange = (time: 'now' | 'later') => {
         setSendTime(time);
-    };
-
-    // Handle individual role checkbox change
-    const handleCheckboxChange = (role: string) => {
-        if (role === 'all') {
-            // If "All" is checked, select all roles
-            if (selectedRoles.includes('all')) {
-                setSelectedRoles([]);
-            } else {
-                setSelectedRoles(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-            }
-        } else {
-            // If any individual role is checked/unchecked, update the selected roles
-            if (selectedRoles.includes(role)) {
-                setSelectedRoles(selectedRoles.filter((r) => r !== role));
-            } else {
-                setSelectedRoles([...selectedRoles, role]);
-            }
-        }
     };
 
     const handleSubmit = () => {
@@ -161,7 +142,7 @@ const SendMultipleMessage: React.FC = () => {
     }
 
     // Check if all roles are selected
-    const isAllSelected = selectedRoles.length === 6;
+    // const isAllSelected = selectedRoles.length === 6;
 
     if (!currentEvent) {
         return null;
@@ -176,7 +157,7 @@ const SendMultipleMessage: React.FC = () => {
             )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send WhatsApp to Attendee' />
-                <Link to="/events/all-attendee" onClick={()=>dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
@@ -188,38 +169,9 @@ const SendMultipleMessage: React.FC = () => {
                     </div>
 
                     <div className='p-5'>
-                        {/* Select Roles */}
-                        <div className='mt-2'>
-                            <h5 className='font-semibold mb-3'>Select Roles</h5>
-                            <div className="flex flex-row text-sm items-center justify-between pl-5">
-                                {/* Checkbox for All Roles */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={isAllSelected}
-                                        onChange={() => handleCheckboxChange('all')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>All</span>
-                                </label>
-
-                                {/* Other checkboxes for individual roles like speaker, delegate, etc. */}
-                                {['speaker', 'delegate', 'sponsor', 'moderator', 'panelist'].map((role) => (
-                                    <label key={role} className="flex items-center space-x-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedRoles.includes(role)}
-                                            onChange={() => handleCheckboxChange(role)}
-                                            className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                        />
-                                        <span>{role.charAt(0).toUpperCase() + role.slice(1)}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
 
                         {/* Send By */}
-                        <div className='mt-10'>
+                        <div className=''>
                             <h5 className='font-semibold mb-3'>Send By</h5>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -275,9 +227,19 @@ const SendMultipleMessage: React.FC = () => {
                         {/* WhatsApp Message */}
                         <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
-                            <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
+                            <div className='w-2/3 bg-zinc-200 mt-5 rounded-xl p-5'>
                                 <p>
-                                    Hi "<strong>firstname</strong>", just a reminder for our event "<strong>Event-Title</strong>". We're excited to welcome you to this exclusive event. "<strong>Event-Date-Time</strong>". <br /> <br /> To ensure a smooth check-in experience, please download the Klout Club app in advance. You can download it here <a href="https://onelink.to/r3fzb9" className='font-bold'>https://onelink.to/r3fzb9</a>
+                                    Dear <strong>"Attendee Name"</strong>, <br /> <br />
+
+                                    Thank you for registering for <strong>{currentEvent.title}</strong>. <br />
+                                    This is a reminder message that the registration will start on <strong>{currentEvent.event_start_date}</strong> at <strong>{currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type}</strong> at <strong>{currentEvent.event_venue_name} ({currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type})</strong> along with breakfast. Event commences at <strong>{currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type}</strong>. <br />
+                                    <strong>{currentEvent.title}</strong> is a <strong>2</strong> day event and will end on <strong>{currentEvent.event_end_date}</strong> at <strong>{currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type}</strong> at <strong>{currentEvent.event_venue_name} ({currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type})</strong> along with breakfast. Event commences at <strong>{currentEvent.end_time + ":" + currentEvent.end_minute_time + " " + currentEvent.end_time_type}</strong>. <br /><br />
+
+                                    Registration and check-in for the event will happen with the Klout Club app. <br />
+                                    To ensure a smooth check-in and networking experience, you can download it here: <strong>"Link"</strong>. <br />
+                                    We look forward to welcoming you to the event! <br /><br />
+
+                                    Regards, Team Insightner <br />
                                 </p>
                             </div>
                         </div>

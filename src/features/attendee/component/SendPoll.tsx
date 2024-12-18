@@ -13,7 +13,7 @@ import axios from 'axios';
 
 const SendPoll: React.FC = () => {
     const { token } = useSelector((state: RootState) => state.auth);
-    const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
+    // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now");
@@ -58,23 +58,23 @@ const SendPoll: React.FC = () => {
     };
 
     // Handle individual role checkbox change
-    const handleCheckboxChange = (role: string) => {
-        if (role === 'all') {
-            // If "All" is checked, select all roles
-            if (selectedRoles.includes('all')) {
-                setSelectedRoles([]);
-            } else {
-                setSelectedRoles(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-            }
-        } else {
-            // If any individual role is checked/unchecked, update the selected roles
-            if (selectedRoles.includes(role)) {
-                setSelectedRoles(selectedRoles.filter((r) => r !== role));
-            } else {
-                setSelectedRoles([...selectedRoles, role]);
-            }
-        }
-    };
+    // const handleCheckboxChange = (role: string) => {
+    //     if (role === 'all') {
+    //         // If "All" is checked, select all roles
+    //         if (selectedRoles.includes('all')) {
+    //             setSelectedRoles([]);
+    //         } else {
+    //             setSelectedRoles(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
+    //         }
+    //     } else {
+    //         // If any individual role is checked/unchecked, update the selected roles
+    //         if (selectedRoles.includes(role)) {
+    //             setSelectedRoles(selectedRoles.filter((r) => r !== role));
+    //         } else {
+    //             setSelectedRoles([...selectedRoles, role]);
+    //         }
+    //     }
+    // };
 
     const handleSubmit = () => {
         if(!link) {
@@ -160,7 +160,7 @@ const SendPoll: React.FC = () => {
     }
 
     // Check if all roles are selected
-    const isAllSelected = selectedRoles.length === 6;
+    // const isAllSelected = selectedRoles.length === 6;
 
     if (!currentEvent) {
         return null;
@@ -187,35 +187,6 @@ const SendPoll: React.FC = () => {
                     </div>
 
                     <div className='p-5'>
-                        {/* Select Roles */}
-                        <div className='mt-2'>
-                            <h5 className='font-semibold mb-3'>Select Roles</h5>
-                            <div className="flex flex-row text-sm items-center justify-between pl-5">
-                                {/* Checkbox for All Roles */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={isAllSelected}
-                                        onChange={() => handleCheckboxChange('all')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>All</span>
-                                </label>
-
-                                {/* Other checkboxes for individual roles like speaker, delegate, etc. */}
-                                {['speaker', 'delegate', 'sponsor', 'moderator', 'panelist'].map((role) => (
-                                    <label key={role} className="flex items-center space-x-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedRoles.includes(role)}
-                                            onChange={() => handleCheckboxChange(role)}
-                                            className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                        />
-                                        <span>{role.charAt(0).toUpperCase() + role.slice(1)}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
 
                         {/* Send By */}
                         <div className='mt-10'>
@@ -294,7 +265,8 @@ const SendPoll: React.FC = () => {
                                 <p>
                                     Hi <strong>User</strong>, <br /> <br />
                                     Hope you're enjoying the <strong>{currentEvent.title}</strong> 🎉 We'd love for you to take a moment to fill out this quick poll/survery: <strong>link</strong> <br /> <br />
-                                    Thank you for your time! <br />
+                                    Thank you for your time! <br /> <br />
+                                    Regards, Team Insightner <br />
                                 </p>
                             </div>
                         </div>

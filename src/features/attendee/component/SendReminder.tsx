@@ -263,19 +263,19 @@ const SendReminder: React.FC = () => {
                         {/* WhatsApp Message */}
                         {selectedMethod === "whatsapp" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
-                            <div className='w-2/3 xl:w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
+                            <div className='w-2/3 bg-zinc-200 mt-5 rounded-xl p-5'>
                                 <p>
                                     Dear <strong>"Attendee Name"</strong>,
                                     <br />
                                     <br />
-                                    Thank you for registering for <strong>"Event Name"</strong>.
-                                    This is a reminder message that the event will be held on <strong>"Event Date"</strong> at <strong>"Venue Name"</strong>. <br /> <br />
+                                    Thank you for registering for <strong>{currentEvent.title}</strong>. <br />
+                                    This is a reminder message that the event will be held on <strong>{currentEvent.event_date}</strong> at <strong>{currentEvent.event_venue_name}</strong>. <br /> <br />
 
-                                    Registration and check-in for the event will happen with the Klout Club app.
-                                    To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>.
+                                    Registration and check-in for the event will happen with the Klout Club app. <br />
+                                    To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>. <br />
                                     We look forward to welcoming you to the event! <br /><br />
 
-                                    Regards, Team  Insightner
+                                    Regards, Team  Insightner <br />
                                 </p>
                             </div>
                         </div>}

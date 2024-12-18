@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 
 const SameDayReminder: React.FC = () => {
     const { token } = useSelector((state: RootState) => state.auth);
-    const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
+    // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now");
@@ -38,25 +38,6 @@ const SameDayReminder: React.FC = () => {
     // Handle sending time selection (Now or Later)
     const handleSendTimeChange = (time: 'now' | 'later') => {
         setSendTime(time);
-    };
-
-    // Handle individual role checkbox change
-    const handleCheckboxChange = (role: string) => {
-        if (role === 'all') {
-            // If "All" is checked, select all roles
-            if (selectedRoles.includes('all')) {
-                setSelectedRoles([]);
-            } else {
-                setSelectedRoles(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-            }
-        } else {
-            // If any individual role is checked/unchecked, update the selected roles
-            if (selectedRoles.includes(role)) {
-                setSelectedRoles(selectedRoles.filter((r) => r !== role));
-            } else {
-                setSelectedRoles([...selectedRoles, role]);
-            }
-        }
     };
 
     console.log(currentEvent);
@@ -84,9 +65,9 @@ const SameDayReminder: React.FC = () => {
                     selectedCheckedUser === 'checkedIn' ? 1 : 0
             };
         }
-        
+
         console.log(dataObj); // Check if `check_in` is added correctly
-        
+
         setLoading(true);
         try {
             axios.post(`${imageBaseUrl}/api/notifications-samedayinvitation`, dataObj, {
@@ -133,26 +114,10 @@ const SameDayReminder: React.FC = () => {
             });
         }
 
-
-        //     event_id: eventId,
-        // send_to: null,
-        // send_method: "whatsapp",
-        // subject: "",
-        // message: "",
-        // start_date: currentDate,
-        // delivery_schedule: "now",
-        // start_date_time: "01",
-        // start_date_type: "am",
-        // end_date: currentDate,
-        // end_date_time: "01",
-        // end_date_type: "pm",
-        // no_of_times: "1",
-        // hour_interval: "1",
-        // status: 1,
     }
 
     // Check if all roles are selected
-    const isAllSelected = selectedRoles.length === 6;
+    // const isAllSelected = selectedRoles.length === 6;
 
     if (!currentEvent) {
         return null;
@@ -167,7 +132,7 @@ const SameDayReminder: React.FC = () => {
             )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send WhatsApp to Attendee' />
-                <Link to="/events/all-attendee" onClick={()=>dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
@@ -179,38 +144,8 @@ const SameDayReminder: React.FC = () => {
                     </div>
 
                     <div className='p-5'>
-                        {/* Select Roles */}
-                        <div className='mt-2'>
-                            <h5 className='font-semibold mb-3'>Select Roles</h5>
-                            <div className="flex flex-row text-sm items-center justify-between pl-5">
-                                {/* Checkbox for All Roles */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={isAllSelected}
-                                        onChange={() => handleCheckboxChange('all')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>All</span>
-                                </label>
-
-                                {/* Other checkboxes for individual roles like speaker, delegate, etc. */}
-                                {['speaker', 'delegate', 'sponsor', 'moderator', 'panelist'].map((role) => (
-                                    <label key={role} className="flex items-center space-x-2 cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedRoles.includes(role)}
-                                            onChange={() => handleCheckboxChange(role)}
-                                            className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                        />
-                                        <span>{role.charAt(0).toUpperCase() + role.slice(1)}</span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Send By */}
-                        <div className='mt-10'>
+                        <div className=''>
                             <h5 className='font-semibold mb-3'>Send By</h5>
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
@@ -266,9 +201,18 @@ const SameDayReminder: React.FC = () => {
                         {/* WhatsApp Message */}
                         <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
-                            <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
+                            <div className='w-2/3 bg-zinc-200 mt-5 rounded-xl p-5'>
                                 <p>
-                                    Hi "<strong>firstname</strong>", just a reminder for our event "<strong>Event-Title</strong>". We're excited to welcome you to this exclusive event. "<strong>Event-Date-Time</strong>". <br /> <br /> To ensure a smooth check-in experience, please download the Klout Club app in advance. You can download it here <a href="https://onelink.to/r3fzb9" className='font-bold'>https://onelink.to/r3fzb9</a>
+                                    Dear <strong>"Attendee Name"</strong>, <br /><br />
+
+                                    Thank you for registering for <strong>{currentEvent.title}</strong>. <br />
+                                    This is a reminder message that the event is scheduled for <strong>"Today or Event Date"</strong> at <strong>{currentEvent.event_venue_name}</strong>. <br /><br />
+
+                                    Registration and check-in for the event will happen with the Klout Club app. <br />
+                                    To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>. <br />
+                                    We look forward to welcoming you to the event! <br /><br />
+
+                                    Regards, Team  Insightner <br />
                                 </p>
                             </div>
                         </div>
