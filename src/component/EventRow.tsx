@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { eventUUID } from '../features/event/eventSlice';
 import { useDispatch } from 'react-redux';
@@ -22,34 +22,62 @@ interface EventRowProps {
     start_time?: string,
     start_minute_time?: string,
     start_time_type?: string,
+    end_time?: string,
+    end_minute_time?: string,
+    end_time_type?: string,
     date: string,
-    id?: number
+    id?: number,
 }
 
 const EventRow: React.FC<EventRowProps> = (props) => {
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
-    const today = new Date().toISOString().slice(0, 10);
+    const [isLive, setIsLive] = useState(false);
 
-    const { token } = useSelector((state: RootState) => (state.auth));
+    const eventStartTime: string = `${props.start_time}:${props.start_minute_time} ${props.start_time_type}`;
+    const eventEndTime: string = `${props.end_time}:${props.end_minute_time} ${props.end_time_type}`;
 
+    // Function to parse time string to Date object
+    const parseEventTime = (time: string, date: string) => {
+        const [timeStr, period] = time.split(' ');
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        let adjustedHours = hours;
+
+        if (period === 'PM' && hours !== 12) adjustedHours += 12;
+        if (period === 'AM' && hours === 12) adjustedHours = 0;
+
+        return new Date(`${date}T${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`);
+    };
+
+    // Effect to check if the event is live
+    useEffect(() => {
+        const startDate = parseEventTime(eventStartTime, props.date);
+        const endDate = parseEventTime(eventEndTime, props.date);
+
+        const currentDate = new Date();
+
+        // Check if the current date is within the event's start and end time
+        if (currentDate >= startDate && currentDate <= endDate) {
+            setIsLive(true);
+        } else {
+            setIsLive(false);
+        }
+    }, [eventStartTime, eventEndTime, props.date]);
+
+    const { token } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const generatePDF = (uuid: string) => {
-        // setLoading(true)
         axios.get(`${apiBaseUrl}/api/generatePDF/${uuid}`)
             .then(res => {
                 if (res.data.status === 200) {
-                    //   setLoading(false)
                     const url = imageBaseUrl + "/" + res.data.data.pdf_path;
                     window.open(url, '_blank');
-
                 }
-
-            })
-    }
+            });
+    };
 
     const handleDelete = async (id: number) => {
         const result = await Swal.fire({
@@ -90,15 +118,13 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                 });
             }
         }
-    }
-
-    console.log(today, props.date);
-
+    };
 
     return (
         <div className='p-5 overflow-scroll relative border-b flex items-center bg-white mb-3 justify-between gap-5 rounded-lg'>
 
-            {today === props.date && <div className='p-2 absolute left-0 right-0 mx-auto w-fit top-2'>
+            {/* Display Live Tag */}
+            {isLive && <div className='p-2 absolute left-0 right-0 mx-auto w-fit top-2'>
                 <span className='text-xs font-bold  absolute right-1 top-1 px-1 rounded border text-red-600 border-red-600 flex items-center gap-1'>Live <span className='w-2 h-2 rounded-full bg-red-600 liveBlink' /></span>
             </div>}
 
@@ -132,10 +158,8 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
             {/* Links */}
             <div className='min-w-[110px]'>
-
                 <Link to='/events/view-event/' className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
-                    dispatch(eventUUID(props.uuid)); dispatch(heading('View Event')); setTimeout(() => {
-                    }, 500);
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('View Event'));
                 }}>View Event</Link> <br />
                 <button className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('Edit Event')); setTimeout(() => {
@@ -143,13 +167,10 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                     }, 500);
                 }} >Edit Event</button> <br />
                 <Link to='/events/all-attendee' className="text-blue-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
-                    dispatch(eventUUID(props.uuid)); dispatch(heading('All Attendee')); setTimeout(() => {
-                    }, 500);
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('All Attendee'));
                 }}>All Attendees</Link> <br />
-                {/* <button className="text-green-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1">View Sponsors</button> <br /> */}
                 <Link to={"/events/view-agendas"} className="text-yellow-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
-                    dispatch(heading('View Agendas')); setTimeout(() => {
-                    }, 500); dispatch(eventUUID(props.uuid));
+                    dispatch(heading('View Agendas')); dispatch(eventUUID(props.uuid));
                 }} >View Agendas</Link> <br />
 
                 <button className="text-purple-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1"
@@ -163,7 +184,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                 >Delete Event</button>
             </div>
         </div >
-    )
-}
+    );
+};
 
 export default EventRow;

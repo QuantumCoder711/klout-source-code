@@ -6,6 +6,8 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 interface BarChartProps {
     hours: string[];
+    checkedInUsers: number;
+    allCounts: number[];
 }
 
 const BarChart: React.FC<BarChartProps> = (props) => {
@@ -13,8 +15,8 @@ const BarChart: React.FC<BarChartProps> = (props) => {
     const data = {
         labels: props.hours,
         datasets: [{
-            label: "369",
-            data: [3, 6, 9],
+            label: String(props.checkedInUsers),
+            data: props.allCounts,
             backgroundColor: "royalblue",
             borderColor: "black",
             borderWidth: 1

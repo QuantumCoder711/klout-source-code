@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MdDateRange, MdMyLocation } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { eventUUID } from '../features/event/eventSlice';
@@ -16,15 +16,53 @@ type eventCardProps = {
     imageUrl: string,
     imageAlt: string,
     eventuuid: string,
+    start_time?: string,
+    start_minute_time?: string,
+    start_time_type?: string,
+    end_time?: string,
+    end_minute_time?: string,
+    end_time_type?: string,
     eventId: number,
 }
 
-const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, imageAlt, eventuuid, eventId }) => {
+const EventCard: React.FC<eventCardProps> = (props) => {
 
     const dispatch = useDispatch();
     const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const { token } = useSelector((state: RootState) => (state.auth));
-    const today = new Date().toISOString().slice(0, 10);
+
+    const [isLive, setIsLive] = useState<boolean>(false);
+
+    const eventStartTime: string = `${props.start_time}:${props.start_minute_time} ${props.start_time_type}`;
+    const eventEndTime: string = `${props.end_time}:${props.end_minute_time} ${props.end_time_type}`;
+    
+        // Function to parse time string to Date object
+        const parseEventTime = (time: string, date: string) => {
+            const [timeStr, period] = time.split(' ');
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            let adjustedHours = hours;
+    
+            if (period === 'PM' && hours !== 12) adjustedHours += 12;
+            if (period === 'AM' && hours === 12) adjustedHours = 0;
+    
+            return new Date(`${date}T${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`);
+        };
+    
+        // Effect to check if the event is live
+        useEffect(() => {
+            const startDate = parseEventTime(eventStartTime, props.date);
+            const endDate = parseEventTime(eventEndTime, props.date);
+    
+            const currentDate = new Date();
+    
+            // Check if the current date is within the event's start and end time
+            if (currentDate >= startDate && currentDate <= endDate) {
+                console.log("Current Date & Time is: ", currentDate);
+                setIsLive(true);
+            } else {
+                setIsLive(false);
+            }
+        }, [eventStartTime, eventEndTime, props.date]);
 
     const handleClick = (eventuuid: string) => {
         console.log("Hello", eventuuid);
@@ -79,25 +117,25 @@ const EventCard: React.FC<eventCardProps> = ({ title, date, venue, imageUrl, ima
         <div className="card bg-base-100 shadow-xl rounded-lg">
             <figure>
                 <img
-                    src={imageUrl}
-                    alt={imageAlt}
+                    src={props.imageUrl}
+                    alt={props.imageAlt}
                     style={{ height: '200px', width: '100%', objectFit: 'cover' }}
                 />
             </figure>
             <div className="card-body relative p-3 text-black bg-white rounded-bl-lg rounded-br-lg">
-                {today===date && <span className='text-xs font-bold  absolute right-1 top-1 px-1 rounded border text-red-600 border-red-600 flex items-center gap-1'>Live <span className='w-2 h-2 rounded-full bg-red-600 liveBlink'/></span>}
-                <h2 className="card-title">{title}</h2>
-                <p className="inline-flex gap-2 items-start"><MdMyLocation className="text-2xl" /> {venue}</p>
-                <p className="font-semibold inline-flex gap-2 items-center"><MdDateRange className="text-2xl" /> {date}</p>
+                {isLive && <span className='text-xs font-bold  absolute right-1 top-1 px-1 rounded border text-red-600 border-red-600 flex items-center gap-1'>Live <span className='w-2 h-2 rounded-full bg-red-600 liveBlink'/></span>}
+                <h2 className="card-title">{props.title}</h2>
+                <p className="inline-flex gap-2 items-start"><MdMyLocation className="text-2xl" /> {props.venue}</p>
+                <p className="font-semibold inline-flex gap-2 items-center"><MdDateRange className="text-2xl" /> {props.date}</p>
                 <div className="flex gap-3 mt-2 text-xs flex-wrap">
-                    <Link to='/events/view-event/' onClick={() => { handleClick(eventuuid); dispatch(heading("View Event")); }} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
-                    <Link to='/events/edit-event' onClick={() => { handleClick(eventuuid); dispatch(heading("Edit Event")); }} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
-                    <Link to='/events/all-attendee/' onClick={() => { handleClick(eventuuid); dispatch(heading("All Attendee")) }} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
+                    <Link to='/events/view-event/' onClick={() => { handleClick(props.eventuuid); dispatch(heading("View Event")); }} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
+                    <Link to='/events/edit-event' onClick={() => { handleClick(props.eventuuid); dispatch(heading("Edit Event")); }} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
+                    <Link to='/events/all-attendee/' onClick={() => { handleClick(props.eventuuid); dispatch(heading("All Attendee")) }} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
                     {/* <Link to='/events/view-sponsers/' onClick={() => handleClick(eventuuid)} className="underline text-green-500 hover:text-green-600">View Sponsers</Link> */}
-                    <Link to='/events/view-agendas/' onClick={() => { handleClick(eventuuid); dispatch(heading("View Agendas")); }} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
+                    <Link to='/events/view-agendas/' onClick={() => { handleClick(props.eventuuid); dispatch(heading("View Agendas")); }} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
                     <button onClick={() => {
-                        if (eventId !== undefined) {
-                            handleDelete(eventId);
+                        if (props.eventId !== undefined) {
+                            handleDelete(props.eventId);
                         }
                     }} className="underline text-red-500 hover:text-red-600">Delete Event</button>
                 </div>

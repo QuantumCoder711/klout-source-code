@@ -16,7 +16,7 @@ import axios from 'axios';
 const SendReminder: React.FC = () => {
     // State to keep track of selected roles and selected sending method
     const { token } = useSelector((state: RootState) => state.auth);
-    const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
+    // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'email' | null>("email");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now"); // State for "now" and "later" radio buttons
     const [title, setTitle] = useState<string>("");
@@ -31,25 +31,25 @@ const SendReminder: React.FC = () => {
     console.log(currentEvent);
 
     // Handle change of checkboxes
-    const handleCheckboxChange = (role: string) => {
-        if (role === 'all') {
-            // Toggle "All" checkbox: Select all roles or deselect all
-            if (selectedRoles.includes('all')) {
-                // If "All" is already selected, deselect all roles
-                setSelectedRoles([]);
-            } else {
-                // Otherwise, select all roles
-                setSelectedRoles(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
-            }
-        } else {
-            // For other roles, toggle individual role
-            setSelectedRoles(prevRoles =>
-                prevRoles.includes(role)
-                    ? prevRoles.filter(r => r !== role) // Deselect if already selected
-                    : [...prevRoles, role] // Select if not selected
-            );
-        }
-    };
+    // const handleCheckboxChange = (role: string) => {
+    //     if (role === 'all') {
+    //         // Toggle "All" checkbox: Select all roles or deselect all
+    //         if (selectedRoles.includes('all')) {
+    //             // If "All" is already selected, deselect all roles
+    //             setSelectedRoles([]);
+    //         } else {
+    //             // Otherwise, select all roles
+    //             setSelectedRoles(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
+    //         }
+    //     } else {
+    //         // For other roles, toggle individual role
+    //         setSelectedRoles(prevRoles =>
+    //             prevRoles.includes(role)
+    //                 ? prevRoles.filter(r => r !== role) // Deselect if already selected
+    //                 : [...prevRoles, role] // Select if not selected
+    //         );
+    //     }
+    // };
 
     // Handle method selection (WhatsApp or Mail)
     const handleMethodChange = (method: 'whatsapp' | 'email') => {
@@ -229,80 +229,9 @@ const SendReminder: React.FC = () => {
 
                     {/* All Fields Wrapper Div */}
                     <div className='p-5'>
-                        {/* Select Roles */}
-                        <div className='mt-2'>
-                            <h5 className='font-semibold mb-3'>Select Roles</h5>
-                            <div className="flex flex-row items-center justify-between pl-5 text-sm">
-                                {/* Checkbox for All Roles */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRoles.includes('all')}
-                                        onChange={() => handleCheckboxChange('all')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>All</span>
-                                </label>
-
-                                {/* Checkbox for Speaker */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRoles.includes('speaker')}
-                                        onChange={() => handleCheckboxChange('speaker')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>Speaker</span>
-                                </label>
-
-                                {/* Checkbox for Delegate */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRoles.includes('delegate')}
-                                        onChange={() => handleCheckboxChange('delegate')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>Delegate</span>
-                                </label>
-
-                                {/* Checkbox for Sponsor */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRoles.includes('sponsor')}
-                                        onChange={() => handleCheckboxChange('sponsor')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>Sponsor</span>
-                                </label>
-
-                                {/* Checkbox for Moderator */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRoles.includes('moderator')}
-                                        onChange={() => handleCheckboxChange('moderator')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>Moderator</span>
-                                </label>
-
-                                {/* Checkbox for Panelist */}
-                                <label className="flex items-center space-x-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedRoles.includes('panelist')}
-                                        onChange={() => handleCheckboxChange('panelist')}
-                                        className="checkbox checkbox-sm rounded-sm border-zinc-400"
-                                    />
-                                    <span>Panelist</span>
-                                </label>
-                            </div>
-                        </div>
 
                         {/* Select WhatsApp or Mail */}
-                        <div className='mt-10'>
+                        <div className=''>
                             <h5 className='font-semibold mb-3'>Send By</h5>
                             <div className="flex gap-10 pl-5">
                                 {/* Radio button for Mail */}

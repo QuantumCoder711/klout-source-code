@@ -22,6 +22,9 @@ type eventType = {
     start_time: string,
     start_minute_time: string,
     start_time_type: string,
+    end_time: string,
+    end_minute_time: string,
+    end_time_type: string,
     id: number
 }
 
@@ -155,6 +158,9 @@ const Event: React.FC = () => {
                                     start_minute_time={event.start_minute_time}
                                     start_time={event.start_time}
                                     start_time_type={event.start_time_type}
+                                    end_minute_time={event.end_minute_time}
+                                    end_time={event.end_time}
+                                    end_time_type={event.end_time_type}
                                     total_attendee={event.total_attendee}
                                     total_pending_delegate={event.total_pending_delegate}
                                     total_checkedin={event.total_checkedin}

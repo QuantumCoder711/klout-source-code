@@ -51,6 +51,8 @@ const ChartsData: React.FC = () => {
         currentEvent: state.events.currentEvent,
     }));
 
+    // console.log(eventAttendee);
+
     useEffect(() => {
         if (currentEventUUID) {
             dispatch(allEventAttendee({ eventuuid: currentEventUUID, token }));
@@ -61,13 +63,6 @@ const ChartsData: React.FC = () => {
     const [nonCheckedIn, setNonCheckedIn] = useState<number>(0);
     const [dateDifference, setDateDifference] = useState<number>(0);
 
-    // const [startTime, setStartTime] = useState<string>();
-    // const [startTimeType, setStartTimeType] = useState<"AM" | "PM">();
-    // const [endTime, setEndTime] = useState<string>();
-    // const [endTimeType, setEndTimeType] = useState<"AM" | "PM">();
-    // const [hours, setHours] = useState<string[]>();
-
-
     // Helper function to calculate the difference in days
     const calculateDateDifference = (startDate: string, endDate: string): number => {
         const start = new Date(startDate);
@@ -75,66 +70,104 @@ const ChartsData: React.FC = () => {
         return (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
     };
 
-    // function parseTime(timeString: string): Date {
-    //     const [time, period] = timeString.split(' ');
-    //     const [hoursStr, minutesStr] = time.split(':');
-    //     let hours: number = parseInt(hoursStr, 10);
-    //     let minutes: number = minutesStr ? parseInt(minutesStr, 10) : 0;
-
-    //     if (period === "PM" && hours !== 12) {
-    //         hours += 12;
-    //     } else if (period === "AM" && hours === 12) {
-    //         hours = 0;
-    //     }
-
-    //     return new Date(2024, 0, 1, hours, minutes);
-    // }
-
-
-    function generateHours(startTime:string, endTime:string) {
-        function parseTime(timeStr:string) {
-          const [time, period] = timeStr.split(" "); 
-          let [hours, minutes] = time.split(":").map(Number); 
-          return { hours, minutes, period };
+    function generateHours(startTime: string, endTime: string) {
+        function parseTime(timeStr: string) {
+            const [time, period] = timeStr.split(" ");
+            let [hours, minutes] = time.split(":").map(Number);
+            return { hours, minutes, period };
         }
-      
+
         const start = parseTime(startTime);
         const end = parseTime(endTime);
-      
-        const to24Hour = (hours:number, period:string) =>
-          period === "PM" && hours !== 12 ? hours + 12 : period === "AM" && hours === 12 ? 0 : hours;
-      
+
+        const to24Hour = (hours: number, period: string) =>
+            period === "PM" && hours !== 12 ? hours + 12 : period === "AM" && hours === 12 ? 0 : hours;
+
         let startHour = to24Hour(start.hours, start.period);
         const endHour = to24Hour(end.hours, end.period) + (end.minutes > 0 ? 1 : 0); // Round up for endTime
-      
+
         const timeArray = [];
         while (startHour <= endHour) { // Modified condition here
-          let displayHour = startHour % 12 === 0 ? 12 : startHour % 12; // Convert back to 12-hour format
-          let displayPeriod = startHour < 12 || startHour === 24 ? "AM" : "PM";
-          timeArray.push(`${displayHour} ${displayPeriod}`);
-          startHour++;
+            let displayHour = startHour % 12 === 0 ? 12 : startHour % 12; // Convert back to 12-hour format
+            let displayPeriod = startHour < 12 || startHour === 24 ? "AM" : "PM";
+            timeArray.push(`${displayHour} ${displayPeriod}`);
+            startHour++;
         }
-      
+
         return timeArray;
-      }
+    }
 
 
     let start_time: string = currentEvent?.start_time + ":" + currentEvent?.start_minute_time + " " + currentEvent?.start_time_type;
     let end_time: string = currentEvent?.end_time + ":" + currentEvent?.end_minute_time + " " + currentEvent?.end_time_type;
     console.log(start_time);
     console.log(end_time);
-    // console.log(parseTime(start_time));
-    // console.log(parseTime(end_time));
-    // console.log(start_time);
-    // console.log(end_time);
-
-    // console.log("Current event is: ", currentEvent);
 
     // let hoursArray: string[] = generateHours(start_time, end_time);
     let hoursArray: string[] = generateHours(start_time, end_time);
+    const checkInTimes = eventAttendee.map((attendee: attendeeType) => {
+        return attendee.check_in_time;
+    });
 
-    console.log(hoursArray);
+    console.log(hoursArray, checkInTimes);
 
+    const extractHour = (timeStr: string): number => {
+        const date = new Date(timeStr); // Parse the datetime string
+        return date.getHours();
+    };
+
+    // Function to convert '1 AM', '2 AM', etc., into an integer hour (24-hour format)
+    const convertTimePeriodToHour = (period: string): number => {
+        const [hourStr, periodOfDay] = period.split(' ');
+        let hour = parseInt(hourStr);
+
+        // Convert AM/PM to 24-hour format
+        if (periodOfDay === 'PM' && hour !== 12) {
+            hour += 12; // Convert PM hours (except for 12 PM)
+        }
+        if (periodOfDay === 'AM' && hour === 12) {
+            hour = 0; // Convert 12 AM to 0 hour (midnight)
+        }
+
+        return hour;
+    };
+
+    // Function to count the number of check-ins in each time period
+    const countCheckInsByPeriod = (checkInTimes: string[], timePeriods: string[]): { period: string, count: number }[] => {
+        // Initialize counts object
+        const checkInCounts: { [key: string]: number } = timePeriods.reduce((counts: { [key: string]: number }, period) => {
+            counts[period] = 0;
+            return counts;
+        }, {});
+
+        // Iterate through check-in times and update counts
+        checkInTimes.forEach(checkIn => {
+            const checkInHour = extractHour(checkIn);
+
+            // Find the corresponding time period
+            timePeriods.forEach(period => {
+                const periodHour = convertTimePeriodToHour(period);
+                if (checkInHour === periodHour) {
+                    checkInCounts[period]++;
+                }
+            });
+        });
+
+        // Create and return sorted count results
+        const sortedCounts = timePeriods.map(period => ({
+            period,
+            count: checkInCounts[period],
+        }));
+
+        return sortedCounts;
+    };
+
+    const sortedCheckInCounts = countCheckInsByPeriod(checkInTimes, hoursArray);
+    const allCounts = sortedCheckInCounts.map((sorted)=>{
+        return sorted.count;
+    })
+
+    console.log("ChecksIn", sortedCheckInCounts);
 
     useEffect(() => {
         // Calculate checkedIn and nonCheckedIn counts in one go
@@ -160,12 +193,6 @@ const ChartsData: React.FC = () => {
         // console.log("The Date Difference is: ", dateDifference);
     }, [currentEvent, dateDifference]);
 
-
-
-    // console.log("Total checked in users are: ", checkedIn);
-    // console.log("Total non-checked in users are: ", nonCheckedIn);
-
-
     if (loading) {
         return <Loader />
     }
@@ -185,7 +212,7 @@ const ChartsData: React.FC = () => {
                 </div>
 
                 <div className='w-1/3'>
-                    <BarChart hours={hoursArray} />
+                    <BarChart hours={hoursArray} checkedInUsers={checkedIn} allCounts={allCounts}/>
                 </div>
             </div>
         </div>

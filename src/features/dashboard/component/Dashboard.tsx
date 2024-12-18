@@ -22,6 +22,12 @@ const Dashboard: React.FC = () => {
     uuid: string,
     event_venue_name: string,
     id: number,
+    start_time?: string,
+    start_minute_time?: string,
+    start_time_type?: string,
+    end_time?: string,
+    end_minute_time?: string,
+    end_time_type?: string,
   }
 
   const { events, loading, error } = useSelector((state: RootState) => state.events);
@@ -124,6 +130,12 @@ const Dashboard: React.FC = () => {
                 title={upcomingEvent.title}
                 eventId={upcomingEvent.id}
                 imageUrl={`https://api.klout.club/${upcomingEvent.image}`}
+                start_minute_time={upcomingEvent.start_minute_time}
+                start_time={upcomingEvent.start_time}
+                start_time_type={upcomingEvent.start_time_type}
+                end_minute_time={upcomingEvent.end_minute_time}
+                end_time={upcomingEvent.end_time}
+                end_time_type={upcomingEvent.end_time_type}
                 imageAlt={upcomingEvent.title}
                 date={upcomingEvent.event_start_date}
                 venue={upcomingEvent.event_venue_name}

@@ -6,6 +6,8 @@ import axios from "axios";
 import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Loader from "../../../component/Loader";
+import Swal from "sweetalert2";
 const dummyImage = "https://via.placeholder.com/150";
 
 // Define the form data type
@@ -42,7 +44,7 @@ const AddEventAttendee: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState('');
-  const [image, setImage] = useState<Blob|null>(null);
+  const [image, setImage] = useState<Blob | null>(null);
   const { token } = useSelector((state: RootState) => (state.auth));
   const { currentEventUUID } = useSelector((state: RootState) => (state.events));
   // const { currentAttendeeUUID } = useSelector((state: RootState) => (state.attende));
@@ -58,6 +60,8 @@ const AddEventAttendee: React.FC = () => {
 
   const [companies, setCompanies] = useState<ApiType[] | undefined>();
   const [selectedJobTitle, setSelectedJobTitle] = useState<string | number>(''); // Track selected job title
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [, setErrorsExcel] = useState({});
   const [, setInvalidMessage] = useState("");
@@ -96,6 +100,7 @@ const AddEventAttendee: React.FC = () => {
   };
 
   const onSubmit: SubmitHandler<FormInputType> = async (data) => {
+    setLoading(true);
 
     const formData = new FormData();
 
@@ -141,6 +146,8 @@ const AddEventAttendee: React.FC = () => {
     } catch (error) {
       alert('An error occurred while submitting the form.');
       console.error('Error:', error);
+    } finally {
+      setLoading(false);
     }
 
   }
@@ -205,12 +212,20 @@ const AddEventAttendee: React.FC = () => {
 
 
   const handleFileUpload = async (e: any) => {
+    if (selectedExcelFile) {
+      setLoading(true);
+    }
     e.preventDefault();
 
     setDownloadInvalidExcel(false);
 
     if (!selectedExcelFile) {
-      setErrorsExcel({ message: "Please select an Excel file." });
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: 'Please select an excel file',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
@@ -294,14 +309,16 @@ const AddEventAttendee: React.FC = () => {
             fileInputRef.current.value = "";
           }
         }
-      });
+      }).then(() => {
+        setLoading(false);
+      })
 
     setIsLoadingExcel(false);
   };
 
-  // if(loading) {
-  //     return <Loader />
-  // }
+  if (loading) {
+    return <Loader />
+  }
 
   return (
     <div className="p-6 pt-3">

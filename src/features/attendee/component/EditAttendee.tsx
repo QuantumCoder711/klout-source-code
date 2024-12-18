@@ -85,7 +85,8 @@ const EditAttendee = () => {
       }
     }).then((res => {
       const attendeeData: FormInputType = res.data.data;
-      // console.log("All Attendee Data is: ", attendeeData);
+
+      console.log("All Attendee Data is: ", attendeeData);
       console.log("Job Titles are: ", jobTitles);
       console.log("Companies are: ", companies);
       console.log("Industries are: ", industries);
