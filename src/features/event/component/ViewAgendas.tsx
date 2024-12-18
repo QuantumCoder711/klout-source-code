@@ -251,10 +251,15 @@ const ViewAgendas: React.FC = () => {
   const showImage = (imgBase:string, agendaTitle:string, agendaDescription:string, eventDate:string, startTime:string, endTime:string, startMinuteTime:string, endTimeType:string, endMinuteTime:string, position:number, startTimeType:string) => {
     const agendaImage = `${apiBaseUrl}/${imgBase}`;
 
+    if(imgBase === " ") {
+      imgBase = "";
+    }
+
     Swal.fire({
       title: agendaTitle,
       text: agendaDescription,
-      imageUrl: agendaImage || dummyImage,
+      imageUrl: imgBase ? agendaImage : dummyImage,
+      width: "600px",
       imageHeight: "300px",
       imageWidth: "300px",
       confirmButtonText: 'OK',

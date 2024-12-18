@@ -29,13 +29,10 @@ const AllAttendee: React.FC = () => {
   const [searchEmail, setSearchEmail] = useState('');
   const [searchPhone, setSearchPhone] = useState('');
 
-  const totalPages = Math.ceil(allAttendees.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  const currentAttendees: attendeeType[] = allAttendees.slice(startIndex, endIndex);
-  console.log(currentAttendees);
-
+  
+  const currentAttendees: attendeeType[] = allAttendees;
+  // console.log(currentAttendees);
+  
   // Filter attendees based on the search terms
   const filteredAttendees = currentAttendees.filter((attendee) => {
     const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
@@ -45,6 +42,13 @@ const AllAttendee: React.FC = () => {
     const matchesPhone = (attendee.phone_number ?? '').toLowerCase().includes(searchPhone.toLowerCase());
     return matchesName && matchesCompany && matchesDesignation && matchesEmail && matchesPhone;
   });
+  
+  const totalPages = Math.ceil(filteredAttendees.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  const attendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
+    console.log(currentAttendees);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -92,7 +96,7 @@ const AllAttendee: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <div className="mb-6">
           <span className="text-gray-800 font-semibold">
-            Showing {currentAttendees.length} entries out of {allAttendees.length}
+            Showing {attendees.length} entries out of {allAttendees.length}
           </span>
         </div>
         <div className="flex justify-between flex-col-reverse min-[1440px]:flex-row gap-5 items-center">
@@ -185,8 +189,8 @@ const AllAttendee: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredAttendees.length > 0 ? (
-              filteredAttendees.map((attendee, index) => (
+            {attendees.length > 0 ? (
+              attendees.map((attendee, index) => (
                 <tr key={attendee.uuid} className="bg-white border-b border-gray-400 hover:bg-gray-50">
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.title}</td>

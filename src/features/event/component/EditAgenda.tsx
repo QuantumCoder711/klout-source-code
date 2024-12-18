@@ -27,13 +27,15 @@ type formInputType = {
 };
 
 const EditAgenda: React.FC = () => {
+
+    const dummyImage = "https://via.placeholder.com/150";
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<formInputType>();
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string>("");
     const [agenda, setAgendaData] = useState<formInputType | null>();
     const [image, setImage] = useState<File | null>(null);  // This is where the selected image file will be stored.
-    const dummyImage = "https://via.placeholder.com/150";
+    const [agendaImage, setAgendaImage] = useState<string>(dummyImage);
 
     const { token } = useSelector((state: RootState) => (state.auth));
 
@@ -49,7 +51,7 @@ const EditAgenda: React.FC = () => {
             axios.get(`${apiBaseUrl}/api/agendas/${currentAgendaUUID}`)
                 .then((res) => {
                     if (res.data) {
-                        const agendaData = res.data.data;
+                        const agendaData:formInputType = res.data.data;
                         setAgendaData(agendaData);
                         console.log(agendaData);
 
@@ -68,7 +70,7 @@ const EditAgenda: React.FC = () => {
 
                         // If the agenda has an image path, set it as the selected image
                         if (agendaData.image_path) {
-                            setSelectedImage(agendaData.image_path);
+                            setAgendaImage(`${apiBaseUrl}/${agendaData.image_path}`);
                         }
                     }
                 });
@@ -126,6 +128,8 @@ const EditAgenda: React.FC = () => {
             for (let [key, value] of formData.entries()) {
                 console.log(key, value);
             }
+
+            console.log("Form Data is: ", formData);
 
             // Step 2: Make the API request to update the agenda
             try {
@@ -205,7 +209,7 @@ const EditAgenda: React.FC = () => {
                     {/* Display the uploaded image or dummy image */}
                     <div className="w-full">
                         <img
-                            src={selectedImage ? `${apiBaseUrl}/${selectedImage}`: dummyImage}
+                            src={selectedImage || agendaImage}
                             alt="Selected Banner"
                             className="w-full h-60 object-contain"
                         />

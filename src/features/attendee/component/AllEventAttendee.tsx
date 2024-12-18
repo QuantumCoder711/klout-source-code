@@ -94,16 +94,6 @@ const AllEventAttendee: React.FC = () => {
     const [roleFilter, setRoleFilter] = useState('');
 
     // Filter attendees based on the search terms
-    // const filteredAttendees = eventAttendee.filter((attendee) => {
-    //     const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
-    //     const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
-    //     const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
-    //     const matchesCheckIn = checkInFilter === '' || attendee.check_in === Number(checkInFilter) || attendee.check_in_second === Number(checkInFilter) || attendee.check_in_third === Number(checkInFilter) || attendee.check_in_forth === Number(checkInFilter) || attendee.check_in_fifth === Number(checkInFilter)
-    //     const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
-    //     return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
-    // });
-
-    // Filter attendees based on the search terms
     const filteredAttendees = eventAttendee
         .filter((attendee) => {
             const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
@@ -126,26 +116,6 @@ const AllEventAttendee: React.FC = () => {
 
             return dateTimeB - dateTimeA; // Descending order
         });
-
-
-
-
-    // const actionLinks: { [key: string]: string } = {
-    //     'Add Attendee': '/events/add-attendee',
-    //     'Send Reminder': '/events/send-reminder',
-    //     'Send Invitation': '/events/send-invitation',
-    //     'Send Same Day Reminder': '/events/same-day-reminder',
-    //     'Send Poll': '/events/send-poll',
-    //     'Send In App Message': '/events/send-to-app',
-    //     'Pending Requests': '/events/pending-user-request',
-    //     'Send Template Message': '/events/send-multiple-message',
-    //     'Session Reminder': '/events/session-reminder',
-    //     'Day Two Reminder': '/events/day-two-reminder',
-    //     'Reminder Visit Booth': '/events/reminder-to-visit-booth',
-    //     'Day Two Same Day Reminder': '/events/day_two_same_day_reminder',
-    //     'Thank You Message': '/events/thank-you-message',
-    // };
-
 
     // console.log("Checked Users are: ", checkedUsers2ndDay);
 
@@ -273,13 +243,6 @@ const AllEventAttendee: React.FC = () => {
         });
     }
 
-    // const handleChange = (e: any) => {
-    //     const action = e.target.value;
-    //     // const setPageHeading =  Object.keys(action).find(key => actionLinks[key] === action);
-    //     // console.log(setPageHeading);
-    //     setSelectedAction(action);
-    // };
-
     const showQRCode = () => {
         Swal.fire({
             title: 'QR Code',
@@ -290,7 +253,6 @@ const AllEventAttendee: React.FC = () => {
             confirmButtonText: 'OK'
         });
     }
-
 
     const showImage = (
         img: string,
@@ -313,7 +275,7 @@ const AllEventAttendee: React.FC = () => {
 
         Swal.fire({
             title: `${firstName} ${lastName}`,
-            // width: "600px",
+            width: "750px",
             text: email,
             imageUrl: img ? agendaImage : dummyImage,  // Use provided image or fallback
             imageHeight: "300px",
