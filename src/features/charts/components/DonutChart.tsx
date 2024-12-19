@@ -12,7 +12,7 @@ interface DonutChartProps {
 const DonutChart:React.FC<DonutChartProps> = (props) => {
 
     const data = {
-        labels: ["Yes", "No"],
+        labels: ["Checked In", "Non-Checked In"],
         datasets: [{
             label: "Users",
             data: [props.checkedInUsers, props.nonCheckedInUsers],

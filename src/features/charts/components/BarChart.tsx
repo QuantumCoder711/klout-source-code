@@ -15,18 +15,26 @@ const BarChart: React.FC<BarChartProps> = (props) => {
     const data = {
         labels: props.hours,
         datasets: [{
-            label: String(props.checkedInUsers),
+            label: String(props.checkedInUsers) + " Checked In",
             data: props.allCounts,
-            backgroundColor: "royalblue",
-            borderColor: "black",
-            borderWidth: 1
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: "rgba(75, 192, 192)",
+            borderWidth: 1,
+            // barThickness: ,
+            maxBarThickness: 60,
+            minBarLength: 0,
         }],
     };
 
-    const options = {};
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+    };
+
+
 
     return (
-        <div className='w-full'>
+        <div className='w-full h-80'>
             <Bar data={data} options={options}></Bar>
         </div>
     )

@@ -206,12 +206,12 @@ const ChartsData: React.FC = () => {
                 </Link>
             </div>
 
-            <div className='flex justify-between gap-10 items-baseline'>
+            <div className='flex justify-between gap-40 bg-white p-10 rounded shadow-sm items-baseline'>
                 <div className='w-1/3'>
                     <DonutChart checkedInUsers={checkedIn} nonCheckedInUsers={nonCheckedIn} />
                 </div>
 
-                <div className='w-1/3'>
+                <div className='w-2/3'>
                     <BarChart hours={hoursArray} checkedInUsers={checkedIn} allCounts={allCounts}/>
                 </div>
             </div>
