@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const DayTwoSameDayReminder: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
@@ -157,7 +157,7 @@ const DayTwoSameDayReminder: React.FC = () => {
             )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send WhatsApp to Attendee' />
-                <Link to="/events/all-attendee" onClick={()=>dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
@@ -228,7 +228,12 @@ const DayTwoSameDayReminder: React.FC = () => {
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
                             <div className='w-2/3 bg-zinc-200 mt-5 rounded-xl p-5'>
                                 <p>
-                                    Hi "<strong>firstname</strong>", just a reminder for our event "<strong>Event-Title</strong>". We're excited to welcome you to this exclusive event. "<strong>Event-Date-Time</strong>". <br /> <br /> To ensure a smooth check-in experience, please download the Klout Club app in advance. You can download it here <a href="https://onelink.to/r3fzb9" className='font-bold'>https://onelink.to/r3fzb9</a>
+                                    Dear <strong>"Attendee Name", </strong> <br /> <br />
+
+                                    This is a friendly reminder that Day 2 of <strong>{currentEvent.title}</strong> will be starting at <strong> {currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type}</strong> at <strong>{currentEvent.event_venue_name}</strong> <br /> <br />
+
+                                    Regards, <br />
+                                    <strong>{user?.company_name}</strong>
                                 </p>
                             </div>
                         </div>

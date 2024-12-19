@@ -15,7 +15,7 @@ import axios from 'axios';
 
 const SendReminder: React.FC = () => {
     // State to keep track of selected roles and selected sending method
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'email' | null>("email");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now"); // State for "now" and "later" radio buttons
@@ -275,7 +275,7 @@ const SendReminder: React.FC = () => {
                                     To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>. <br />
                                     We look forward to welcoming you to the event! <br /><br />
 
-                                    Regards, Team  Insightner <br />
+                                    Regards, Team  <strong>{user?.company_name}</strong> <br />
                                 </p>
                             </div>
                         </div>}

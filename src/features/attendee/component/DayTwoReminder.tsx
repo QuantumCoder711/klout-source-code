@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const DayTwoReminder: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
@@ -204,7 +204,7 @@ const DayTwoReminder: React.FC = () => {
                                 <p>
                                     Hi <strong>"Attendee Name"</strong> <br /> <br />
 
-                                    This is a friendly reminder that Day 2 of {currentEvent.title} will commence at <strong>{currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type}</strong> at <strong>{currentEvent.event_venue_name}</strong> <br /> <br />
+                                    This is a friendly reminder that Day 2 of <strong>{currentEvent.title}</strong> will commence at <strong>{currentEvent.start_time + ":" + currentEvent.start_minute_time + " " + currentEvent.start_time_type}</strong> at <strong>{currentEvent.event_venue_name}</strong> <br /> <br />
 
                                     We request you to check in and mark your attendance by scanning the QR code at the registration desk. <br /><br />
 
@@ -213,7 +213,7 @@ const DayTwoReminder: React.FC = () => {
                                     Looking forward to seeing you. <br /><br />
 
                                     Regards, <br />
-                                    Insightner
+                                    <strong>{user?.company_name}</strong>
                                 </p>
                             </div>
                         </div>

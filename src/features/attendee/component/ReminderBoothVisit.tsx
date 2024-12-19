@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const ReminderBoothVisit: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
@@ -235,8 +235,7 @@ const ReminderBoothVisit: React.FC = () => {
 
                                     Enjoy the event! <br /> <br />
 
-                                    Regards,
-                                    Insightner <br />
+                                    Regards, <strong>{user?.company_name}</strong> <br />
                                 </p>
                             </div>
                         </div>

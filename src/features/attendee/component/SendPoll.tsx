@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const SendPoll: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
@@ -266,7 +266,7 @@ const SendPoll: React.FC = () => {
                                     Hi <strong>User</strong>, <br /> <br />
                                     Hope you're enjoying the <strong>{currentEvent.title}</strong> 🎉 We'd love for you to take a moment to fill out this quick poll/survery: <strong>link</strong> <br /> <br />
                                     Thank you for your time! <br /> <br />
-                                    Regards, Team Insightner <br />
+                                    Regards, Team <strong>{user?.company_name}</strong> <br />
                                 </p>
                             </div>
                         </div>

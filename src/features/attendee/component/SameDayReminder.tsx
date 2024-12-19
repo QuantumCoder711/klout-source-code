@@ -12,7 +12,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const SameDayReminder: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
@@ -212,7 +212,7 @@ const SameDayReminder: React.FC = () => {
                                     To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>. <br />
                                     We look forward to welcoming you to the event! <br /><br />
 
-                                    Regards, Team  Insightner <br />
+                                    Regards, Team  <strong>{user?.company_name}</strong> <br />
                                 </p>
                             </div>
                         </div>

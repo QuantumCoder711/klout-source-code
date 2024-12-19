@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const SessionReminder: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
@@ -233,7 +233,7 @@ const SessionReminder: React.FC = () => {
                                     The next session is about to begin. We kindly request you to join us back inside the hall. Thank you! <br /><br />
 
                                     Regards, <br />
-                                    Insightner
+                                    <strong>{user?.company_name}</strong>
                                 </p>
                             </div>
                         </div>

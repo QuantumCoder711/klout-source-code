@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const ThankYouMessage: React.FC = () => {
-    const { token } = useSelector((state: RootState) => state.auth);
+    const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
     const [selectedCheckedUser, setSelectedCheckedUser] = useState<'checkedIn' | 'nonCheckedIn' | 'all'>("all");
@@ -176,7 +176,7 @@ const ThankYouMessage: React.FC = () => {
             )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send Thank You Message' />
-                <Link to="/events/all-attendee" onClick={()=>dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
@@ -245,9 +245,17 @@ const ThankYouMessage: React.FC = () => {
                         {/* WhatsApp Message */}
                         <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
-                            <div className='w-1/2 bg-zinc-200 mt-5 rounded-xl p-5'>
+                            <div className='w-2/3 bg-zinc-200 mt-5 rounded-xl p-5'>
                                 <p>
+                                    Thank you for being part of <strong> {currentEvent.title} </strong><br /> <br />
+                                    It was a privilege to host you at this distinguished gathering of Senior Leaders and industry Trailblazers from diverse Sectors. <br /> <br />
 
+                                    We hope you found the conference insightful and impactful, gaining valuable perspectives to drive innovation and excellence in your field. <br /> <br />
+
+                                    Your active participation made the event truly memorable, and we are excited about staying connected and welcoming you to future editions of <strong> {currentEvent.title} </strong>and other events organised by <strong>{user?.company_name}</strong>  <br /> <br />
+
+                                    Warm regards, <br />
+                                    Team <strong>{user?.company_name}</strong>
                                 </p>
                             </div>
                         </div>
