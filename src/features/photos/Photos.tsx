@@ -18,11 +18,6 @@ interface Folder {
     id: string;
 }
 
-interface fileData {
-    uuid: string;
-    userId: string;
-}
-
 // Define constants or types for chunk size and apiUrl
 const CHUNK_SIZE = 5 * 1024 * 1024; // Example chunk size: 1MB
 
