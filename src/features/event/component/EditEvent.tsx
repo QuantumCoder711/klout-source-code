@@ -41,6 +41,7 @@ type formInputType = {
 type eventType = {
     title: string,
     image: string,
+    uuid: string,
     description: string,
     qr_code: string,
     event_start_date: string,
@@ -61,16 +62,24 @@ type eventType = {
     pincode: string;
 }
 
+interface EditEventProps {
+    uuid?: string;
+}
 
-const EditEvent: React.FC = () => {
+
+const EditEvent: React.FC<EditEventProps> = ({uuid}) => {
+    console.log(uuid);
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    const { currentEvent, currentEventUUID, loading } = useSelector((state: RootState) => ({
-        currentEvent: state.events.currentEvent as eventType,
-        currentEventUUID: state.events.currentEventUUID,
-        loading: state.events.loading
-    }));;
     const { token } = useSelector((state: RootState) => state.auth);
+    const { currentEventUUID, loading, allEvent } = useSelector((state: RootState) => ({
+        currentEventUUID: state.events.currentEventUUID,
+        loading: state.events.loading,
+        allEvent: state.events.events
+    }));
+
+    const currentEvent = allEvent.find(event => uuid === event.uuid);
+
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<formInputType>();
@@ -80,7 +89,7 @@ const EditEvent: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState('');
     const [image, setImage] = useState();
     const selectedCountryCode = watch('country');
-    const dummyImage = imageBaseUrl + '/' + currentEvent.image;
+    const dummyImage = imageBaseUrl + '/' + currentEvent?.image;
 
 
     const handleImageUpload = (e: any) => {
@@ -245,7 +254,7 @@ const EditEvent: React.FC = () => {
                     {/* Title */}
                     <label htmlFor="title" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className=" font-semibold text-green-700 flex justify-between items-center">Event Name &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="title" defaultValue={currentEvent.title} type="text" className="grow" {...register('title', { required: 'Title is required' })} />
+                        <input id="title" defaultValue={currentEvent?.title} type="text" className="grow" {...register('title', { required: 'Title is required' })} />
                     </label>
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
                 </div>
@@ -281,7 +290,7 @@ const EditEvent: React.FC = () => {
                     {/* Description */}
                     <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className=" font-semibold text-green-700 flex justify-between items-center">Description &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <textarea id="description" defaultValue={currentEvent.description} className="grow bg-white" {...register('description', { required: 'Description is required' })} />
+                        <textarea id="description" defaultValue={currentEvent?.description} className="grow bg-white" {...register('description', { required: 'Description is required' })} />
                     </label>
                     {errors.description && <p className="text-red-600">{errors.description.message}</p>}
                 </div>
@@ -291,7 +300,7 @@ const EditEvent: React.FC = () => {
                         {/* Event Start Date */}
                         <label htmlFor="event_start_date" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">Event Start Date &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="event_start_date" defaultValue={currentEvent.event_start_date} type="date" className="grow bg-white" {...register('event_start_date', { required: 'Start date is required' })} />
+                            <input id="event_start_date" defaultValue={currentEvent?.event_start_date} type="date" className="grow bg-white" {...register('event_start_date', { required: 'Start date is required' })} />
                         </label>
                         {errors.event_start_date && <p className="text-red-600">{errors.event_start_date.message}</p>}
                     </div>
@@ -300,7 +309,7 @@ const EditEvent: React.FC = () => {
                         {/* Event End Date */}
                         <label htmlFor="event_end_date" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">Event End Date &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="event_end_date" defaultValue={currentEvent.event_end_date} type="date" className="grow" {...register('event_end_date', { required: 'End date is required' })} />
+                            <input id="event_end_date" defaultValue={currentEvent?.event_end_date} type="date" className="grow" {...register('event_end_date', { required: 'End date is required' })} />
                         </label>
                         {errors.event_end_date && <p className="text-red-600">{errors.event_end_date.message}</p>}
                     </div>
@@ -312,19 +321,19 @@ const EditEvent: React.FC = () => {
                         <label className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">Start Time &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <div className="flex gap-2 grow">
-                                <select id="start_time" defaultValue={currentEvent.start_time} className="grow bg-white" {...register('start_time', { required: 'Start hour is required' })}>
+                                <select id="start_time" defaultValue={currentEvent?.start_time} className="grow bg-white" {...register('start_time', { required: 'Start hour is required' })}>
                                     <option value="">HH</option>
                                     {hours.map((hour) => (
                                         <option key={hour} value={hour}>{hour}</option>
                                     ))}
                                 </select>
-                                <select id="start_minute_time" defaultValue={currentEvent.start_minute_time} className="grow bg-white" {...register('start_minute_time', { required: 'Start minute is required' })}>
+                                <select id="start_minute_time" defaultValue={currentEvent?.start_minute_time} className="grow bg-white" {...register('start_minute_time', { required: 'Start minute is required' })}>
                                     <option value="">MM</option>
                                     {minutes.map((minute) => (
                                         <option key={minute} value={minute}>{minute}</option>
                                     ))}
                                 </select>
-                                <select id="start_time_type" defaultValue={currentEvent.start_time_type} className="grow bg-white" {...register('start_time_type', { required: 'AM/PM is required' })}>
+                                <select id="start_time_type" defaultValue={currentEvent?.start_time_type} className="grow bg-white" {...register('start_time_type', { required: 'AM/PM is required' })}>
                                     <option value="">AM/PM</option>
                                     {amPm.map((ampm) => (
                                         <option key={ampm} value={ampm}>{ampm}</option>
@@ -342,19 +351,19 @@ const EditEvent: React.FC = () => {
                         <label className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">End Time &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <div className="flex gap-2 grow">
-                                <select id="end_time" defaultValue={currentEvent.end_time} className="grow bg-white" {...register('end_time', { required: 'End hour is required' })}>
+                                <select id="end_time" defaultValue={currentEvent?.end_time} className="grow bg-white" {...register('end_time', { required: 'End hour is required' })}>
                                     <option value="">HH</option>
                                     {hours.map((hour) => (
                                         <option key={hour} value={hour}>{hour}</option>
                                     ))}
                                 </select>
-                                <select id="end_minute_time" defaultValue={currentEvent.end_minute_time} className="grow bg-white" {...register('end_minute_time', { required: 'End minute is required' })}>
+                                <select id="end_minute_time" defaultValue={currentEvent?.end_minute_time} className="grow bg-white" {...register('end_minute_time', { required: 'End minute is required' })}>
                                     <option value="">MM</option>
                                     {minutes.map((minute) => (
                                         <option key={minute} value={minute}>{minute}</option>
                                     ))}
                                 </select>
-                                <select id="end_time_type" defaultValue={currentEvent.end_time_type} className="grow bg-white" {...register('end_time_type', { required: 'AM/PM is required' })}>
+                                <select id="end_time_type" defaultValue={currentEvent?.end_time_type} className="grow bg-white" {...register('end_time_type', { required: 'AM/PM is required' })}>
                                     <option value="">AM/PM</option>
                                     {amPm.map((ampm) => (
                                         <option key={ampm} value={ampm}>{ampm}</option>
@@ -373,7 +382,7 @@ const EditEvent: React.FC = () => {
                     {/* Venue Name */}
                     <label htmlFor="event_venue_name" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Name &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="event_venue_name" defaultValue={currentEvent.event_venue_name} type="text" className="grow" {...register('event_venue_name', { required: 'Venue name is required' })} />
+                        <input id="event_venue_name" defaultValue={currentEvent?.event_venue_name} type="text" className="grow" {...register('event_venue_name', { required: 'Venue name is required' })} />
                     </label>
                     {errors.event_venue_name && <p className="text-red-600">{errors.event_venue_name.message}</p>}
                 </div>
@@ -382,7 +391,7 @@ const EditEvent: React.FC = () => {
                     {/* Venue Address */}
                     <label htmlFor="event_venue_address_1" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Address &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="event_venue_address_1" defaultValue={currentEvent.event_venue_address_1} type="text" className="grow" {...register('event_venue_address_1', { required: 'Address is required' })} />
+                        <input id="event_venue_address_1" defaultValue={currentEvent?.event_venue_address_1} type="text" className="grow" {...register('event_venue_address_1', { required: 'Address is required' })} />
                     </label>
                     {errors.event_venue_address_1 && <p className="text-red-600">{errors.event_venue_address_1.message}</p>}
                 </div>
@@ -440,7 +449,7 @@ const EditEvent: React.FC = () => {
                         {/* Pincode */}
                         <label htmlFor="pincode" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">Pincode &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="pincode" defaultValue={currentEvent.pincode} type="text" className="grow" {...register('pincode', { required: 'Pincode is required', minLength: { value: 6, message: 'Pincode must be at least 5 characters' } })} />
+                            <input id="pincode" defaultValue={currentEvent?.pincode} type="text" className="grow" {...register('pincode', { required: 'Pincode is required', minLength: { value: 6, message: 'Pincode must be at least 5 characters' } })} />
                         </label>
                         {errors.pincode && <p className="text-red-600">{errors.pincode.message}</p>}
                     </div>
@@ -450,7 +459,7 @@ const EditEvent: React.FC = () => {
                     {/* Google Map Link */}
                     <label htmlFor="google_map_link" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className=" font-semibold text-green-700 flex justify-between items-center">Google Map Link &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="google_map_link" defaultValue={currentEvent.google_map_link} type="url" className="grow" {...register('google_map_link', { required: false, pattern: { value: /^https?:\/\//, message: 'Link must start with http or https' } })} />
+                        <input id="google_map_link" defaultValue={currentEvent?.google_map_link} type="url" className="grow" {...register('google_map_link', { required: false, pattern: { value: /^https?:\/\//, message: 'Link must start with http or https' } })} />
                     </label>
                     {errors.google_map_link && <p className="text-red-600">{errors.google_map_link.message}</p>}
                 </div>
@@ -459,7 +468,7 @@ const EditEvent: React.FC = () => {
                     {/* Google Map Link */}
                     <label htmlFor="video_url" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className="font-semibold text-green-700 flex justify-between items-center">Live Youtube Video Link &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="video_url" defaultValue={currentEvent.video_url} className="grow" {...register('video_url')} />
+                        <input id="video_url" defaultValue={currentEvent?.video_url} className="grow" {...register('video_url')} />
                     </label>
                     {errors.video_url && <p className="text-red-600">{errors.video_url.message}</p>}
                 </div>

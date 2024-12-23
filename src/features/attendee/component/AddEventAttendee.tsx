@@ -40,13 +40,18 @@ type ApiType = {
   uuid: string;
 }
 
-const AddEventAttendee: React.FC = () => {
+interface AddEventAttendeeProps {
+  uuid: string | undefined;
+}
+
+const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({uuid}) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState('');
   const [image, setImage] = useState<Blob | null>(null);
   const { token } = useSelector((state: RootState) => (state.auth));
-  const { currentEventUUID } = useSelector((state: RootState) => (state.events));
+  // const { currentEventUUID } = useSelector((state: RootState) => (state.events));
+  const currentEventUUID = uuid;
   // const { currentAttendeeUUID } = useSelector((state: RootState) => (state.attende));
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
   const [selectedExcelFile, setSelectedExcelFile] = useState<File | null>(null);

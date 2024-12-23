@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { RiWhatsappFill } from "react-icons/ri";
 import { IoMail } from "react-icons/io5";
 import { Editor } from '@tinymce/tinymce-react';
@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const SendReminder: React.FC = () => {
+    const { uuid } = useParams<{ uuid: string }>();
     // State to keep track of selected roles and selected sending method
     const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
@@ -26,7 +27,9 @@ const SendReminder: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState<boolean>(false);
 
-    const { currentEvent } = useSelector((state: RootState) => state.events);
+    const { events } = useSelector((state: RootState) => state.events);
+
+    const currentEvent = events.find((event) => event.uuid === uuid);
 
     console.log(currentEvent);
 
@@ -215,7 +218,14 @@ const SendReminder: React.FC = () => {
             )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send Email / SMS to Attendee' />
-                <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                <Link
+                    to="#"
+                    onClick={() => {
+                        window.history.back(); // Go back to the previous page
+                        dispatch(heading("All Attendees")); // Optional: You can still dispatch the action if needed
+                    }}
+                    className="btn btn-error text-white btn-sm"
+                >
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
@@ -378,7 +388,7 @@ const SendReminder: React.FC = () => {
 
                         <h3 className='text-xl mt-2 font-medium'>{currentEvent?.title}</h3>
                         <div className='grid place-content-end mt-2'>
-                            <Link to={"/events/view-event/"} onClick={() => { dispatch(eventUUID(currentEvent?.uuid)); dispatch(heading('View Event')); }} className="btn btn-error text-white btn-sm ">
+                            <Link to={`/events/view-event/${uuid}`} onClick={() => { dispatch(eventUUID(currentEvent?.uuid)); dispatch(heading('View Event')); }} className="btn btn-error text-white btn-sm ">
                                 View Event <IoMdArrowRoundBack size={20} className='rotate-180' />
                             </Link>
                         </div>

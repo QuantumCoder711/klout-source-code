@@ -136,7 +136,6 @@ const Event: React.FC = () => {
 
 
 
-
                 {/* Event Table */}
                 <div className="overflow-x-auto rounded-lg">
                     {

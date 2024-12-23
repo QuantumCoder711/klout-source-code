@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import HeadingH2 from '../../component/HeadingH2';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { useDispatch } from 'react-redux';
 import { heading } from '../heading/headingSlice';
@@ -40,24 +40,27 @@ type attendeeType = {
 };
 
 const ChartsData: React.FC = () => {
+    const {uuid} = useParams<{uuid: string}>();
+
     const dispatch = useDispatch<AppDispatch>();
 
     const { token } = useSelector((state: RootState) => state.auth);
 
-    const { eventAttendee, loading, currentEventUUID, currentEvent } = useSelector((state: RootState) => ({
+    const { eventAttendee, loading, events } = useSelector((state: RootState) => ({
         eventAttendee: state.events.eventAttendee,
         loading: state.events.attendeeLoader,
-        currentEventUUID: state.events.currentEventUUID,
-        currentEvent: state.events.currentEvent,
+        events: state.events.events
     }));
+
+    const currentEvent = events.find((event)=>event.uuid === uuid);
 
     // console.log(eventAttendee);
 
     useEffect(() => {
-        if (currentEventUUID) {
-            dispatch(allEventAttendee({ eventuuid: currentEventUUID, token }));
+        if (uuid) {
+            dispatch(allEventAttendee({ eventuuid: uuid, token }));
         }
-    }, []);
+    }, [uuid, token]);
 
     const [checkedIn, setCheckedIn] = useState<number>(0);
     const [nonCheckedIn, setNonCheckedIn] = useState<number>(0);

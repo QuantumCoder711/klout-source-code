@@ -39,7 +39,7 @@ const ChartCard: React.FC<ChartCardProps> = (props) => {
                 <div className="mt-2 flex items-center gap-2 rounded-bl-lg rounded-br-lg">
 
                     {/* Whatsapp Button */}
-                    <Link to={`/all-charts/event-chart`} onClick={()=>{dispatch(eventUUID(props.uuid)); dispatch(heading("Chart Report"))}} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-amber-500 text-white text-xl grid place-content-center'>
+                    <Link to={`/all-charts/event-chart/${props.uuid}`} onClick={()=>{dispatch(eventUUID(props.uuid)); dispatch(heading("Chart Report"))}} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-amber-500 text-white text-xl grid place-content-center'>
                         <IoPieChartSharp />
                     </Link>
 

@@ -32,15 +32,25 @@ import SameDayReminder from "./features/attendee/component/SameDayReminder";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import SendPollPage from "./pages/SendPollPage";
 import SendToAppPage from "./pages/SendToAppPage";
-import SendMultipleMessagePage from "./pages/SendMultipleMessagePage";
-import SesssionReminderPage from "./pages/SessionReminderPage";
+// import SendMultipleMessagePage from "./pages/SendMultipleMessagePage";
+// import SesssionReminderPage from "./pages/SessionReminderPage";
+import SessionReminder from "./features/attendee/component/SessionReminder";
 import Day2ReminderPage from "./pages/Day2ReminderPage";
+import DayTwoReminder from "./features/attendee/component/DayTwoReminder";
 import ReminderBoothVisitPage from "./pages/ReminderBoothVisitPage";
 import DayTwoSameDayReminderPage from "./pages/DayTwoSameDayReminderPage";
 import ThankYouMessagePage from "./pages/ThankYouMessagePage";
 import ChartsData from "./features/charts/ChartsData";
 import AllPhotosPage from "./pages/AllPhotosPage";
 import Photos from "./features/photos/Photos";
+import SendMultipleMessage from "./features/attendee/component/SendMultipleMessage";
+import SendToApp from "./features/attendee/component/SendToApp";
+import SendPoll from "./features/attendee/component/SendPoll";
+import ReminderBoothVisit from "./features/attendee/component/ReminderBoothVisit";
+import DayTwoSameDayReminder from "./features/attendee/component/DayTwoSameDayReminder";
+import ThankYouMessage from "./features/attendee/component/ThankYouMessage";
+import EditAttendee from "./features/attendee/component/EditAttendee";
+import EditAgenda from "./features/event/component/EditAgenda";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -62,34 +72,34 @@ const App: React.FC = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventPage />} />
           <Route path="/events/add-event" element={<AddEventPage />} />
-          <Route path="/events/view-event" element={<ViewEventPage />} />
-          <Route path="/events/view-agendas" element={<ViewAgendasPage />} />
-          <Route path="/events/add-agenda" element={<AddAgendaPage />} />
-          <Route path="/events/edit-agenda" element={<EditAgendaPage />} />
-          <Route path="/events/edit-event" element={<EditEventPage />} />
-          <Route path="/events/all-attendee" element={<AllEventAttendeePage />} />
-          <Route path="/events/edit-attendee" element={<EditAttendeePage />} />
-          <Route path="/events/pending-user-request" element={<PendingUserRequest />} />
-          <Route path="/events/send-to-app" element={<SendToAppPage />} />
-          <Route path="/events/add-attendee" element={<AddEventAttendeePage />} />
-          <Route path="/events/send-reminder" element={<SendReminder />} />
-          <Route path="/events/send-poll" element={<SendPollPage />} />
-          <Route path="/events/send-multiple-message" element={<SendMultipleMessagePage />} />
-          <Route path="/events/session-reminder" element={<SesssionReminderPage />} />
-          <Route path="/events/day-two-reminder" element={<Day2ReminderPage />} />
-          <Route path="/events/reminder-to-visit-booth" element={<ReminderBoothVisitPage />} />
-          <Route path="/events/day_two_same_day_reminder" element={<DayTwoSameDayReminderPage />} />
+          <Route path="/events/view-event/:uuid" element={<ViewEventPage />} />
+          <Route path="/events/view-agendas/:uuid" element={<ViewAgendasPage />} />
+          <Route path="/events/add-agenda/:uuid" element={<AddAgendaPage />} />
+          <Route path="/events/edit-agenda/:agenda_uuid/:id" element={<EditAgenda />} />
+          <Route path="/events/edit-event/:uuid" element={<EditEventPage />} />
+          <Route path="/events/all-attendee/:uuid" element={<AllEventAttendeePage />} />
+          <Route path="/events/edit-attendee/:attendee_uuid/:id" element={<EditAttendee />} />
+          <Route path="/events/pending-user-request/:uuid" element={<PendingUserRequest />} />
+          <Route path="/events/send-to-app/:uuid" element={<SendToApp />} />
+          <Route path="/events/add-attendee/:uuid" element={<AddEventAttendeePage />} />
+          <Route path="/events/send-reminder/:uuid" element={<SendReminder />} />
+          <Route path="/events/send-poll/:uuid" element={<SendPoll />} />
+          <Route path="/events/send-multiple-message/:uuid" element={<SendMultipleMessage />} />
+          <Route path="/events/session-reminder/:uuid" element={<SessionReminder />} />
+          <Route path="/events/day-two-reminder/:uuid" element={<DayTwoReminder />} />
+          <Route path="/events/reminder-to-visit-booth/:uuid" element={<ReminderBoothVisit />} />
+          <Route path="/events/day_two_same_day_reminder/:uuid" element={<DayTwoSameDayReminder />} />
           <Route path="/events/send-invitation" element={<SendInvitation />} />
-          <Route path="/events/thank-you-message" element={<ThankYouMessagePage />} />
-          <Route path="/events/same-day-reminder" element={<SameDayReminder />} />
+          <Route path="/events/thank-you-message/:uuid" element={<ThankYouMessage />} />
+          <Route path="/events/same-day-reminder/:uuid" element={<SameDayReminder />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />
           <Route path="/all-sponsors" element={<AllSponsorPage />} />
           <Route path="/all-reports" element={<AllReports />} />
           <Route path="/all-photos" element={<AllPhotosPage />} />
-          <Route path="/all-photos/photo" element={<Photos />} />
+          <Route path="/all-photos/photo/:uuid" element={<Photos />} />
           <Route path="/all-charts" element={<AllCharts />} />
-          <Route path="/all-charts/event-chart" element={<ChartsData />} />
-          <Route path="/all-reports/whatsapp-report" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
+          <Route path="/all-charts/event-chart/:uuid" element={<ChartsData />} />
+          <Route path="/all-reports/whatsapp-report/:uuid" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
           <Route path="/all-reports/mail-report" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
         </Route>
       </Routes>

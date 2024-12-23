@@ -46,22 +46,29 @@ type attendeeType = {
     id: number;
 };
 
-const AllEventAttendee: React.FC = () => {
+interface AllEventAttendeeProps {
+    uuid: string | undefined;
+}
+
+const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
     const dispatch = useAppDispatch();
+
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const dummyImage = "https://via.placeholder.com/150";
 
     // const [selectedAction, setSelectedAction] = useState('');
 
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID, eventAttendee, loading, currentEvent } = useSelector((state: RootState) => ({
+    const { currentEventUUID, eventAttendee, loading, allEvents } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
         eventAttendee: state.events.eventAttendee as attendeeType[],
         loading: state.events.attendeeLoader,
-        currentEvent: state.events,
+        allEvents: state.events.events,
     }));
 
-    const qrCode = `${apiBaseUrl}/${currentEvent?.currentEvent?.qr_code}`;
+    const currentEvent = allEvents.find(event => uuid === event.uuid);
+
+    const qrCode = `${apiBaseUrl}/${currentEvent?.qr_code}`;
 
     const [dateDifference, setDateDifference] = useState<number>(0);
 
@@ -73,12 +80,12 @@ const AllEventAttendee: React.FC = () => {
     };
 
     useEffect(() => {
-        if (currentEventUUID && token) {
-            dispatch(allEventAttendee({ eventuuid: currentEventUUID, token }));
+        if (currentEvent && token) {
+            dispatch(allEventAttendee({ eventuuid: currentEvent.uuid, token }));
         }
 
-        if (currentEvent.currentEvent) {
-            setDateDifference(calculateDateDifference(currentEvent.currentEvent?.event_start_date, currentEvent.currentEvent?.event_end_date));
+        if (currentEvent) {
+            setDateDifference(calculateDateDifference(currentEvent?.event_start_date, currentEvent?.event_end_date));
         }
 
         // console.log("Checked Users are: ", checkedUsers);
@@ -243,10 +250,10 @@ const AllEventAttendee: React.FC = () => {
         });
     }
 
-    const showQRCode = () => {
+    const showQRCode = (title: string | undefined) => {
         Swal.fire({
-            title: 'QR Code',
-            text: 'Here is your QR code',
+            title: title || "QR Code",
+            // text: 'Here is your QR code',
             imageUrl: qrCode,
             imageHeight: "300px",
             imageWidth: "300px",
@@ -267,7 +274,7 @@ const AllEventAttendee: React.FC = () => {
     ) => {
         const agendaImage = `${apiBaseUrl}/${img}`;
 
-        if(img === " ") {
+        if (img === " ") {
             img = "";
         }
 
@@ -311,17 +318,23 @@ const AllEventAttendee: React.FC = () => {
                 <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
 
                 <div className='flex items-center gap-3'>
-                    <button onClick={showQRCode} className='btn-sm text-white bg-amber-400 hover:bg-amber-500 btn'>QR Code</button>
-                    <Link to="/" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
+                    <button onClick={() => showQRCode(currentEvent?.title)} className='btn-sm text-white bg-amber-400 hover:bg-amber-500 btn'>QR Code</button>
+                    <Link
+                        to="#"
+                        onClick={() => {
+                            window.history.back(); // Go back to the previous page
+                        }}
+                        className="btn btn-error text-white btn-sm"
+                    >
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>
             </div>
             <br />
-            
+
             <div className="flex items-center flex-wrap gap-2 mb-4">
                 <Link
-                    to="/events/add-attendee"
+                    to={`/events/add-attendee/${uuid}`}
                     onClick={() => { dispatch(heading('Add Attendee')) }}
                     className="btn btn-secondary text-white btn-xs"
                     title="Add a new attendee"
@@ -330,7 +343,7 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/send-reminder"
+                    to={`/events/send-reminder/${uuid}`}
                     onClick={() => { dispatch(heading('Send Reminder')); }}
                     className="btn btn-accent text-white btn-xs"
                     title="Send a reminder to attendees"
@@ -339,7 +352,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/send-invitation"
+                    // to="/events/send-invitation"
+                    to={`/events/send-invitation/${uuid}`}
                     onClick={() => { dispatch(heading('Send Invitation')); }}
                     className="btn hidden btn-primary text-white btn-xs"
                     title="Send an invitation to attendees"
@@ -348,7 +362,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/same-day-reminder"
+                    // to="/events/same-day-reminder"
+                    to={`/events/same-day-reminder/${uuid}`}
                     onClick={() => { dispatch(heading('Send Same Day Reminder')); }}
                     className="btn btn-warning text-white btn-xs"
                     title="Send a same day reminder"
@@ -357,7 +372,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/send-poll"
+                    // to="/events/send-poll"
+                    to={`/events/send-poll/${uuid}`}
                     onClick={() => { dispatch(heading('Send Poll')); }}
                     className="btn btn-info text-white btn-xs"
                     title="Send a poll to attendees"
@@ -366,7 +382,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/send-to-app"
+                    // to="/events/send-to-app"
+                    to={`/events/send-to-app/${uuid}`}
                     onClick={() => { dispatch(heading('Send In App Message')); }}
                     className="btn btn-primary text-white btn-xs"
                     title="Send an in-app message"
@@ -375,7 +392,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/pending-user-request"
+                    // to="/events/pending-user-request"
+                    to={`/events/pending-user-request/${uuid}`}
                     onClick={() => { dispatch(heading("Pending Requests")) }}
                     className="btn btn-error text-white btn-xs"
                     title="View pending user requests"
@@ -384,7 +402,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/send-multiple-message"
+                    // to="/events/send-multiple-message"
+                    to={`/events/send-multiple-message/${uuid}`}
                     onClick={() => { dispatch(heading('Send Template Message')); }}
                     className="btn bg-orange-500 hover:bg-orange-600 text-white btn-xs"
                     title="Send template message to multiple users"
@@ -393,7 +412,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/session-reminder"
+                    // to="/events/session-reminder"
+                    to={`/events/session-reminder/${uuid}`}
                     onClick={() => { dispatch(heading('Session Reminder')); }}
                     className="btn bg-fuchsia-500 hover:bg-fuchsia-600 text-white btn-xs"
                     title="Send a session reminder"
@@ -402,7 +422,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/day-two-reminder"
+                    // to="/events/day-two-reminder"
+                    to={`/events/day-two-reminder/${uuid}`}
                     onClick={() => { dispatch(heading('Day 2 Reminder')); }}
                     className="btn bg-emerald-500 hover:bg-emerald-600 text-white btn-xs"
                     title="Send a Day 2 reminder"
@@ -411,7 +432,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/reminder-to-visit-booth"
+                    // to="/events/reminder-to-visit-booth"
+                    to={`/events/reminder-to-visit-booth/${uuid}`}
                     onClick={() => { dispatch(heading('Reminder Visit Booth')); }}
                     className="btn bg-indigo-500 hover:bg-indigo-600 text-white btn-xs"
                     title="Send reminder to visit booth"
@@ -420,7 +442,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/day_two_same_day_reminder"
+                    // to="/events/day_two_same_day_reminder"
+                    to={`/events/day_two_same_day_reminder/${uuid}`}
                     onClick={() => { dispatch(heading('Day Two Same Day Reminder')); }}
                     className="btn bg-purple-500 hover:bg-purple-600 text-white btn-xs"
                     title="Send Day 2 same day reminder"
@@ -429,7 +452,8 @@ const AllEventAttendee: React.FC = () => {
                 </Link>
 
                 <Link
-                    to="/events/thank-you-message"
+                    // to="/events/thank-you-message"
+                    to={`/events/thank-you-message/${uuid}`}
                     onClick={() => { dispatch(heading('Thank You Message')); }}
                     className="btn bg-rose-500 hover:bg-rose-600 text-white btn-xs"
                     title="Send a thank you message"
@@ -445,7 +469,6 @@ const AllEventAttendee: React.FC = () => {
                     <FaFileExcel /> Export Data
                 </button>
             </div>
-
 
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-between flex-col-reverse min-[1440px]:flex-row gap-5 items-center">
@@ -739,7 +762,7 @@ const AllEventAttendee: React.FC = () => {
                                                     <FaEye className='text-black/70' />
                                                 </span>
 
-                                                <Link to={`/events/edit-attendee`} onClick={() => { dispatch(attendeeUUID(attendee.uuid)); dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
+                                                <Link to={`/events/edit-attendee/${attendee.uuid}/${currentEvent?.id}`} onClick={() => { dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit />
                                                 </Link>
                                                 <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">

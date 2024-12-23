@@ -6,6 +6,7 @@ import axios from 'axios';
 import { RootState } from '../../../redux/store';
 import { useSelector } from 'react-redux';
 import Loader from '../../../component/Loader';
+import { useParams } from 'react-router-dom';
 
 type MessageState = {
     _id: string;
@@ -28,12 +29,13 @@ type ReciptState = {
 
 
 const WhatsAppReport: React.FC = () => {
+    const {uuid} = useParams<{uuid: string}>();
 
     const [activeTab, setActiveTab] = useState<number>(1);
     const [selectedTemplate, setSelectedTemplate] = useState('event_downloadapp');
     const [allData, setAllData] = useState([]);
     const { user, loading } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID } = useSelector((state: RootState) => (state.events));
+    // const { currentEventUUID } = useSelector((state: RootState) => (state.events));
     const [totalMessage, setTotalMessage] = useState(0);
     const [totalDelivered, setTotalDelivered] = useState(0);
     const [totalRead, setTotalRead] = useState(0);
@@ -47,7 +49,7 @@ const WhatsAppReport: React.FC = () => {
 
         axios.post("https://app.klout.club/api/organiser/v1/whatsapp/all-recipt",
             {
-                eventUUID: currentEventUUID,
+                eventUUID: uuid,
                 templateName: selectedTemplate,
                 userID,
             },

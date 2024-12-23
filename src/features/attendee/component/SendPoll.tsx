@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { RiWhatsappFill } from "react-icons/ri";
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 const SendPoll: React.FC = () => {
+    const { uuid } = useParams<{ uuid: string }>();
     const { token, user } = useSelector((state: RootState) => state.auth);
     // const [selectedRoles, setSelectedRoles] = useState<string[]>(['all', 'speaker', 'delegate', 'sponsor', 'moderator', 'panelist']);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | null>("whatsapp");  // Default to whatsapp only
@@ -40,7 +41,9 @@ const SendPoll: React.FC = () => {
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
 
-    const { currentEvent } = useSelector((state: RootState) => state.events);
+    const { events } = useSelector((state: RootState) => state.events);
+
+    const currentEvent = events.find((event) => event.uuid === uuid);
 
     // Handle method selection (WhatsApp only now)
     const handleMethodChange = () => {
@@ -77,7 +80,7 @@ const SendPoll: React.FC = () => {
     // };
 
     const handleSubmit = () => {
-        if(!link) {
+        if (!link) {
             Swal.fire({
                 icon: 'error',
                 title: 'Validation Error',
@@ -175,7 +178,14 @@ const SendPoll: React.FC = () => {
             )}
             <div className='flex justify-between items-baseline'>
                 <HeadingH2 title='Send WhatsApp to Attendee' />
-                <Link to="/events/all-attendee" onClick={()=>dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                <Link
+                    to="#"
+                    onClick={() => {
+                        window.history.back(); // Go back to the previous page
+                        dispatch(heading("All Attendees")); // Optional: You can still dispatch the action if needed
+                    }}
+                    className="btn btn-error text-white btn-sm"
+                >
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>
             </div>
@@ -316,7 +326,7 @@ const SendPoll: React.FC = () => {
 
                         <h3 className='text-xl mt-2 font-medium'>{currentEvent?.title}</h3>
                         <div className='grid place-content-end mt-2'>
-                            <Link to={"/events/view-event/"} onClick={() => { dispatch(eventUUID(currentEvent?.uuid)); dispatch(heading('View Event')); }} className="btn btn-error text-white btn-sm ">
+                            <Link to={`/events/view-event/${uuid}`} onClick={() => { dispatch(eventUUID(currentEvent?.uuid)); dispatch(heading('View Event')); }} className="btn btn-error text-white btn-sm ">
                                 View Event <IoMdArrowRoundBack size={20} className='rotate-180' />
                             </Link>
                         </div>

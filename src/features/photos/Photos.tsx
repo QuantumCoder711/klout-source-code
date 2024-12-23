@@ -547,7 +547,7 @@ import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import HeadingH2 from "../../component/HeadingH2";
 import { heading } from "../heading/headingSlice";
 import { useDispatch } from "react-redux";
@@ -564,13 +564,17 @@ const CHUNK_SIZE = 5 * 1024 * 1024; // Example chunk size: 1MB
 // }
 
 const Photos: React.FC = () => {
+    const { uuid } = useParams<{ uuid: string }>();
     const photApiBaseUrl = import.meta.env.VITE_PHOTO_API_URL;
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
 
     const { user } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID } = useSelector((state: RootState) => (state.events));
-    const { currentEvent } = useSelector((state: RootState) => (state.events));
+    // const { currentEventUUID } = useSelector((state: RootState) => (state.events));
+    const { events } = useSelector((state: RootState) => (state.events));
+
+    const currentEvent = events.find((event) => event.uuid === uuid);
+
     const [eventZip, setEventZip] = useState<File[]>([]);
     const [profileZip, setProfileZip] = useState<File[]>([]);
     const [email,] = useState<string>(user?.email || "");
@@ -631,8 +635,8 @@ const Photos: React.FC = () => {
                 formData.append("totalChunks", totalChunks.toString());
                 formData.append("fieldName", fieldName);
                 formData.append("email", email);
-                if (currentEventUUID) {
-                    formData.append("event_uuid", currentEventUUID);
+                if (uuid) {
+                    formData.append("event_uuid", uuid);
                 }
 
                 const xhr = new XMLHttpRequest();
@@ -736,7 +740,7 @@ const Photos: React.FC = () => {
             const response = await axios.post(
                 `${apiBaseUrl}/api/get-event-attendee-numbers`,
                 {
-                    event_uuid: currentEventUUID,
+                    event_uuid: uuid,
                 },
                 {
                     headers: {
@@ -774,18 +778,19 @@ const Photos: React.FC = () => {
     }
 
     const handleImageRecognition = () => {
-        fetch(`${photApiBaseUrl}/group-photo`, {
+
+        fetch(`https://app.klout.club/api/organiser/v1/event-checkin/grouping-photo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                event_uuid: currentEventUUID
+                eventUUID: uuid
             })
         })
             .then(response => response.json())
             .then(data => {
-                if (data.status === "success") {
+                if (data.status === true) {
                     // Show success alert using SweetAlert2
                     Swal.fire({
                         icon: 'success',
@@ -814,9 +819,6 @@ const Photos: React.FC = () => {
                 console.error('Error:', error);
             });
     };
-    
-
-
 
     return (
         <div className="h-full w-full">
@@ -824,7 +826,7 @@ const Photos: React.FC = () => {
             <div className="mb-4 flex justify-between items-center">
                 <HeadingH2 title={currentEvent?.title} />
                 <div className='flex items-center gap-3'>
-                    <Link to="/all-photos/" onClick={() => dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
+                    <Link to="/all-photos/" onClick={() => dispatch(heading("All Photos"))} className="btn btn-error text-white btn-sm">
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>

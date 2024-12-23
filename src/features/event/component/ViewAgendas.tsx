@@ -36,7 +36,11 @@ type AgendaType = {
   position: number;
 };
 
-const ViewAgendas: React.FC = () => {
+interface ViewAgendasProps {
+  uuid: string | undefined;
+}
+
+const ViewAgendas: React.FC<ViewAgendasProps> = ({ uuid }) => {
   const dispatch = useDispatch<AppDispatch>();
   const dummyImage = "https://via.placeholder.com/150";
 
@@ -46,7 +50,6 @@ const ViewAgendas: React.FC = () => {
   const [filterTitle, setFilterTitle] = useState(""); // State for the filter input
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-  const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { events, loading } = useSelector((state: RootState) => state.events);
   const [eventId, setEventId] = useState<number>();
 
@@ -54,7 +57,7 @@ const ViewAgendas: React.FC = () => {
 
   const [button, setButton] = useState<boolean>(false);
 
-  const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
+  const currentEvent = events.find((event) => event.uuid === uuid); // Use find() to directly get the current event
 
   // console.log("Current Event is: ",currentEvent?.id);
 
@@ -248,10 +251,10 @@ const ViewAgendas: React.FC = () => {
     }
   };
 
-  const showImage = (imgBase:string, agendaTitle:string, agendaDescription:string, eventDate:string, startTime:string, endTime:string, startMinuteTime:string, endTimeType:string, endMinuteTime:string, position:number, startTimeType:string) => {
+  const showImage = (imgBase: string, agendaTitle: string, agendaDescription: string, eventDate: string, startTime: string, endTime: string, startMinuteTime: string, endTimeType: string, endMinuteTime: string, position: number, startTimeType: string) => {
     const agendaImage = `${apiBaseUrl}/${imgBase}`;
 
-    if(imgBase === " ") {
+    if (imgBase === " ") {
       imgBase = "";
     }
 
@@ -290,7 +293,14 @@ const ViewAgendas: React.FC = () => {
       <div className='flex justify-between items-center'>
         <HeadingH2 title={currentEvent.title} />
         <div className='flex items-center gap-3'>
-          <Link to="/events/" onClick={() => dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
+          <Link
+            to="#"
+            onClick={() => {
+              window.history.back(); // Go back to the previous page
+              // dispatch(heading("All Events")); // Optional: You can still dispatch the action if needed
+            }}
+            className="btn btn-error text-white btn-sm"
+          >
             <IoMdArrowRoundBack size={20} /> Go Back
           </Link>
         </div>
@@ -407,10 +417,10 @@ const ViewAgendas: React.FC = () => {
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' + data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.position}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-3">
-                      <span onClick={()=>showImage(data.image_path, data.title, data.description, data.event_date, data.start_time, data.end_time, data.start_minute_time, data.end_time_type, data.end_minute_time, data.position, data.start_time_type)} className='w-6 h-6 p-1 cursor-pointer bg-zinc-100 hover:bg-zinc-200 rounded-full grid place-content-center'>
-                        <FaEye className='text-black/70'/>
+                      <span onClick={() => showImage(data.image_path, data.title, data.description, data.event_date, data.start_time, data.end_time, data.start_minute_time, data.end_time_type, data.end_minute_time, data.position, data.start_time_type)} className='w-6 h-6 p-1 cursor-pointer bg-zinc-100 hover:bg-zinc-200 rounded-full grid place-content-center'>
+                        <FaEye className='text-black/70' />
                       </span>
-                      <Link to={`/events/edit-agenda`} onClick={() => { dispatch(agendaUUID(data.uuid)); dispatch(heading("Edit Agenda")) }} className="text-blue-500 hover:text-blue-700">
+                      <Link to={`/events/edit-agenda/${data.uuid}/${currentEvent.id}`} onClick={() => { dispatch(agendaUUID(data.uuid)); dispatch(heading("Edit Agenda")) }} className="text-blue-500 hover:text-blue-700">
                         <FaEdit size={20} />
                       </Link>
                       <button onClick={() => deleteAgenda(data.uuid)} className="text-red-500 hover:text-red-700">

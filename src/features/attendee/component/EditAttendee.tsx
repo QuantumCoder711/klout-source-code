@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TiArrowRight } from 'react-icons/ti';
 import Loader from '../../../component/Loader';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // Define the form data type
 type FormInputType = {
@@ -38,6 +38,8 @@ type ApiType = {
 
 
 const EditAttendee = () => {
+  const { uuid, attendee_uuid } = useParams<{ uuid: string, attendee_uuid: string }>();
+
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const dummyImage = "https://via.placeholder.com/150";
 
@@ -46,7 +48,9 @@ const EditAttendee = () => {
   const { token } = useSelector((state: RootState) => (state.auth));
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [attendeeImage, setAttendeeImage] = useState<string>(dummyImage);
-  const { currentEvent } = useSelector((state: RootState) => (state.events));
+  const { events } = useSelector((state: RootState) => (state.events));
+
+  const currentEvent = events.find((event) => event.uuid === uuid);
   // console.log(currentEvent);
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -62,9 +66,13 @@ const EditAttendee = () => {
 
   const [status, setStatus] = useState<number | string>();
 
-  const { currentAttendeeUUID, loading } = useSelector((state: RootState) => state.attendee);
+  const { allAttendees, loading } = useSelector((state: RootState) => state.attendee);
 
-  // console.log(currentAttendeeUUID);
+  const attendee = allAttendees.find((attendee:any)=>attendee.uuid === attendee);
+
+  // console.log(allAttendees);
+
+  // console.log(attendee);
 
   useEffect(() => {
     axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
@@ -78,7 +86,7 @@ const EditAttendee = () => {
     // axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
     // axios.get(`${apiBaseUrl}/api/get-industries`).then(res => setIndustries(res.data.data));
 
-    axios.post(`${apiBaseUrl}/api/attendees/${currentAttendeeUUID}`, {}, {
+    axios.post(`${apiBaseUrl}/api/attendees/${attendee_uuid}`, {}, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -190,7 +198,7 @@ const EditAttendee = () => {
     console.log("Form Data is: ", formData);
 
     axios
-      .post(`${apiBaseUrl}/api/attendees/${currentAttendeeUUID}`, formData, {
+      .post(`${apiBaseUrl}/api/attendees/${attendee_uuid}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${token}`

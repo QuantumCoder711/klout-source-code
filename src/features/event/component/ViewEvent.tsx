@@ -8,40 +8,54 @@ import { IoMdArrowRoundBack } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { heading } from '../../heading/headingSlice';
 
-const ViewEvent: React.FC = () => {
-    const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+interface ViewEventProps {
+    uuid: string | undefined;
+}
 
-    type eventType = {
-        title: string,
-        image: string,
-        description: string,
-        qr_code: string,
-        event_start_date: string,
-        event_end_date: string,
-        start_time: string,
-        start_minute_time: string,
-        start_time_type: string,
-        end_time: string,
-        end_minute_time: string,
-        end_time_type: string,
-        event_venue_name: string,
-        event_venue_address_1: string,
-        google_map_link: string
-    }
+type eventType = {
+    id: number,
+    title: string,
+    uuid: string,
+    image: string,
+    description: string,
+    qr_code: string,
+    event_start_date: string,
+    event_end_date: string,
+    start_time: string,
+    start_minute_time: string,
+    start_time_type: string,
+    end_time: string,
+    end_minute_time: string,
+    end_time_type: string,
+    event_venue_name: string,
+    event_venue_address_1: string,
+    google_map_link: string
+}
+
+const ViewEvent: React.FC<ViewEventProps> = ({ uuid }) => {
+    console.log("The id is: ", uuid);
+    const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useAppDispatch();
 
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEvent, currentEventUUID, loading } = useSelector((state: RootState) => ({
+    const { currentEvent, loading, allEvent } = useSelector((state: RootState) => ({
         currentEvent: state.events.currentEvent as eventType,
-        currentEventUUID: state.events.currentEventUUID,
-        loading: state.events.loading
+        loading: state.events.loading,
+        allEvent: state.events.events
     }));
 
     useEffect(() => {
-        if (token && currentEventUUID) {
-            dispatch(fetchExistingEvent({ token, eventuuid: currentEventUUID }));
+
+        const event = allEvent.find((event: eventType) => {
+            return uuid === event.uuid;
+        });
+
+        console.log("The current event is: ", event);
+
+        if (token && event) {
+            dispatch(fetchExistingEvent({ token, eventuuid: event.uuid }));
         }
-    }, [dispatch, token, currentEventUUID]);
+    }, [dispatch, token]);
 
     // If loading, show the Loader component
     if (loading) {
@@ -54,9 +68,17 @@ const ViewEvent: React.FC = () => {
             <div className="mb-4 flex justify-between items-center">
                 <HeadingH2 title={currentEvent.title} />
                 <div className='flex items-center gap-3'>
-                    <Link to="/events/" onClick={() => dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
+                    <Link
+                        to="#"
+                        onClick={() => {
+                            window.history.back(); // Go back to the previous page
+                            dispatch(heading("All Events")); // Optional: You can still dispatch the action if needed
+                        }}
+                        className="btn btn-error text-white btn-sm"
+                    >
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
+
                 </div>
             </div>
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiChevronLeft, TiChevronRight } from "react-icons/ti";
 import { FaDownload } from 'react-icons/fa';
@@ -44,18 +44,21 @@ interface PendingRequestType {
 }
 
 const PendingUserRequest: React.FC = () => {
-
+    const { uuid } = useParams<{ uuid: string }>();
     const dispatch = useDispatch<AppDispatch>();
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID, pendingRequests, user_id, loading, currentEvent } = useSelector((state: RootState) => ({
-        currentEventUUID: state.events.currentEventUUID,
+    const { pendingRequests, user_id, loading, events } = useSelector((state: RootState) => ({
         pendingRequests: state.events.pendingRequests,
         user_id: state.auth.user?.id,
         loading: state.events.loading,
-        currentEvent: state.events.currentEvent,
+        events: state.events.events,
     }));
+
+    const currentEvent = events.find((event) => event.uuid === uuid);
+
+    const currentEventUUID = currentEvent?.uuid;
 
     const event_id: string | undefined = currentEvent?.uuid;
 
@@ -171,52 +174,6 @@ const PendingUserRequest: React.FC = () => {
         });
     };
 
-    // const deleteAttendee = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
-    //     e.preventDefault();
-
-    //     const thisClicked = e.currentTarget;
-
-    //     // Assuming these values are available in the scope
-    //     // const token = 'yourAuthToken'; // Replace with actual auth token
-
-    //     Swal.fire({
-    //         title: "Are you sure?",
-    //         text: "You won't be able to revert this!",
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#3085d6",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: "Yes, delete it!",
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             axios.delete(`/api/attendees/${id}`, {
-    //                 headers: {
-    //                     "Authorization": `Bearer ${token}`,
-    //                 }
-    //             })
-    //                 .then(function (res) {
-    //                     Swal.fire({
-    //                         icon: "success",
-    //                         title: res.data.message,
-    //                         showConfirmButton: false,
-    //                         // timer: 1500,
-    //                     });
-    //                     setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
-    //                     // thisClicked.closest("tr")?.remove(); // Safely remove the row
-    //                 })
-    //                 .catch(function (error) {
-    //                     Swal.fire({
-    //                         icon: "error",
-    //                         title: "An Error Occurred!",
-    //                         showConfirmButton: false,
-    //                         timer: 1500,
-    //                     });
-    //                     console.error("Error during delete attendee:", error);
-    //                 });
-    //         }
-    //     });
-    // };
-
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 10;  // Display 10 rows per page
@@ -317,7 +274,14 @@ const PendingUserRequest: React.FC = () => {
             <div className='flex justify-between items-center'>
                 <HeadingH2 title={currentEvent?.title} />
                 <div className='flex items-center gap-3'>
-                    <Link to="/events/all-attendee" onClick={() => dispatch(heading("All Attendee"))} className="btn btn-error text-white btn-sm">
+                    <Link
+                        to="#"
+                        onClick={() => {
+                            window.history.back(); // Go back to the previous page
+                            dispatch(heading("All Attendees")); // Optional: You can still dispatch the action if needed
+                        }}
+                        className="btn btn-error text-white btn-sm"
+                    >
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>

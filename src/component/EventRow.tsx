@@ -26,7 +26,7 @@ interface EventRowProps {
     end_minute_time?: string,
     end_time_type?: string,
     date: string,
-    id?: number,
+    id: number,
 }
 
 const EventRow: React.FC<EventRowProps> = (props) => {
@@ -158,18 +158,18 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
             {/* Links */}
             <div className='min-w-[110px]'>
-                <Link to='/events/view-event/' className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
+                <Link to={`/events/view-event/${props.uuid}`} className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('View Event'));
                 }}>View Event</Link> <br />
-                <button className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
-                    dispatch(eventUUID(props.uuid)); dispatch(heading('Edit Event')); setTimeout(() => {
-                        navigate('/events/edit-event')
-                    }, 500);
-                }} >Edit Event</button> <br />
-                <Link to='/events/all-attendee' className="text-blue-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
+                <Link 
+                    to={`/events/edit-event/${props.uuid}`}
+                className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('Edit Event'));
+                }} >Edit Event</Link> <br />
+                <Link to={`/events/all-attendee/${props.uuid}`} className="text-blue-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('All Attendee'));
                 }}>All Attendees</Link> <br />
-                <Link to={"/events/view-agendas"} className="text-yellow-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
+                <Link to={`/events/view-agendas/${props.uuid}`} className="text-yellow-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
                     dispatch(heading('View Agendas')); dispatch(eventUUID(props.uuid));
                 }} >View Agendas</Link> <br />
 

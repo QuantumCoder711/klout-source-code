@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../../redux/store';
 import Swal from 'sweetalert2';
 import Loader from '../../../component/Loader';
@@ -27,7 +27,7 @@ type formInputType = {
 };
 
 const EditAgenda: React.FC = () => {
-
+    const { agenda_uuid, id } = useParams<{ agenda_uuid: string, id: string }>();
     const dummyImage = "https://via.placeholder.com/150";
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
@@ -39,19 +39,18 @@ const EditAgenda: React.FC = () => {
 
     const { token } = useSelector((state: RootState) => (state.auth));
 
-    const { currentEventUUID } = useSelector((state: RootState) => state.events);
-    const { currentAgendaUUID } = useSelector((state: RootState) => state.events);
+    // const { currentAgendaUUID } = useSelector((state: RootState) => state.events);
     const { events, loading } = useSelector((state: RootState) => state.events);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-    const currentEvent = events.find((event) => event.uuid === currentEventUUID); // Use find() to directly get the current event
+    const currentEvent = events.find((event) => event.uuid === id); // Use find() to directly get the current event
 
     useEffect(() => {
-        if (currentAgendaUUID) {
-            axios.get(`${apiBaseUrl}/api/agendas/${currentAgendaUUID}`)
+        if (agenda_uuid) {
+            axios.get(`${apiBaseUrl}/api/agendas/${agenda_uuid}`)
                 .then((res) => {
                     if (res.data) {
-                        const agendaData:formInputType = res.data.data;
+                        const agendaData: formInputType = res.data.data;
                         setAgendaData(agendaData);
                         console.log(agendaData);
 
@@ -75,7 +74,7 @@ const EditAgenda: React.FC = () => {
                     }
                 });
         }
-    }, [currentAgendaUUID, setValue]);
+    }, [agenda_uuid, setValue]);
 
     console.log(agenda);
 
@@ -133,7 +132,7 @@ const EditAgenda: React.FC = () => {
 
             // Step 2: Make the API request to update the agenda
             try {
-                const res = await axios.post(`${apiBaseUrl}/api/agendas/${currentAgendaUUID}`, formData, {
+                const res = await axios.post(`${apiBaseUrl}/api/agendas/${agenda_uuid}`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                         'Authorization': `Bearer ${token}`
@@ -175,7 +174,14 @@ const EditAgenda: React.FC = () => {
             <div className='flex justify-between items-center'>
                 <h2 className='text-black text-2xl font-semibold'>Edit Agenda</h2>
                 <div className='flex items-center gap-3'>
-                    <Link to="/events/view-agendas" onClick={() => dispatch(heading("View Agendas"))} className="btn btn-error text-white btn-sm">
+                    <Link
+                        to="#"
+                        onClick={() => {
+                            window.history.back(); // Go back to the previous page
+                            dispatch(heading("View Agendas")); // Optional: You can still dispatch the action if needed
+                        }}
+                        className="btn btn-error text-white btn-sm"
+                    >
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>

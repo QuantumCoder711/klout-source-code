@@ -37,7 +37,7 @@ const PhotoCard: React.FC<PhotoCardProps> = (props) => {
                 <div className="mt-2 flex items-center gap-2 rounded-bl-lg rounded-br-lg">
 
                     {/* Whatsapp Button */}
-                    <Link to={`/all-photos/photo`} onClick={()=>{dispatch(eventUUID(props.uuid)); dispatch(heading("Photo"))}} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-sky-500 text-white text-xl grid place-content-center'>
+                    <Link to={`/all-photos/photo/${props.uuid}`} onClick={()=>{dispatch(eventUUID(props.uuid)); dispatch(heading("Photo"))}} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-sky-500 text-white text-xl grid place-content-center'>
                         <MdPhotoSizeSelectActual />
                     </Link>
 
