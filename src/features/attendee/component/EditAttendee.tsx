@@ -66,7 +66,7 @@ const EditAttendee = () => {
 
   const [status, setStatus] = useState<number | string>();
 
-  const { allAttendees, loading } = useSelector((state: RootState) => state.attendee);
+  const { loading } = useSelector((state: RootState) => state.attendee);
 
   useEffect(() => {
     axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
