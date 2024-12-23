@@ -67,7 +67,6 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
     const { token } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch();
-    const navigate = useNavigate();
 
     const generatePDF = (uuid: string) => {
         axios.get(`${apiBaseUrl}/api/generatePDF/${uuid}`)

@@ -5,7 +5,6 @@ import { RootState, useAppDispatch } from '../../../redux/store';
 import { allEventAttendee } from '../../event/eventSlice';
 import { FaEdit, FaFileExcel, FaEye, FaUserFriends, FaUserClock, FaPoll } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
-import { attendeeUUID } from '../attendeeSlice';
 import { Link } from 'react-router-dom';
 import HeadingH2 from '../../../component/HeadingH2';
 import * as XLSX from 'xlsx';  // Import the xlsx library

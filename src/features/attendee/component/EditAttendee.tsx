@@ -68,12 +68,6 @@ const EditAttendee = () => {
 
   const { allAttendees, loading } = useSelector((state: RootState) => state.attendee);
 
-  const attendee = allAttendees.find((attendee:any)=>attendee.uuid === attendee);
-
-  // console.log(allAttendees);
-
-  // console.log(attendee);
-
   useEffect(() => {
     axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
     axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));

@@ -38,30 +38,6 @@ type formInputType = {
     _method: string;
 };
 
-type eventType = {
-    title: string,
-    image: string,
-    uuid: string,
-    description: string,
-    qr_code: string,
-    event_start_date: string,
-    event_end_date: string,
-    start_time: string,
-    start_minute_time: string,
-    start_time_type: string,
-    end_time: string,
-    end_minute_time: string,
-    end_time_type: string,
-    event_venue_name: string,
-    event_venue_address_1: string,
-    google_map_link: string,
-    video_url: string;
-    country: string,
-    state: string,
-    city: string,
-    pincode: string;
-}
-
 interface EditEventProps {
     uuid?: string;
 }
