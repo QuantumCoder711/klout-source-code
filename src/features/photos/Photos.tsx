@@ -1,548 +1,3 @@
-// import React, { useState, FormEvent, ChangeEvent } from "react";
-// import axios from "axios";
-// import { TiArrowRight } from "react-icons/ti";
-// import { useSelector } from "react-redux";
-// import { AppDispatch, RootState } from "../../redux/store";
-// import { Link } from "react-router-dom";
-// import HeadingH2 from "../../component/HeadingH2";
-// import { heading } from "../heading/headingSlice";
-// import { useDispatch } from "react-redux";
-// import { IoMdArrowRoundBack } from "react-icons/io";
-
-// // Define constants or types for chunk size and apiUrl
-// const CHUNK_SIZE = 5 * 1024 * 1024; // Example chunk size: 1MB
-
-// interface ApiResponse {
-//     download_link: string;
-// }
-
-// const Photos: React.FC = () => {
-//     const photApiBaseUrl = import.meta.env.VITE_PHOTO_API_URL;
-//     const dispatch = useDispatch<AppDispatch>();
-
-//     const { user } = useSelector((state: RootState) => state.auth);
-//     const { currentEventUUID } = useSelector((state: RootState) => (state.events));
-//     const {currentEvent} = useSelector((state: RootState)=>(state.events));
-//     const [eventZip, setEventZip] = useState<File[]>([]);
-//     const [profileZip, setProfileZip] = useState<File[]>([]);
-//     const [email,] = useState<string>(user?.email || "");
-//     const [error, setError] = useState<string>("");
-//     const [loading, setLoading] = useState<boolean>(false);
-//     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-//     const [apiResponse, setApiResponse] = useState<string>("");
-//     const [selectedOption, setSelectedOption] = useState<string>("2");
-//     const [downloadUrl, setDownloadUrl] = useState<string>("");
-
-
-//     // Event handlers with correct types
-//     const handleOptionChange = (e: ChangeEvent<HTMLSelectElement>): void => setSelectedOption(e.target.value);
-//     const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
-//         if (e.target.files) {
-//             setEventZip(Array.from(e.target.files));
-//         }
-//     };
-//     const handleProfileFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
-//         if (e.target.files) {
-//             setProfileZip(Array.from(e.target.files));
-//         }
-//     };
-//     // const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => setEmail(e.target.value);
-
-//     const validateEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-//     const uploadChunks = async (file: File, fieldName: string): Promise<void> => {
-//         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
-//         for (let i = 0; i < totalChunks; i++) {
-//             const start = i * CHUNK_SIZE;
-//             const end = Math.min(start + CHUNK_SIZE, file.size);
-//             const chunk = file.slice(start, end);
-
-//             const formData = new FormData();
-//             formData.append("fileChunk", chunk);
-//             formData.append("fileName", file.name);
-//             formData.append("chunkIndex", i.toString());
-//             formData.append("totalChunks", totalChunks.toString());
-//             formData.append("fieldName", fieldName);
-//             formData.append("email", email);
-//             if (currentEventUUID) {
-//                 formData.append("event_uuid", currentEventUUID);
-//             }
-
-//             console.log("The Form Data is: ", formData);
-
-//             try {
-//                 await axios.post(`${photApiBaseUrl}/upload`, formData, {
-//                     headers: { "Content-Type": "multipart/form-data" }
-//                 });
-//             } catch (error) {
-//                 console.error(`Error uploading chunk ${i + 1}/${totalChunks} for ${file.name}`, error);
-//                 throw error;
-//             }
-//         }
-//     };
-
-//     const handleSubmit = async (e: FormEvent): Promise<void> => {
-//         e.preventDefault();
-//         setLoading(true);
-//         setIsSubmitting(true);
-//         setApiResponse("");
-//         setError("");
-//         setDownloadUrl("");
-
-//         if (!validateEmail(email)) {
-//             setError("Please enter a valid email address.");
-//             setLoading(false);
-//             setIsSubmitting(false);
-//             return;
-//         }
-
-//         try {
-//             // Upload eventZip files
-//             for (const file of eventZip) {
-//                 await uploadChunks(file, "event_zip");
-//             }
-
-//             // Upload profileZip files
-//             for (const file of profileZip) {
-//                 await uploadChunks(file, "profile_zip");
-//             }
-
-//             // Submit additional data after all chunks are uploaded
-//             const response = await axios.post<ApiResponse>(`${photApiBaseUrl}/finalize-upload`, {
-//                 email,
-//                 send_email_or_url: selectedOption,
-//                 event_uuid: currentEventUUID
-//             });
-
-//             setLoading(false);
-//             setIsSubmitting(false);
-//             if (selectedOption === "1") {
-//                 setApiResponse(`Email sent to ${email} with download link.`);
-//             } else {
-//                 setDownloadUrl(response.data.download_link);
-//                 setApiResponse("");
-//             }
-//         } catch (error) {
-//             console.error("Error uploading files:", error);
-//             setLoading(false);
-//             setIsSubmitting(false);
-//             setApiResponse("Error, try again later!");
-//         }
-//     };
-
-//     return (
-//         <div className="h-full w-full">
-//             {/* Heading */}
-//             <div className="mb-4 flex justify-between items-center">
-//                 <HeadingH2 title={currentEvent?.title} />
-//                 <div className='flex items-center gap-3'>
-//                     <Link to="/all-photos/" onClick={() => dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
-//                         <IoMdArrowRoundBack size={20} /> Go Back
-//                     </Link>
-//                 </div>
-//             </div>
-
-//             <div className="mx-auto w-full h-full grid place-content-center">
-//                 <form onSubmit={handleSubmit} className="flex flex-col max-w-3xl gap-5 bg-white p-10 rounded-md shadow-md">
-
-//                     <label htmlFor="eventImages" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold text-green-700 flex justify-between items-center">
-//                             Event Zip Files: <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' />
-//                         </span>
-//                         <input
-//                             id="eventImages"
-//                             type="file"
-//                             multiple
-//                             required
-//                             className="grow"
-//                             onChange={handleFileChange}
-//                         />
-//                     </label>
-//                     {/* <div>
-//                     <label>Profile ZIP Files:</label>
-//                     <input type="file" multiple required onChange={handleProfileFileChange} />
-//                 </div> */}
-//                     <label htmlFor="profileImages" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold text-green-700 flex justify-between items-center">
-//                             Profile Zip Files: <span className="text-red-600 ml-1">*</span>  &nbsp; <TiArrowRight className='mt-1' />
-//                         </span>
-//                         <input
-//                             id="profileImages"
-//                             type="file"
-//                             multiple
-//                             required
-//                             className="grow"
-//                             onChange={handleProfileFileChange}
-//                         />
-//                     </label>
-//                     {/* <div>
-//                     <label>Email:</label>
-//                     <input type="email" value={email} required onChange={handleEmailChange} />
-//                 </div> */}
-
-//                     <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold text-green-700 flex justify-between items-center">Email <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-//                         <input id="email_id" value={email} required readOnly type="email" className="grow" />
-//                     </label>
-//                     {/* <div>
-//                     <label>Send Option:</label>
-//                     <select value={selectedOption} required onChange={handleOptionChange}>
-//                         <option value="2">Provide Download Link</option>
-//                     </select>
-//                 </div> */}
-
-//                     <label htmlFor="option" className="input input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold min-w-fit text-green-700 flex justify-between items-center">Send Option: <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-//                         <select className="w-full h-full border-none outline-none" value={selectedOption} required onChange={handleOptionChange}>
-//                             <option value="2" className="border-none outline-none">Provide Download Link</option>
-//                         </select>
-//                     </label>
-//                     <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-md bg-klt_primary-500 text-white mx-auto w-fit">
-//                         {loading ? "Uploading..." : "Submit"}
-//                     </button>
-//                     {error && <p style={{ color: "red" }}>{error}</p>}
-//                     {apiResponse && <p>{apiResponse}</p>}
-//                     {downloadUrl && (
-//                         <div className="apiResponseMessage">
-//                             <a
-//                                 href={downloadUrl}
-//                                 target="_blank"
-//                                 rel="noopener noreferrer"
-//                             >
-//                                 Download file
-//                             </a>
-//                         </div>
-//                     )}
-//                 </form>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Photos;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useState, FormEvent, ChangeEvent } from "react";
-// import { TiArrowRight } from "react-icons/ti";
-// import { useSelector } from "react-redux";
-// import { AppDispatch, RootState } from "../../redux/store";
-// import { Link } from "react-router-dom";
-// import HeadingH2 from "../../component/HeadingH2";
-// import { heading } from "../heading/headingSlice";
-// import { useDispatch } from "react-redux";
-// import { IoMdArrowRoundBack } from "react-icons/io";
-
-// // Define constants or types for chunk size and apiUrl
-// const CHUNK_SIZE = 5 * 1024 * 1024; // Example chunk size: 1MB
-
-// interface ApiResponse {
-//     download_link: string;
-// }
-
-// const Photos: React.FC = () => {
-//     const photApiBaseUrl = import.meta.env.VITE_PHOTO_API_URL;
-//     const dispatch = useDispatch<AppDispatch>();
-
-//     const { user } = useSelector((state: RootState) => state.auth);
-//     const { currentEventUUID } = useSelector((state: RootState) => (state.events));
-//     const { currentEvent } = useSelector((state: RootState) => (state.events));
-//     const [eventZip, setEventZip] = useState<File[]>([]);
-//     const [profileZip, setProfileZip] = useState<File[]>([]);
-//     const [email,] = useState<string>(user?.email || "");
-//     const [error, setError] = useState<string>(""); 
-//     const [loading, setLoading] = useState<boolean>(false);
-//     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-//     const [apiResponse, setApiResponse] = useState<string>(""); 
-//     const [selectedOption, setSelectedOption] = useState<string>("2");
-//     const [downloadUrl, setDownloadUrl] = useState<string>("");
-
-//     const handleOptionChange = (e: ChangeEvent<HTMLSelectElement>): void => setSelectedOption(e.target.value);
-//     const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
-//         if (e.target.files) {
-//             setEventZip(Array.from(e.target.files));
-//         }
-//     };
-//     const handleProfileFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
-//         if (e.target.files) {
-//             setProfileZip(Array.from(e.target.files));
-//         }
-//     };
-
-//     const validateEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-//     const uploadChunks = (file: File, fieldName: string): Promise<void> => {
-//         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
-//         return new Promise((resolve, reject) => {
-//             let chunkIndex = 0;
-
-//             const uploadNextChunk = () => {
-//                 if (chunkIndex >= totalChunks) {
-//                     resolve();
-//                     return;
-//                 }
-
-//                 const start = chunkIndex * CHUNK_SIZE;
-//                 const end = Math.min(start + CHUNK_SIZE, file.size);
-//                 const chunk = file.slice(start, end);
-
-//                 const formData = new FormData();
-//                 formData.append("fileChunk", chunk);
-//                 formData.append("fileName", file.name);
-//                 formData.append("chunkIndex", chunkIndex.toString());
-//                 formData.append("totalChunks", totalChunks.toString());
-//                 formData.append("fieldName", fieldName);
-//                 formData.append("email", email);
-//                 if (currentEventUUID) {
-//                     formData.append("event_uuid", currentEventUUID);
-//                 }
-
-//                 const xhr = new XMLHttpRequest();
-//                 xhr.open("POST", `${photApiBaseUrl}/upload`, true);
-
-//                 xhr.onreadystatechange = () => {
-//                     if (xhr.readyState === 4) {
-//                         if (xhr.status === 200) {
-//                             chunkIndex++;
-//                             uploadNextChunk();
-//                         } else {
-//                             reject(new Error(`Error uploading chunk ${chunkIndex + 1}/${totalChunks} for ${file.name}`));
-//                         }
-//                     }
-//                 };
-
-//                 xhr.send(formData);
-//             };
-
-//             uploadNextChunk();
-//         });
-//     };
-
-//     const handleSubmit = async (e: FormEvent): Promise<void> => {
-//         e.preventDefault();
-//         setLoading(true);
-//         setIsSubmitting(true);
-//         setApiResponse("");
-//         setError("");
-//         setDownloadUrl("");
-
-//         if (!validateEmail(email)) {
-//             setError("Please enter a valid email address.");
-//             setLoading(false);
-//             setIsSubmitting(false);
-//             return;
-//         }
-
-//         try {
-//             // Upload eventZip files
-//             for (const file of eventZip) {
-//                 await uploadChunks(file, "event_zip");
-//             }
-
-//             // Upload profileZip files
-//             for (const file of profileZip) {
-//                 await uploadChunks(file, "profile_zip");
-//             }
-
-//             // Finalize the upload and get the download link
-//             const xhr = new XMLHttpRequest();
-//             xhr.open("POST", `${photApiBaseUrl}/finalize-upload`, true);
-//             xhr.setRequestHeader("Content-Type", "application/json");
-
-//             xhr.onreadystatechange = () => {
-//                 if (xhr.readyState === 4) {
-//                     setLoading(false);
-//                     setIsSubmitting(false);
-//                     if (xhr.status === 200) {
-//                         const response: ApiResponse = JSON.parse(xhr.responseText);
-//                         if (selectedOption === "1") {
-//                             setApiResponse(`Email sent to ${email} with download link.`);
-//                         } else {
-//                             setDownloadUrl(response.download_link);
-//                             setApiResponse("");
-//                         }
-//                     } else {
-//                         setApiResponse("Error, try again later!");
-//                     }
-//                 }
-//             };
-
-//             const requestBody = JSON.stringify({
-//                 email,
-//                 send_email_or_url: selectedOption,
-//                 event_uuid: currentEventUUID,
-//             });
-
-//             xhr.send(requestBody);
-//         } catch (error) {
-//             console.error("Error uploading files:", error);
-//             setLoading(false);
-//             setIsSubmitting(false);
-//             setApiResponse("Error, try again later!");
-//         }
-//     };
-
-//     return (
-//         <div className="h-full w-full">
-//             {/* Heading */}
-//             <div className="mb-4 flex justify-between items-center">
-//                 <HeadingH2 title={currentEvent?.title} />
-//                 <div className='flex items-center gap-3'>
-//                     <Link to="/all-photos/" onClick={() => dispatch(heading("All Events"))} className="btn btn-error text-white btn-sm">
-//                         <IoMdArrowRoundBack size={20} /> Go Back
-//                     </Link>
-//                 </div>
-//             </div>
-
-//             <div className="mx-auto w-full h-full grid place-content-center">
-//                 <form onSubmit={handleSubmit} className="flex flex-col max-w-3xl gap-5 bg-white p-10 rounded-md shadow-md">
-
-//                     <label htmlFor="eventImages" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold text-green-700 flex justify-between items-center">
-//                             Event Zip Files: <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' />
-//                         </span>
-//                         <input
-//                             id="eventImages"
-//                             type="file"
-//                             multiple
-//                             required
-//                             className="grow"
-//                             onChange={handleFileChange}
-//                         />
-//                     </label>
-
-//                     <label htmlFor="profileImages" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold text-green-700 flex justify-between items-center">
-//                             Profile Zip Files: <span className="text-red-600 ml-1">*</span>  &nbsp; <TiArrowRight className='mt-1' />
-//                         </span>
-//                         <input
-//                             id="profileImages"
-//                             type="file"
-//                             multiple
-//                             required
-//                             className="grow"
-//                             onChange={handleProfileFileChange}
-//                         />
-//                     </label>
-
-//                     <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold text-green-700 flex justify-between items-center">Email <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-//                         <input id="email_id" value={email} required readOnly type="email" className="grow" />
-//                     </label>
-
-//                     <label htmlFor="option" className="input input-bordered bg-white text-black flex items-center gap-2">
-//                         <span className="font-semibold min-w-fit text-green-700 flex justify-between items-center">Send Option: <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-//                         <select className="w-full h-full border-none outline-none" value={selectedOption} required onChange={handleOptionChange}>
-//                             <option value="2" className="border-none outline-none">Provide Download Link</option>
-//                         </select>
-//                     </label>
-//                     <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-md bg-klt_primary-500 text-white mx-auto w-fit">
-//                         {loading ? "Uploading..." : "Submit"}
-//                     </button>
-//                     {error && <p style={{ color: "red" }}>{error}</p>}
-//                     {apiResponse && <p>{apiResponse}</p>}
-//                     {downloadUrl && (
-//                         <div className="apiResponseMessage">
-//                             <a
-//                                 href={downloadUrl}
-//                                 target="_blank"
-//                                 rel="noopener noreferrer"
-//                             >
-//                                 Download file
-//                             </a>
-//                         </div>
-//                     )}
-//                 </form>
-//             </div>
-//         </div>
-//     );
-// };
-
-// export default Photos;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from "react-redux";
@@ -555,13 +10,21 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import { FcOpenedFolder } from "react-icons/fc";
 import axios from "axios";
 import Swal from "sweetalert2";
+import Files from "./Files";
+
+interface Folder {
+    path: string;
+    name: string;
+    id: string;
+}
+
+interface fileData {
+    uuid: string;
+    userId: string;
+}
 
 // Define constants or types for chunk size and apiUrl
 const CHUNK_SIZE = 5 * 1024 * 1024; // Example chunk size: 1MB
-
-// interface ApiResponse {
-//     download_link: string;
-// }
 
 const Photos: React.FC = () => {
     const { uuid } = useParams<{ uuid: string }>();
@@ -586,6 +49,9 @@ const Photos: React.FC = () => {
     const [downloadUrl, setDownloadUrl] = useState<string>("");
 
     const [active, setActive] = useState<1 | 2>(1);
+    const [folders, setFolders] = useState<Folder[]>([]);
+    const [path, setPath] = useState<string>('');
+    const [files, setFiles] = useState<boolean>(false);
     const [uploadsCompleted, setUploadsCompleted] = useState<boolean>(false);
     const [uploadedCount, setUploadedCount] = useState<number>(0);
 
@@ -605,6 +71,22 @@ const Photos: React.FC = () => {
     };
 
     const validateEmail = (email: string): boolean => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    useEffect(() => {
+        axios.post("https://app.klout.club/api/organiser/v1/event-checkin/get-event-photo-folders",
+            {
+                eventUUID: uuid,
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        ).then(res => {
+            console.log("All folders are: ", res.data);
+            setFolders(res.data.folders);
+        })
+    }, []);
 
     const uploadChunks = (file: File, fieldName: string): Promise<void> => {
         const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
@@ -835,13 +317,13 @@ const Photos: React.FC = () => {
             <div className="mx-auto w-full grid place-content-center mt-10">
                 <div className="flex justify-between">
                     <div>
-                        <button onClick={() => setActive(1)} className={`btn ${active === 1 ? "bg-white" : ""} btn-sm rounded-b-none`}>Upload Files</button>
-                        <button onClick={() => setActive(2)} className={`btn ${active === 2 ? "bg-white" : ""} btn-sm rounded-b-none`}>Folders</button>
+                        <button onClick={() => {setActive(1); setFiles(false);}} className={`btn ${active === 1 ? "bg-white" : ""} btn-sm rounded-b-none`}>Upload Files</button>
+                        <button onClick={() => {setActive(2); setFiles(false);}} className={`btn ${active === 2 ? "bg-white" : ""} btn-sm rounded-b-none`}>Folders</button>
                     </div>
                     <button onClick={getAttendeeProfileImage} className="btn btn-sm rounded-b-none btn-accent text-white w-fit">Get Attendee Image Zip</button>
                 </div>
 
-                <div className="max-w-3xl min-w-[48rem] p-10 bg-white rounded-b-md shadow-md">
+                <div className="max-w-3xl min-w-[48rem] relative p-10 bg-white rounded-b-md shadow-md">
                     {active === 1 && <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
                         <label htmlFor="eventImages" className="input w-full input-bordered bg-white text-black flex items-center gap-2">
@@ -924,14 +406,25 @@ const Photos: React.FC = () => {
                     </form>}
 
                     {
-                        active === 2 && <div>
-                            <div className="grid grid-cols-3 gap-5">
+                        active === 2 && !files && <div>
+                            <div className="grid grid-cols-4 gap-5 select-none">
+                                {
+                                    folders.map((folder) => (
+                                        <div key={folder.id} onDoubleClick={() => { setFiles(true); setPath(folder.id) }} className="p-2 hover:bg-sky-500/20 flex flex-col items-center">
+                                            <FcOpenedFolder size={80} />
+                                            <span className="capitalize">{folder.name}</span>
+                                            {/* {files && <Files userId={folder.name}/>} */}
+                                        </div>
+                                    ))
+                                }
+                                {/* <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
                                 <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
-                                <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
-                                <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
+                                <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" /> */}
                             </div>
                         </div>
                     }
+
+                    {files && <Files uuid={uuid} id={path} setFiles={setFiles} />}
                 </div>
             </div>
         </div>
