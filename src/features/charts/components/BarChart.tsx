@@ -15,7 +15,7 @@ const BarChart: React.FC<BarChartProps> = (props) => {
     const data = {
         labels: props.hours,
         datasets: [{
-            label: String(props.checkedInUsers) + " Checked In",
+            label: "Check-Ins",
             data: props.allCounts,
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             borderColor: "rgba(75, 192, 192)",

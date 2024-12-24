@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../../redux/store';
 import { useDispatch } from 'react-redux';
 import { heading } from '../../heading/headingSlice';
@@ -26,7 +26,7 @@ type formInputType = {
 };
 
 const AddAgenda: React.FC = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => (state.auth));
     const dispatch = useDispatch<AppDispatch>();
     const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
@@ -97,11 +97,14 @@ const AddAgenda: React.FC = () => {
                         /* Read more about isConfirmed, isDenied below */
                         if (result.isConfirmed) {
                             // Swal.fire("Saved!", "", "success");
-                            navigate("/events/view-agendas");
+                            // navigate(`/events/view-agendas/${uuid}`);
+                            window.history.back();
                         }
                     });
                 }
             });
+
+
     }
 
 

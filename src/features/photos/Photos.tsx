@@ -32,6 +32,7 @@ const Photos: React.FC = () => {
     const { events } = useSelector((state: RootState) => (state.events));
 
     const currentEvent = events.find((event) => event.uuid === uuid);
+    const [groupingDone, setGroupingDone] = useState<boolean>(false);
 
     const [eventZip, setEventZip] = useState<File[]>([]);
     const [profileZip, setProfileZip] = useState<File[]>([]);
@@ -208,6 +209,23 @@ const Photos: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        axios.post("https://app.klout.club/api/organiser/v1/event-checkin/get-image-segregation-status",
+            {
+                "eventUUID": uuid
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then(res => {
+                console.log(res.data);
+                if (res.data.data.finalStatus) {
+                    setGroupingDone(true);
+                }
+            });
+    }, []);
+
 
     const handleDownload = async () => {
         setLoading(true);
@@ -312,8 +330,8 @@ const Photos: React.FC = () => {
             <div className="mx-auto w-full grid place-content-center mt-10">
                 <div className="flex justify-between">
                     <div>
-                        <button onClick={() => {setActive(1); setFiles(false);}} className={`btn ${active === 1 ? "bg-white" : ""} btn-sm rounded-b-none`}>Upload Files</button>
-                        <button onClick={() => {setActive(2); setFiles(false);}} className={`btn ${active === 2 ? "bg-white" : ""} btn-sm rounded-b-none`}>Folders</button>
+                        <button onClick={() => { setActive(1); setFiles(false); }} className={`btn ${active === 1 ? "bg-white" : ""} btn-sm rounded-b-none`}>Upload Files</button>
+                        <button onClick={() => { setActive(2); setFiles(false); }} className={`btn ${active === 2 ? "bg-white" : ""} btn-sm rounded-b-none`}>Folders</button>
                     </div>
                     <button onClick={getAttendeeProfileImage} className="btn btn-sm rounded-b-none btn-accent text-white w-fit">Get Attendee Image Zip</button>
                 </div>
@@ -402,7 +420,8 @@ const Photos: React.FC = () => {
 
                     {
                         active === 2 && !files && <div>
-                            <div className="grid grid-cols-4 gap-5 select-none">
+
+                            {groupingDone === true ? <div className="grid grid-cols-4 gap-5 select-none">
                                 {
                                     folders.map((folder) => (
                                         <div key={folder.id} onDoubleClick={() => { setFiles(true); setPath(folder.id) }} className="p-2 hover:bg-sky-500/20 flex flex-col items-center">
@@ -415,7 +434,10 @@ const Photos: React.FC = () => {
                                 {/* <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
                                 <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
                                 <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" /> */}
-                            </div>
+                            </div> :
+                                <p className="text-black text-center">Grouping In Progress</p>
+                            }
+
                         </div>
                     }
 

@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { TiArrowRight } from 'react-icons/ti';
 import Loader from '../../../component/Loader';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 // Define the form data type
 type FormInputType = {
@@ -36,21 +36,18 @@ type ApiType = {
   uuid: string;
 }
 
-
 const EditAttendee = () => {
-  const { uuid, attendee_uuid } = useParams<{ uuid: string, attendee_uuid: string }>();
+  const { attendee_uuid, uuid } = useParams<{ attendee_uuid: string, uuid: string }>();
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const dummyImage = "https://via.placeholder.com/150";
-
-  const navigate = useNavigate();
 
   const { token } = useSelector((state: RootState) => (state.auth));
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [attendeeImage, setAttendeeImage] = useState<string>(dummyImage);
   const { events } = useSelector((state: RootState) => (state.events));
 
-  const currentEvent = events.find((event) => event.uuid === uuid);
+  const currentEvent = events.find((event) => event.id === Number(attendee_uuid));
   // console.log(currentEvent);
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -80,7 +77,7 @@ const EditAttendee = () => {
     // axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
     // axios.get(`${apiBaseUrl}/api/get-industries`).then(res => setIndustries(res.data.data));
 
-    axios.post(`${apiBaseUrl}/api/attendees/${attendee_uuid}`, {}, {
+    axios.post(`${apiBaseUrl}/api/attendees/${uuid}`, {}, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -183,7 +180,9 @@ const EditAttendee = () => {
     // formData.set("industry", selectedIndustry);
     // formData.set("company_name", selectedCompany);
 
-    if (currentEvent) {
+    console.log(currentEvent);
+
+    if (currentEvent?.id) {
       formData.append("event_id", currentEvent.id.toString());
     }
 
@@ -191,8 +190,10 @@ const EditAttendee = () => {
 
     console.log("Form Data is: ", formData);
 
+    console.log(currentEvent?.user_id);
+
     axios
-      .post(`${apiBaseUrl}/api/attendees/${attendee_uuid}`, formData, {
+      .post(`${apiBaseUrl}/api/attendees/${uuid}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${token}`
@@ -202,7 +203,8 @@ const EditAttendee = () => {
         // console.log(res);
         if (res.data.status === 200) {
           swal("Success", res.data.message, "success").then(_ => {
-            navigate("/events/all-attendee");
+            // navigate("/events/all-attendee");
+            window.history.back();
           })
           // console.log(formData);
         };

@@ -5,7 +5,7 @@ import { MdOutlineFileDownload } from "react-icons/md";
 import axios from "axios";
 import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import Loader from "../../../component/Loader";
 import Swal from "sweetalert2";
 const dummyImage = "https://via.placeholder.com/150";
@@ -46,7 +46,7 @@ interface AddEventAttendeeProps {
 
 const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({uuid}) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState('');
   const [image, setImage] = useState<Blob | null>(null);
   const { token } = useSelector((state: RootState) => (state.auth));
@@ -145,7 +145,7 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({uuid}) => {
         })
         .then((res) => {
           if (res.data.status === 200) {
-            swal("Success", res.data.message, "success").then(() => navigate("/events/all-attendee"));
+            swal("Success", res.data.message, "success").then(() => window.history.back());
           }
         });
     } catch (error) {

@@ -64,11 +64,12 @@ const App: React.FC = () => {
           <Route path="/events/add-event" element={<AddEventPage />} />
           <Route path="/events/view-event/:uuid" element={<ViewEventPage />} />
           <Route path="/events/view-agendas/:uuid" element={<ViewAgendasPage />} />
-          <Route path="/events/add-agenda/:uuid" element={<AddAgendaPage />} />
+          <Route path="/events/add-agenda/" element={<AddAgendaPage />} />
           <Route path="/events/edit-agenda/:agenda_uuid/:id" element={<EditAgenda />} />
           <Route path="/events/edit-event/:uuid" element={<EditEventPage />} />
           <Route path="/events/all-attendee/:uuid" element={<AllEventAttendeePage />} />
-          <Route path="/events/edit-attendee/:attendee_uuid/:id" element={<EditAttendee />} />
+          {/* <Route path="/events/edit-attendee/:attendee_uuid/:id" element={<EditAttendee />} /> */}
+          <Route path="/events/edit-attendee/:uuid/:attendee_uuid" element={<EditAttendee />} />
           <Route path="/events/pending-user-request/:uuid" element={<PendingUserRequest />} />
           <Route path="/events/send-to-app/:uuid" element={<SendToApp />} />
           <Route path="/events/add-attendee/:uuid" element={<AddEventAttendeePage />} />

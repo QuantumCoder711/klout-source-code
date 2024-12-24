@@ -93,7 +93,7 @@ const SameDayReminder: React.FC = () => {
                             // Check if the OK button was clicked
                             if (result.isConfirmed) {
                                 // Navigate to the '/events/all-attendee' route
-                                window.location.href = "/events/all-attendee";
+                                window.history.back();
                             }
                         });
                     }

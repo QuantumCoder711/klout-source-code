@@ -4,7 +4,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from 'react-redux';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../../redux/store';
 import Swal from 'sweetalert2';
 import Loader from '../../../component/Loader';
@@ -29,7 +29,7 @@ type formInputType = {
 const EditAgenda: React.FC = () => {
     const { agenda_uuid, id } = useParams<{ agenda_uuid: string, id: string }>();
     const dummyImage = "https://via.placeholder.com/150";
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState<string>("");
@@ -40,10 +40,10 @@ const EditAgenda: React.FC = () => {
     const { token } = useSelector((state: RootState) => (state.auth));
 
     // const { currentAgendaUUID } = useSelector((state: RootState) => state.events);
-    const { events, loading } = useSelector((state: RootState) => state.events);
+    const { loading } = useSelector((state: RootState) => state.events);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-    const currentEvent = events.find((event) => event.uuid === id); // Use find() to directly get the current event
+    // const currentEvent = events.find((event) => event.uuid === id); // Use find() to directly get the current event
 
     useEffect(() => {
         if (agenda_uuid) {
@@ -121,7 +121,9 @@ const EditAgenda: React.FC = () => {
             formData.append("_method", 'PUT');
 
             // Append event_id
-            formData.append("event_id", currentEvent?.id?.toString() ?? "");
+            if (id) {
+                formData.append("event_id", id);
+            }
 
             // Log the FormData for debugging (FormData can't be logged directly, so you will need to inspect it)
             for (let [key, value] of formData.entries()) {
@@ -148,7 +150,8 @@ const EditAgenda: React.FC = () => {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Navigate to view agendas page if user clicks "Ok"
-                            navigate('/events/view-agendas');
+                            // navigate('/events/view-agendas');
+                            window.history.back();
                         }
                     });
                 }

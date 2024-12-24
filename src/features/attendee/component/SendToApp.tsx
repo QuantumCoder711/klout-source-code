@@ -90,7 +90,7 @@ const SendToApp: React.FC = () => {
                         text: 'The app message was sent successfully!',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = "/events/all-attendee";
+                            window.history.back();
                         }
                     });
                 }

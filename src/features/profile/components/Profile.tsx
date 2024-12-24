@@ -139,8 +139,9 @@ const Profile: React.FC = () => {
             .then((res) => {
                 if (res.data.status === 200) {
                     swal("Success", res.data.message, "success").then(() => {
-                        window.location.reload();
+                        // window.location.reload();
                         // setEdit(false);
+                        window.history.back();
                     });
                 };
             });
