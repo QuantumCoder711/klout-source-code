@@ -48,7 +48,6 @@ const EditAttendee = () => {
   const { events } = useSelector((state: RootState) => (state.events));
 
   const currentEvent = events.find((event) => event.id === Number(attendee_uuid));
-  // console.log(currentEvent);
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -65,85 +64,84 @@ const EditAttendee = () => {
 
   const { loading } = useSelector((state: RootState) => state.attendee);
 
+  // State to track if initial data is loaded
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+
+  // Fetch initial data (job titles, companies, and industries)
+  const fetchData = async () => {
+    try {
+      const jobTitlesResponse = await axios.get(`${apiBaseUrl}/api/job-titles`);
+      const companiesResponse = await axios.get(`${apiBaseUrl}/api/companies`);
+      const industriesResponse = await axios.get(`${apiBaseUrl}/api/get-industries`);
+
+      setJobTitles(jobTitlesResponse.data.data);
+      setCompanies(companiesResponse.data.data);
+      setIndustries(industriesResponse.data.data);
+
+      // Set initial data loaded to true after fetching
+      setInitialDataLoaded(true);
+    } catch (error) {
+      console.error("Error fetching initial data:", error);
+    }
+  };
   useEffect(() => {
-    axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
-    axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
-    axios.get(`${apiBaseUrl}/api/get-industries`).then(res => setIndustries(res.data.data));
+    fetchData();
   }, []);
 
-
+  // Fetch attendee data after initial data is loaded
   useEffect(() => {
-    // axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
-    // axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
-    // axios.get(`${apiBaseUrl}/api/get-industries`).then(res => setIndustries(res.data.data));
+    if (initialDataLoaded) {
+      axios.post(`${apiBaseUrl}/api/attendees/${uuid}`, {}, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      }).then((res) => {
+        const attendeeData: FormInputType = res.data.data;
 
-    axios.post(`${apiBaseUrl}/api/attendees/${uuid}`, {}, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    }).then((res => {
-      const attendeeData: FormInputType = res.data.data;
+        console.log("All Attendee Data is: ", attendeeData);
+        console.log("Job Titles are: ", jobTitles);
+        console.log("Companies are: ", companies);
+        console.log("Industries are: ", industries);
 
-      console.log("All Attendee Data is: ", attendeeData);
-      console.log("Job Titles are: ", jobTitles);
-      console.log("Companies are: ", companies);
-      console.log("Industries are: ", industries);
-      const jobExist = jobTitles?.filter((job) => job.name == attendeeData.job_title);
-      const companyExist = companies?.filter((company) => company.name == attendeeData.company_name);
-      const industryExist = industries?.filter((industry) => industry.name == attendeeData.industry);
-      // console.log(companyExist);
+        const jobExist = jobTitles?.filter((job) => job.name == attendeeData.job_title);
+        const companyExist = companies?.filter((company) => company.name == attendeeData.company_name);
+        const industryExist = industries?.filter((industry) => industry.name == attendeeData.industry);
 
-      if (jobExist?.length === 0) {
-        setSelectedJobTitle("Others");
-      }
+        if (jobExist?.length === 0) {
+          setSelectedJobTitle("Others");
+        }
 
-      if (companyExist?.length === 0) {
-        setSelectedCompany("Others");
-      }
+        if (companyExist?.length === 0) {
+          setSelectedCompany("Others");
+        }
 
-      if (industryExist?.length === 0) {
-        setSelectedIndustry("Others");
-      }
+        if (industryExist?.length === 0) {
+          setSelectedIndustry("Others");
+        }
 
-      setValue("first_name", attendeeData.first_name);
-      setValue("last_name", attendeeData.last_name);
-      setValue("email_id", attendeeData.email_id);
-      setValue("phone_number", attendeeData.phone_number);
-      setValue("alternate_mobile_number", attendeeData.alternate_mobile_number);
-      setValue("website", attendeeData.website);
-      setValue("linkedin_page_link", attendeeData.linkedin_page_link);
-      setValue("employee_size", attendeeData.employee_size);
-      setValue("company_turn_over", attendeeData.company_turn_over);
-      setValue("status", attendeeData.status);
-      setValue("company_name", attendeeData.company_name);
-      setValue("industry", attendeeData.industry);
-      setValue("job_title", attendeeData.job_title);
-      if (attendeeData.image) {
-        setAttendeeImage(`${apiBaseUrl}/${attendeeData.image}`);
-      }
+        setValue("first_name", attendeeData.first_name);
+        setValue("last_name", attendeeData.last_name);
+        setValue("email_id", attendeeData.email_id);
+        setValue("phone_number", attendeeData.phone_number);
+        setValue("alternate_mobile_number", attendeeData.alternate_mobile_number);
+        setValue("website", attendeeData.website);
+        setValue("linkedin_page_link", attendeeData.linkedin_page_link);
+        setValue("employee_size", attendeeData.employee_size);
+        setValue("company_turn_over", attendeeData.company_turn_over);
+        setValue("status", attendeeData.status);
+        setValue("company_name", attendeeData.company_name);
+        setValue("industry", attendeeData.industry);
+        setValue("job_title", attendeeData.job_title);
 
-      setStatus(attendeeData.status);
+        if (attendeeData.image) {
+          setAttendeeImage(`${apiBaseUrl}/${attendeeData.image}`);
+        }
 
-      // const isJobExists = jobTitles?.some((data: ApiType) => data.name === selectedJobTitle);
-      // const isCompanyExists = companies?.some((data: ApiType) => data.name === selectedCompany);
-      // const isIndustryExists = industries?.some((data: ApiType) => data.name === selectedIndustry);
-      // // console.log(isJobExists, isCompanyExists, isIndustryExists);
-
-      // if (!isJobExists) {
-      //   setSelectedJobTitle("Others");
-      // }
-
-      // if(!isCompanyExists) {
-      //   setSelectedCompany("Others");
-      // }
-
-      // if (selectedCompany)
-      // setSelectedCompany(attendeeData.company_name);
-      // setSelectedIndustry(attendeeData.industry);
-      // setSelectedJobTitle(attendeeData.job_title);
-    }));
-  }, [jobTitles, companies, industries]);
+        setStatus(attendeeData.status);
+      });
+    }
+  }, [initialDataLoaded, uuid, token]);
 
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,42 +153,23 @@ const EditAttendee = () => {
     }
   };
 
+  // Submit form data
   const onSubmit: SubmitHandler<FormInputType> = async (data) => {
-
     const formData = new FormData();
-
     Object.keys(data).forEach((key) => {
       const value = data[key as keyof FormInputType];
-      // formData.append(key, value);
       if (key === "image" && value instanceof File) {
         formData.append(key, value);  // Append the image file
-      }
-      else {
+      } else {
         formData.append(key, value ? value.toString() : ""); // Append other form data as strings
       }
     });
-
-    // if (selectedImage) {
-    //   formData.append("image", selectedImage);
-    // }
-
-
-
-    // formData.set("job_title", selectedJobTitle);
-    // formData.set("industry", selectedIndustry);
-    // formData.set("company_name", selectedCompany);
-
-    console.log(currentEvent);
 
     if (currentEvent?.id) {
       formData.append("event_id", currentEvent.id.toString());
     }
 
     formData.append("_method", "PUT");
-
-    console.log("Form Data is: ", formData);
-
-    console.log(currentEvent?.user_id);
 
     axios
       .post(`${apiBaseUrl}/api/attendees/${uuid}`, formData, {
@@ -200,21 +179,18 @@ const EditAttendee = () => {
         },
       })
       .then((res) => {
-        // console.log(res);
         if (res.data.status === 200) {
           swal("Success", res.data.message, "success").then(_ => {
-            // navigate("/events/all-attendee");
             window.history.back();
           })
-          // console.log(formData);
-        };
+        }
       });
-
   }
 
   if (loading) {
-    return <Loader />
+    return <Loader />;
   }
+
 
   return (
     <div className="p-6 pt-3">

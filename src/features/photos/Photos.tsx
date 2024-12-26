@@ -33,6 +33,7 @@ const Photos: React.FC = () => {
 
     const currentEvent = events.find((event) => event.uuid === uuid);
     const [groupingDone, setGroupingDone] = useState<boolean>(false);
+    const [segregationStatus, setSegregationStatus] = useState<string>("No segregation status is found against this event");
 
     const [eventZip, setEventZip] = useState<File[]>([]);
     const [profileZip, setProfileZip] = useState<File[]>([]);
@@ -210,20 +211,40 @@ const Photos: React.FC = () => {
     };
 
     useEffect(() => {
-        axios.post("https://app.klout.club/api/organiser/v1/event-checkin/get-image-segregation-status",
-            {
-                "eventUUID": uuid
-            },
-            {
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }).then(res => {
-                console.log(res.data);
-                if (res.data.data.finalStatus) {
-                    setGroupingDone(true);
-                }
-            });
+
+        try {
+            axios.post("https://app.klout.club/api/organiser/v1/event-checkin/get-image-segregation-status",
+                {
+                    "eventUUID": uuid
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }).then(res => {
+                    console.log(res.data);
+                    // if (res.data.data.finalStatus) {
+                    //     setGroupingDone(true);
+                    // }
+                    if (res.data.data.message === "Grouping In Process") {
+                        // setGroupingDone(false);
+                        setSegregationStatus("Grouping In Progress");
+                    }
+
+                    else if (res.data.data.message === "Unzip Successfully") {
+                        setGroupingDone(true);
+                        setSegregationStatus("Unzip Successfully");
+                        // setSegregationStatus("Segregation status is found successfully");
+                    }
+
+                    else {
+                        // setGroupingDone(false);
+                    }
+                });
+        } catch (error) {
+            console.log(error);
+        }
+
     }, []);
 
 
@@ -367,7 +388,7 @@ const Photos: React.FC = () => {
                             />
                         </label>
 
-                        <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
+                        <label htmlFor="email_id" className="input input-bordered bg-white text-black/50 flex items-center gap-2">
                             <span className="font-semibold text-green-700 flex justify-between items-center">Email <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                             <input id="email_id" value={email} required readOnly type="email" className="grow" />
                         </label>
@@ -421,21 +442,21 @@ const Photos: React.FC = () => {
                     {
                         active === 2 && !files && <div>
 
-                            {groupingDone === true ? <div className="grid grid-cols-4 gap-5 select-none">
+                            {groupingDone === true && segregationStatus === "Unzip Successfully" ? <div className="grid grid-cols-4 gap-5 select-none">
                                 {
-                                    folders.map((folder) => (
+                                    folders.length !== 0 ? folders.map((folder) => (
                                         <div key={folder.id} onDoubleClick={() => { setFiles(true); setPath(folder.id) }} className="p-2 hover:bg-sky-500/20 flex flex-col items-center">
                                             <FcOpenedFolder size={80} />
                                             <span className="capitalize">{folder.name}</span>
                                             {/* {files && <Files userId={folder.name}/>} */}
                                         </div>
-                                    ))
+                                    )): <p className="text-center w-full select-text col-span-4">No folders found</p>
                                 }
                                 {/* <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
                                 <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" />
                                 <FcOpenedFolder size={80} className="p-2 hover:bg-sky-500/20" /> */}
-                            </div> :
-                                <p className="text-black text-center">Grouping In Progress</p>
+                            </div> : segregationStatus === "Grouping In Progress" ?
+                                <p className="text-black text-center">Grouping In Progress</p> : <p className="text-center">{segregationStatus}</p>
                             }
 
                         </div>

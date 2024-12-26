@@ -43,7 +43,7 @@ interface EditEventProps {
 }
 
 
-const EditEvent: React.FC<EditEventProps> = ({uuid}) => {
+const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
     console.log(uuid);
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -67,7 +67,6 @@ const EditEvent: React.FC<EditEventProps> = ({uuid}) => {
     const selectedCountryCode = watch('country');
     const dummyImage = imageBaseUrl + '/' + currentEvent?.image;
 
-
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
         setImage(file)
@@ -77,14 +76,20 @@ const EditEvent: React.FC<EditEventProps> = ({uuid}) => {
         }
     };
 
+    console.log("The current event is: ", currentEvent);
+
     useEffect(() => {
         const countryList = Country.getAllCountries();
         setCountries(countryList);
 
-        if (currentEvent) {
+        if (currentEvent?.country) {
             const initialCountry = currentEvent.country;
             const initialState = currentEvent.state;
             const initialCity = currentEvent.city;
+
+            console.log(initialCountry);
+            console.log(initialState);
+            console.log(initialCity);
 
             setValue('country', initialCountry);
             setValue('state', initialState);

@@ -252,7 +252,9 @@ const AddEvent: React.FC = () => {
                 formData.append("image", eventBannerImage);
             }
 
+            
             try {
+                console.log("The form data is: ", formData);
                 // Dispatch the addNewEvent action
                 await dispatch(addNewEvent({ eventData: formData, token })).unwrap(); // unwrap if using createAsyncThunk
 
@@ -462,7 +464,7 @@ const AddEvent: React.FC = () => {
                             <select id="city" className="grow bg-white" {...register('city', { required: 'City is required' })} onChange={(e) => setEventCity(e.target.value)}>
                                 <option value="">Select City</option>
                                 {cities.map((city) => (
-                                    <option key={city.id} value={city.name}>
+                                    <option key={city.isoCode} value={city.name}>
                                         {city.name}
                                     </option>
                                 ))}
