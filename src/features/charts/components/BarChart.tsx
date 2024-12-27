@@ -1,6 +1,7 @@
 import React from 'react';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { ChartOptions } from 'chart.js'; // Import the correct type for options
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -26,9 +27,32 @@ const BarChart: React.FC<BarChartProps> = (props) => {
         }],
     };
 
-    const options = {
+    // const options = {
+    //     responsive: true,
+    //     maintainAspectRatio: false,
+    // };
+
+
+    const options: ChartOptions<'bar'> = {
         responsive: true,
         maintainAspectRatio: false,
+        scales: {
+            x: {
+                type: 'category', // X-axis is categorical with bin labels
+                title: {
+                    display: true,
+                    text: 'Time (Hours)', // Can be adjusted based on your data
+                },
+            },
+            y: {
+                type: 'linear', // Y-axis is continuous, representing the frequency of items
+                title: {
+                    display: true,
+                    text: 'Number of Check-Ins',
+                },
+                beginAtZero: true,
+            },
+        },
     };
 
 

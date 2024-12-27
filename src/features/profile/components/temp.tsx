@@ -1,140 +1,3 @@
-// import React, { useState } from 'react';
-// import { useDispatch } from 'react-redux';
-// import { Link } from 'react-router-dom';
-// import { AppDispatch, RootState } from '../../../redux/store';
-// import { heading } from '../../heading/headingSlice';
-// import { IoMdArrowRoundBack } from 'react-icons/io';
-// import { useSelector } from 'react-redux';
-// import { TiArrowRight } from 'react-icons/ti';
-
-// const Profile: React.FC = () => {
-
-//     const { user, token, loading } = useSelector((state: RootState) => state.auth);
-
-//     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
-//     const dummyImage = "https://via.placeholder.com/150";
-
-//     const dispatch = useDispatch<AppDispatch>();
-
-//     const [edit, setEdit] = useState<boolean>(false);
-
-//     const handleSubmit = async () => {
-//         // Handeling the form submission
-//     }
-
-
-//     return (
-//         <div>
-//             <div className="flex justify-end">
-//                 {/* <HeadingH2 title="Profile" /> */}
-//                 <Link to="/" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
-//                     <IoMdArrowRoundBack size={20} /> Go To Dasboard
-//                 </Link>
-//             </div>
-
-//             {/* Container for the profile page */}
-//             {!edit && <div className="max-w-5xl mx-auto p-8">
-
-//                 {/* Profile Card */}
-//                 <div className="bg-white p-6 rounded-lg shadow-lg relative">
-//                     <div className="absolute top-2 right-2">
-//                         <img src={
-//                             user?.company_logo === null ? dummyImage : `${imageBaseUrl}/${user?.company_logo}`} alt="Company Logo" className="w-16 h-16 rounded-md mx-auto object-contain border border-gray-300" />
-//                     </div>
-//                     <div className="flex items-center space-x-8">
-//                         {/* Profile Picture */}
-//                         <div className="flex-shrink-0">
-//                             <img src={
-//                                 user?.image === null ? dummyImage : `${imageBaseUrl}/${user?.image}`} alt="Profile Picture" className="w-80 h-60 rounded-lg object-cover" />
-//                         </div>
-
-//                         {/* Personal Info */}
-//                         <div className="space-y-2">
-//                             <h2 className="text-2xl font-semibold text-gray-800">{user?.first_name + " " + user?.last_name}</h2>
-//                             <h3 className="text-lg font-semibold text-gray-800">{user?.company_name}</h3>
-//                             <p className="text-sm text-gray-600">{user?.designation}</p>
-//                             <p className="text-gray-500 text-sm">{user?.email}</p>
-//                             <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
-//                             <p className="text-gray-600 text-sm">{user?.designation_name}</p>
-//                             <p className="text-gray-500 text-sm">{user?.address + ", " + user?.pincode}</p>
-//                         </div>
-//                     </div>
-
-//                     <div className="mt-6 border-t border-gray-200 pt-6">
-//                         {/* Company Info */}
-//                         <div className="flex items-center space-x-8">
-//                             {/* Company Logo  */}
-//                             <div className="flex-shrink-0 w-40">
-
-//                             </div>
-
-//                             <div className="space-y-4">
-
-//                                 {/* <p className="text-gray-500">{user?.pincode}</p> */}
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//             </div>
-//             }
-
-//             {!edit && <div className="text-center">
-//                 <button onClick={() => setEdit(true)} className="btn btn-primary mx-auto">Edit Profile</button>
-//             </div>}
-
-//             {
-//                 edit && <div>
-//                     <form className="gap-4 mt-10">
-
-//                         {/* First Name & Last Name */}
-//                         <div className='w-full gap-3'>
-//                             <div className='flex flex-col w-full gap-3 my-4'>
-//                                 {/* First Name */}
-//                                 <label htmlFor="first_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-//                                     <span className="font-semibold text-green-700 flex justify-between items-center">First Name &nbsp; <TiArrowRight className='mt-1' /> </span>
-//                                     <input
-//                                         id="first_name"
-//                                         type="text"
-//                                         className="grow"
-//                                         defaultValue={user?.first_name}  // Use defaultValue instead of value
-//                                     />
-//                                 </label>
-//                             </div>
-//                         </div>
-//                     </form>
-//                 </div>
-//             }
-//         </div>
-//     )
-// }
-
-// export default Profile;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from "react-router-dom";
@@ -196,37 +59,42 @@ const Profile: React.FC = () => {
     const userImage: string = user?.image ? `${imageBaseUrl}/${user?.image}` : "";
     const [logoUrl, setLogoUrl] = useState<string>(company_logo);
     const [userUrl, setUserUrl] = useState<string>(userImage);
-    const { register, handleSubmit, formState: { errors } } = useForm<formInputType>();
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm<formInputType>();
     const [selectedImage, setSelectedImage] = useState(company_logo);
     const [selectedUserImage, setSelectedUserImage] = useState(userImage);
     const [jobTitle, setJobTitles] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [, setCustomCompanyName] = useState<string>(user?.company_name || '');
     const [, setCustomDesignationName] = useState<string>('');
-    const [selectedCompany, setSelectedCompany] = useState<string>();
-    const [selectedDesignation, setSelectedDesignation] = useState<string | null>();
+    // const [selectedCompany, setSelectedCompany] = useState<string>();
+    // const [selectedDesignation, setSelectedDesignation] = useState<string | null>();
     const dummyImage = "https://via.placeholder.com/150";
 
+    // State to track the selected company
+    const [selectedCompany, setSelectedCompany] = useState<string>('');
+    const [selectedDesignation, setSelectedDesignation] = useState<string>('');
+
+    const handleCompanyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCompany(event.target.value);
+    };
+
+    const handleDesignationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedDesignation(event.target.value);
+    }
+
     useEffect(() => {
-        axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data || []));
-        axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data || []));
-        setSelectedCompany(user?.company);
-        setSelectedDesignation(user?.designation_name);
+        axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data));
+        axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data));
+        if (user?.company && user.designation_name) {
+            // setSelectedCompany(user.company);
+            // setSelectedDesignation(user.designation_name);
+            setValue("company", user.company_name);
+            setValue("designation", user.designation);
+        }
+
+        console.log(companies)
     }, []);
 
-    const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCompany(e.target.value);
-        if (e.target.value !== "Others") {
-            setCustomCompanyName(''); // Reset custom name if a valid company is selected
-        }
-    };
-
-    const handleDesignationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedDesignation(e.target.value);
-        if (e.target.value !== "Others") {
-            setCustomDesignationName(''); // Reset custom name if a valid designation is selected
-        }
-    };
 
     // Handle image upload
     const handleImageUpload = (e: any) => {
@@ -266,6 +134,8 @@ const Profile: React.FC = () => {
             formData.append("image", selectedUserImage);
         }
 
+        console.log(formData);
+
         axios
             .post(`${apiBaseUrl}/api/updateprofile`, formData, {
                 headers: {
@@ -276,9 +146,9 @@ const Profile: React.FC = () => {
             .then((res) => {
                 if (res.data.status === 200) {
                     swal("Success", res.data.message, "success").then(() => {
-                        // window.location.reload();
+                        window.location.reload();
                         // setEdit(false);
-                        window.history.back();
+                        // window.history.back();
                     });
                 };
             });
@@ -427,88 +297,103 @@ const Profile: React.FC = () => {
 
                     <div className="flex w-full gap-3">
                         {/* Company */}
-                        <div className='flex flex-col w-full gap-3 my-4'>
-                            <label htmlFor="company" className="input input-bordered bg-white text-black flex items-center gap-2">
-                                <span className="font-semibold text-green-700 min-w-fit flex items-center">Company &nbsp; <TiArrowRight className='mt-1' /></span>
-                                <select
-                                    id="company"
-                                    {...register("company", { required: "Company is required" })}
-                                    className="bg-white pl-3 w-full"
-                                    defaultValue={user?.company_name}
-                                    value={selectedCompany}
-                                    onChange={handleCompanyChange}
-                                >
-                                    <option>{user?.company_name}</option>
-                                    {companies?.map((company: companyType) => (
-                                        <option key={company.id} value={company.name}>
-                                            {company.name}
-                                        </option>
-                                    ))}
-                                    <option value="Others">Others</option>
-                                </select>
-                            </label>
-                            {errors.company && <p className="text-red-600">{errors.company.message}</p>}
-                            {/* {errors.company && <p className="text-red-600">{errors.company.message}</p>} */}
-                            {/* Custom Company Name */}
-                            {selectedCompany === "Others" && (
-                                <div className='flex flex-col w-full gap-3 my-4'>
+                        <div className="flex flex-col w-full gap-3">
+                            <div className="flex flex-col gap-3">
+                                {/* Company Name */}
+                                <label htmlFor="company" className="input input-bordered bg-white text-black flex items-center gap-2 w-full">
+                                    <span className="font-semibold min-w-fit text-green-700 flex justify-between items-center">
+                                        Company Name &nbsp;
+                                        <TiArrowRight className='mt-1' />
+                                    </span>
+                                    {/* Dropdown */}
+                                    <select
+                                        id="company"
+                                        className="bg-transparent text-black w-full p-2 border-none outline-none"
+                                        defaultValue={user?.company}
+                                        
+                                        {...register('company', {
+                                            required: 'Company is required',
+                                            onChange: handleCompanyChange
+                                        })}
+                                    >
+                                        {/* <option value="">Select a company</option> */}
+                                        {
+                                            companies.map((item: companyType) => (
+                                                <option key={item.id} value={item.name}>
+                                                    {item.name}
+                                                </option>
+                                            ))
+                                        }
+                                        <option value="Others">Others</option> {/* Option for Others */}
+                                    </select>
+                                </label>
+
+                                {/* Conditionally Render Address Input */}
+                                {selectedCompany === 'Others' && (
                                     <label htmlFor="customCompany" className="input input-bordered bg-white text-black flex items-center gap-2">
-                                        <span className="font-semibold text-green-700 flex items-center">Company Name &nbsp; <TiArrowRight className='mt-1' /></span>
+                                        <span className="font-semibold text-green-700 flex justify-between items-center">
+                                            Company Name &nbsp;
+                                            <TiArrowRight className='mt-1' />
+                                        </span>
                                         <input
                                             id="customCompany"
                                             type="text"
-                                            // value={customCompanyName}
-                                            // onChange={handleCustomCompanyNameChange}
-                                            className="grow" {...register('company', { required: 'Company name is required' })}
+                                            className="grow"
+                                            defaultValue={user?.company_name} // Use defaultValue instead of value
+                                            {...register('company', { required: 'Company is required' })}
                                         />
                                     </label>
-                                    {errors.company && <p className="text-red-600">{errors.company.message}</p>}
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
 
-                        {/* Designation */}
-                        <div className='flex flex-col w-full gap-3 my-4'>
-                            <label htmlFor="designation" className="input input-bordered bg-white text-black flex items-center gap-2">
-                                <span className="font-semibold text-green-700 min-w-fit flex items-center">Designation &nbsp; <TiArrowRight className='mt-1' /></span>
+                        <div className="flex flex-col w-full gap-3">
+                            {/* Designation Name */}
+                            <label htmlFor="designation" className="input input-bordered bg-white text-black flex items-center gap-2 w-full">
+                                <span className="font-semibold min-w-fit text-green-700 flex justify-between items-center">
+                                    Designation Name &nbsp;
+                                    <TiArrowRight className='mt-1' />
+                                </span>
+                                {/* Dropdown */}
                                 <select
                                     id="designation"
-                                    {...register("designation", { required: "Designation is required" })}
-                                    className="bg-white pl-3 w-full"
+                                    className="bg-transparent text-black w-full p-2 border-none outline-none"
                                     // value={selectedDesignation}
                                     defaultValue={user?.designation}
-                                    onChange={handleDesignationChange}
+                                    {...register('designation', { required: 'Designation is required', onChange: handleDesignationChange})}
+
                                 >
-                                    <option>{user?.designation_name}</option>
-                                    {jobTitle?.map((designation: jobTitleType) => (
-                                        <option key={designation.id} value={designation.name}>
-                                            {designation.name}
-                                        </option>
-                                    ))}
-                                    <option value="Others">Others</option>
+                                    {/* <option value="">Select a Designation</option> */}
+                                    {
+                                        jobTitle.map((item: jobTitleType) => (
+                                            <option key={item.name} value={item.name}>
+                                                {item.name}
+                                            </option>
+                                        ))
+                                    }
+                                    <option value="Others">Others</option> {/* Option for Others */}
                                 </select>
                             </label>
 
-                            {errors.designation && <p className="text-red-600">{errors.designation.message}</p>}
-
-                            {/* Custom Designation Name */}
-                            {selectedDesignation === "Others" && (
-                                <div className='flex flex-col w-full gap-3 my-4'>
-                                    <label htmlFor="customDesignation" className="input input-bordered bg-white text-black flex items-center gap-2">
-                                        <span className="font-semibold text-green-700 flex items-center">Designation Name &nbsp; <TiArrowRight className='mt-1' /></span>
-                                        <input
-                                            id="customDesignation"
-                                            type="text"
-                                            // value={customDesignationName}
-                                            // onChange={handleCustomDesignationNameChange}
-                                            className="grow" {...register('designation', { required: 'Designation is required' })}
-                                        />
-                                    </label>
-                                    {errors.designation && <p className="text-red-600">{errors.designation.message}</p>}
-                                </div>
+                            {/* Conditionally Render Address Input */}
+                            {selectedDesignation === 'Others' && (
+                                <label htmlFor="customDesignation" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                    <span className="font-semibold text-green-700 flex justify-between items-center">
+                                        Designation Name &nbsp;
+                                        <TiArrowRight className='mt-1' />
+                                    </span>
+                                    <input
+                                        id="customDesignation"
+                                        type="text"
+                                        className="grow"
+                                        defaultValue={user?.designation} // Use defaultValue instead of value
+                                        {...register('designation', { required: 'Designation is required' })}
+                                    />
+                                </label>
                             )}
                         </div>
                     </div>
+
 
 
                     <div className="flex w-full gap-3 my-4">
