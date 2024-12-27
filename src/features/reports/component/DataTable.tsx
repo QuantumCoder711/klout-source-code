@@ -4,7 +4,8 @@ import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 type MessageState = {
   _id: string;
   messageID: string | null;
-  customerPhoneNumber: string | null;
+  customerPhoneNumber?: string | null;
+  customerEmail?: string | null;
   messageStatus: string | null;
   timestamp: string | null;
   __v: number;
@@ -23,13 +24,16 @@ type ReciptState = {
 type DataTableProps = {
   data: ReciptState[];
   cardStatus: string;
+  type: "whatsapp" | "email";
 };
 
-const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
+const DataTable: React.FC<DataTableProps> = ({ data, cardStatus, type }) => {
+  // console.log(data, cardStatus);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [nameFilter, setNameFilter] = useState('');
   const [phoneFilter, setPhoneFilter] = useState('');
+  const [emailFilter, setEmailFilter] = useState('');
 
   useEffect(() => {
     setCurrentPage(1);
@@ -40,17 +44,27 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
     const phoneMatch = phoneFilter
       ? data.messageID?.customerPhoneNumber?.includes(phoneFilter)
       : true;
+    const emailMatch = emailFilter ? data.messageID?.customerEmail?.includes(emailFilter) : true;
+    // const emailMatch = emailFilter ? data.messageID?.customerEmail?.toLowerCase().includes(emailFilter.toLowerCase()) : true;
+
 
     // Handle messageStatus filter logic: handle cases where messageStatus might be missing
     const cardStatusMatch = cardStatus
       ? cardStatus === "Sent"
-        ? data.messageID && ["Sent", "Delivered", "Read"].includes(data.messageID.messageStatus || "")
+        ? data.messageID && ["Sent", "Delivered", "Read", "Bounce", "Delivery"].includes(data.messageID.messageStatus || "")
         : data.messageID && data.messageID.messageStatus === cardStatus
       : true;
 
     // Ensure that records with missing fields like messageID or messageStatus are still included in filtering
-    return nameMatch && phoneMatch && cardStatusMatch;
+    if (type === "email") {
+      return nameMatch && emailMatch && cardStatusMatch;
+    }
+    else {
+      return nameMatch && phoneMatch && cardStatusMatch;
+    }
   });
+
+  console.log("Filtered Data is: ", filteredData);
 
   function normalDateFormat(date: string | null) {
     if (!date) return 'N/A';  // Gracefully handle missing date
@@ -153,13 +167,20 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
             value={nameFilter}
             onChange={(e) => setNameFilter(e.target.value)}
           />
-          <input
+          {type === "whatsapp" && <input
             type="tel"
             className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
             placeholder="Search by Phone No."
             value={phoneFilter}
             onChange={(e) => setPhoneFilter(e.target.value)}
-          />
+          />}
+          {type === "email" && <input
+            type="email"
+            className="border border-gray-500 rounded-md p-2 bg-white outline-none text-black"
+            placeholder="Search by Email"
+            value={emailFilter}
+            onChange={(e) => setEmailFilter(e.target.value)}
+          />}
         </div>
       </div>
 
@@ -169,7 +190,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
             <tr className="bg-klt_primary-500 text-white">
               <th className="py-3 px-4 text-start text-nowrap">S.No</th>
               <th className="py-3 px-4 text-start text-nowrap">Name</th>
-              <th className="py-3 px-4 text-start text-nowrap">Phone No.</th>
+              <th className="py-3 px-4 text-start text-nowrap">{type === "whatsapp" ? "Phone No." : "Email"}</th>
               <th className="py-3 px-4 text-start text-nowrap">Message Status</th>
               <th className="py-3 px-4 text-start text-nowrap">Date</th>
             </tr>
@@ -186,9 +207,12 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus }) => {
                 <tr key={data._id}>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{data.firstName}</td>
-                  <td className="py-3 px-4 text-gray-800 text-nowrap">
+                  {type === "whatsapp" && <td className="py-3 px-4 text-gray-800 text-nowrap">
                     {data.messageID?.customerPhoneNumber || 'N/A'} {/* Fallback for missing phone number */}
-                  </td>
+                  </td>}
+                  {type === "email" && <td className="py-3 px-4 text-gray-800 text-nowrap">
+                    {data.messageID?.customerEmail || 'N/A'} {/* Fallback for missing email */}
+                  </td>}
                   <td className="py-3 px-4 text-gray-800 text-nowrap">
                     {data.messageID?.messageStatus || 'Pending'} {/* Fallback for missing message status */}
                   </td>

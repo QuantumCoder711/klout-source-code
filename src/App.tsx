@@ -91,7 +91,7 @@ const App: React.FC = () => {
           <Route path="/all-charts" element={<AllCharts />} />
           <Route path="/all-charts/event-chart/:uuid" element={<ChartsData />} />
           <Route path="/all-reports/whatsapp-report/:uuid" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
-          <Route path="/all-reports/mail-report" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
+          <Route path="/all-reports/mail-report/:uuid" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
         </Route>
       </Routes>
 

@@ -167,7 +167,7 @@ const WhatsAppReport: React.FC = () => {
             </div>
 
             {/* Rendering Table */}
-            <DataTable data={allData} cardStatus={changeCardStatus} />
+            <DataTable data={allData} cardStatus={changeCardStatus} type="whatsapp"/>
 
         </div>
     )
