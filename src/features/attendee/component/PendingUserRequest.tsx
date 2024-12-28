@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HeadingH2 from '../../../component/HeadingH2';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { TiChevronLeft, TiChevronRight } from "react-icons/ti";
 import { FaDownload } from 'react-icons/fa';
@@ -47,7 +47,7 @@ const PendingUserRequest: React.FC = () => {
     const { uuid } = useParams<{ uuid: string }>();
     const dispatch = useDispatch<AppDispatch>();
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => state.auth);
     const { pendingRequests, user_id, loading, events } = useSelector((state: RootState) => ({
         pendingRequests: state.events.pendingRequests,
@@ -113,7 +113,8 @@ const PendingUserRequest: React.FC = () => {
                             timer: 1500,
                         })
                         setTimeout(() => {
-                            navigate("/events/all-attendee");
+                            // navigate("/events/all-attendee");
+                            window.history.back();
                         }, 1500);
                         // latestData.
                         // setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));

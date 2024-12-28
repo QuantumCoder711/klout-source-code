@@ -1,140 +1,3 @@
-// import React, { useState } from 'react';
-// import { useDispatch } from 'react-redux';
-// import { Link } from 'react-router-dom';
-// import { AppDispatch, RootState } from '../../../redux/store';
-// import { heading } from '../../heading/headingSlice';
-// import { IoMdArrowRoundBack } from 'react-icons/io';
-// import { useSelector } from 'react-redux';
-// import { TiArrowRight } from 'react-icons/ti';
-
-// const Profile: React.FC = () => {
-
-//     const { user, token, loading } = useSelector((state: RootState) => state.auth);
-
-//     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
-//     const dummyImage = "https://via.placeholder.com/150";
-
-//     const dispatch = useDispatch<AppDispatch>();
-
-//     const [edit, setEdit] = useState<boolean>(false);
-
-//     const handleSubmit = async () => {
-//         // Handeling the form submission
-//     }
-
-
-//     return (
-//         <div>
-//             <div className="flex justify-end">
-//                 {/* <HeadingH2 title="Profile" /> */}
-//                 <Link to="/" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
-//                     <IoMdArrowRoundBack size={20} /> Go To Dasboard
-//                 </Link>
-//             </div>
-
-//             {/* Container for the profile page */}
-//             {!edit && <div className="max-w-5xl mx-auto p-8">
-
-//                 {/* Profile Card */}
-//                 <div className="bg-white p-6 rounded-lg shadow-lg relative">
-//                     <div className="absolute top-2 right-2">
-//                         <img src={
-//                             user?.company_logo === null ? dummyImage : `${imageBaseUrl}/${user?.company_logo}`} alt="Company Logo" className="w-16 h-16 rounded-md mx-auto object-contain border border-gray-300" />
-//                     </div>
-//                     <div className="flex items-center space-x-8">
-//                         {/* Profile Picture */}
-//                         <div className="flex-shrink-0">
-//                             <img src={
-//                                 user?.image === null ? dummyImage : `${imageBaseUrl}/${user?.image}`} alt="Profile Picture" className="w-80 h-60 rounded-lg object-cover" />
-//                         </div>
-
-//                         {/* Personal Info */}
-//                         <div className="space-y-2">
-//                             <h2 className="text-2xl font-semibold text-gray-800">{user?.first_name + " " + user?.last_name}</h2>
-//                             <h3 className="text-lg font-semibold text-gray-800">{user?.company_name}</h3>
-//                             <p className="text-sm text-gray-600">{user?.designation}</p>
-//                             <p className="text-gray-500 text-sm">{user?.email}</p>
-//                             <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
-//                             <p className="text-gray-600 text-sm">{user?.designation_name}</p>
-//                             <p className="text-gray-500 text-sm">{user?.address + ", " + user?.pincode}</p>
-//                         </div>
-//                     </div>
-
-//                     <div className="mt-6 border-t border-gray-200 pt-6">
-//                         {/* Company Info */}
-//                         <div className="flex items-center space-x-8">
-//                             {/* Company Logo  */}
-//                             <div className="flex-shrink-0 w-40">
-
-//                             </div>
-
-//                             <div className="space-y-4">
-
-//                                 {/* <p className="text-gray-500">{user?.pincode}</p> */}
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//             </div>
-//             }
-
-//             {!edit && <div className="text-center">
-//                 <button onClick={() => setEdit(true)} className="btn btn-primary mx-auto">Edit Profile</button>
-//             </div>}
-
-//             {
-//                 edit && <div>
-//                     <form className="gap-4 mt-10">
-
-//                         {/* First Name & Last Name */}
-//                         <div className='w-full gap-3'>
-//                             <div className='flex flex-col w-full gap-3 my-4'>
-//                                 {/* First Name */}
-//                                 <label htmlFor="first_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-//                                     <span className="font-semibold text-green-700 flex justify-between items-center">First Name &nbsp; <TiArrowRight className='mt-1' /> </span>
-//                                     <input
-//                                         id="first_name"
-//                                         type="text"
-//                                         className="grow"
-//                                         defaultValue={user?.first_name}  // Use defaultValue instead of value
-//                                     />
-//                                 </label>
-//                             </div>
-//                         </div>
-//                     </form>
-//                 </div>
-//             }
-//         </div>
-//     )
-// }
-
-// export default Profile;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from "react-router-dom";
@@ -202,16 +65,16 @@ const Profile: React.FC = () => {
     const [jobTitle, setJobTitles] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [, setCustomCompanyName] = useState<string>(user?.company_name || '');
-    const [, setCustomDesignationName] = useState<string>('');
+    const [, setCustomDesignationName] = useState<string>(user?.designation_name || "");
     const [selectedCompany, setSelectedCompany] = useState<string>();
-    const [selectedDesignation, setSelectedDesignation] = useState<string | null>();
+    const [selectedDesignation, setSelectedDesignation] = useState<string>();
     const dummyImage = "https://via.placeholder.com/150";
 
     useEffect(() => {
         axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data || []));
         axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data || []));
         setSelectedCompany(user?.company);
-        setSelectedDesignation(user?.designation_name);
+        setSelectedDesignation(user?.designation);
     }, []);
 
     const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -276,9 +139,9 @@ const Profile: React.FC = () => {
             .then((res) => {
                 if (res.data.status === 200) {
                     swal("Success", res.data.message, "success").then(() => {
-                        // window.location.reload();
+                        window.location.reload();
                         // setEdit(false);
-                        window.history.back();
+                        // window.history.back();
                     });
                 };
             });
@@ -433,12 +296,12 @@ const Profile: React.FC = () => {
                                 <select
                                     id="company"
                                     {...register("company", { required: "Company is required" })}
-                                    className="bg-white pl-3 w-full"
-                                    defaultValue={user?.company_name}
+                                    className="bg-white pl-3 w-full h-full"
+                                    defaultValue={user?.company_name || user?.company}
                                     value={selectedCompany}
                                     onChange={handleCompanyChange}
                                 >
-                                    <option>{user?.company_name}</option>
+                                    <option>{user?.company_name || user?.company}</option>
                                     {companies?.map((company: companyType) => (
                                         <option key={company.id} value={company.name}>
                                             {company.name}
@@ -474,12 +337,12 @@ const Profile: React.FC = () => {
                                 <select
                                     id="designation"
                                     {...register("designation", { required: "Designation is required" })}
-                                    className="bg-white pl-3 w-full"
+                                    className="bg-white pl-3 w-full h-full"
                                     // value={selectedDesignation}
                                     defaultValue={user?.designation}
                                     onChange={handleDesignationChange}
                                 >
-                                    <option>{user?.designation_name}</option>
+                                    <option>{user?.designation || user?.designation_name}</option>
                                     {jobTitle?.map((designation: jobTitleType) => (
                                         <option key={designation.id} value={designation.name}>
                                             {designation.name}
