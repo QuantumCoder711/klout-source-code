@@ -539,8 +539,8 @@
 
 
 
-import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import { RootState } from '../../../redux/store';
 import { useSelector } from 'react-redux';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -593,15 +593,15 @@ const EditAttendee = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [industries, setIndustries] = useState<ApiType[]>();
-  const [selectedIndustry, setSelectedIndustry] = useState<string>(); // Track selected industry
+  const [, setSelectedIndustry] = useState<string>(); // Track selected industry
 
   const [companies, setCompanies] = useState<ApiType[]>();
-  const [selectedCompany, setSelectedCompany] = useState<string>(); // Track selected company
+  // const [selectedCompany, setSelectedCompany] = useState<string>(); // Track selected company
 
   const [jobTitles, setJobTitles] = useState<ApiType[]>();
-  const [selectedJobTitle, setSelectedJobTitle] = useState<string>(); // Track selected job title
+  const [, setSelectedJobTitle] = useState<string>(); // Track selected job title
 
-  const [status, setStatus] = useState<number | string>();
+  const [, setStatus] = useState<number | string>();
 
   const [companyFilled, setCompanyFilled] = useState<string>("");
   const [jobFilled, setJobFilled] = useState<string>("");
@@ -650,7 +650,7 @@ const EditAttendee = () => {
         console.log("Industries are: ", industries);
 
         const jobExist = jobTitles?.filter((job) => job.name == attendeeData.job_title);
-        const companyExist = companies?.filter((company) => company.name == attendeeData.company_name);
+        // const companyExist = companies?.filter((company) => company.name == attendeeData.company_name);
         const industryExist = industries?.filter((industry) => industry.name == attendeeData.industry);
 
         if (jobExist?.length === 0) {

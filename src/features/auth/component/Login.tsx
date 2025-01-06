@@ -91,16 +91,17 @@ const Login: React.FC = () => {
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 {...register('password', { required: 'Password is required' })}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                                className="mt-1 block relative w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
                             />
                             {/* Eye Icon */}
                             <span
-                                className="absolute inset-y-0 right-3 flex items-center top-6 cursor-pointer"
+                                className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
                                 onClick={() => setShowPassword(!showPassword)} // Toggle visibility
                             >
                                 {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
                             </span>
                             {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                            <Link to={"/forgot-password"} className='text-klt_primary-900 text-sm mt-3'>Forgot Password ?</Link>
                         </div>
 
                         {/* Submit Button */}
@@ -114,9 +115,9 @@ const Login: React.FC = () => {
                             </button>
                         </div>
 
-                        <hr className='!my-10 border border-zinc-200' />
+                        <hr className='!my-5 border border-zinc-200' />
 
-                        <Link to={"/forgot-password"} className='text-klt_primary-900'>Forgot Password ?</Link>
+                        <span>Don't have an account ? <Link to={"/signup"} className='text-klt_primary-900'>Signup Here</Link></span>
                     </form>
                 </div>
             </div>

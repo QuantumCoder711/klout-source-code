@@ -44,7 +44,7 @@ interface EditEventProps {
 
 
 const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
-    console.log(uuid);
+    // console.log(uuid);
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const { token } = useSelector((state: RootState) => state.auth);
@@ -76,16 +76,23 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
         }
     };
 
-    console.log("The current event is: ", currentEvent);
+    // console.log("The current event is: ", currentEvent);
 
     useEffect(() => {
-        const countryList = Country.getAllCountries();
-        setCountries(countryList);
-
-        if (currentEvent?.country) {
-            const initialCountry = currentEvent.country;
-            const initialState = currentEvent.state;
-            const initialCity = currentEvent.city;
+        axios.post(`${apiBaseUrl}/api/display/${uuid}`, {}, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(res => {
+            const countryList = Country.getAllCountries();
+            setCountries(countryList);
+            
+            const data = res.data.data;
+            console.log("Data fetched from API is: ", res.data.data);
+            const initialCountry = data.country;
+            const initialState = data.state;
+            const initialCity = data.city;
 
             console.log(initialCountry);
             console.log(initialState);
@@ -104,8 +111,12 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                     setCities(citiesOfState);
                 }
             }
-        }
-    }, [currentEvent, setValue]);
+        })
+    }, [setValue, currentEvent]);
+
+    // useEffect(() => {
+
+    // }, [currentEvent, setValue]);
 
     const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedCountry = e.target.value;
@@ -301,20 +312,20 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                         {/* Start Time */}
                         <label className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">Start Time &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <div className="flex gap-2 grow">
-                                <select id="start_time" defaultValue={currentEvent?.start_time} className="grow bg-white" {...register('start_time', { required: 'Start hour is required' })}>
+                            <div className="flex gap-2 grow h-full">
+                                <select id="start_time" defaultValue={currentEvent?.start_time} className="grow bg-white h-full" {...register('start_time', { required: 'Start hour is required' })}>
                                     <option value="">HH</option>
                                     {hours.map((hour) => (
                                         <option key={hour} value={hour}>{hour}</option>
                                     ))}
                                 </select>
-                                <select id="start_minute_time" defaultValue={currentEvent?.start_minute_time} className="grow bg-white" {...register('start_minute_time', { required: 'Start minute is required' })}>
+                                <select id="start_minute_time" defaultValue={currentEvent?.start_minute_time} className="grow bg-white h-full" {...register('start_minute_time', { required: 'Start minute is required' })}>
                                     <option value="">MM</option>
                                     {minutes.map((minute) => (
                                         <option key={minute} value={minute}>{minute}</option>
                                     ))}
                                 </select>
-                                <select id="start_time_type" defaultValue={currentEvent?.start_time_type} className="grow bg-white" {...register('start_time_type', { required: 'AM/PM is required' })}>
+                                <select id="start_time_type" defaultValue={currentEvent?.start_time_type} className="grow bg-white h-full" {...register('start_time_type', { required: 'AM/PM is required' })}>
                                     <option value="">AM/PM</option>
                                     {amPm.map((ampm) => (
                                         <option key={ampm} value={ampm}>{ampm}</option>
@@ -331,20 +342,20 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                         {/* End Time */}
                         <label className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">End Time &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <div className="flex gap-2 grow">
-                                <select id="end_time" defaultValue={currentEvent?.end_time} className="grow bg-white" {...register('end_time', { required: 'End hour is required' })}>
+                            <div className="flex gap-2 grow h-full">
+                                <select id="end_time" defaultValue={currentEvent?.end_time} className="grow bg-white h-full" {...register('end_time', { required: 'End hour is required' })}>
                                     <option value="">HH</option>
                                     {hours.map((hour) => (
                                         <option key={hour} value={hour}>{hour}</option>
                                     ))}
                                 </select>
-                                <select id="end_minute_time" defaultValue={currentEvent?.end_minute_time} className="grow bg-white" {...register('end_minute_time', { required: 'End minute is required' })}>
+                                <select id="end_minute_time" defaultValue={currentEvent?.end_minute_time} className="grow bg-white h-full" {...register('end_minute_time', { required: 'End minute is required' })}>
                                     <option value="">MM</option>
                                     {minutes.map((minute) => (
                                         <option key={minute} value={minute}>{minute}</option>
                                     ))}
                                 </select>
-                                <select id="end_time_type" defaultValue={currentEvent?.end_time_type} className="grow bg-white" {...register('end_time_type', { required: 'AM/PM is required' })}>
+                                <select id="end_time_type" defaultValue={currentEvent?.end_time_type} className="grow bg-white h-full" {...register('end_time_type', { required: 'AM/PM is required' })}>
                                     <option value="">AM/PM</option>
                                     {amPm.map((ampm) => (
                                         <option key={ampm} value={ampm}>{ampm}</option>
@@ -382,7 +393,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                         {/* Country */}
                         <label htmlFor="country" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">Country &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="country" value={watch('country')} className="grow bg-white" {...register('country', { required: 'Country is required' })} onChange={handleCountryChange}>
+                            <select id="country" value={watch('country')} className="grow bg-white h-full" {...register('country', { required: 'Country is required' })} onChange={handleCountryChange}>
                                 <option value="">Select Country</option>
                                 {countries.map((country) => (
                                     <option key={country.isoCode} value={country.isoCode}>
@@ -398,7 +409,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                         {/* State */}
                         <label htmlFor="state" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">State &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="state" value={watch('state')} className="grow bg-white" {...register('state', { required: 'State is required' })} onChange={handleStateChange}>
+                            <select id="state" value={watch('state')} className="grow bg-white h-full" {...register('state', { required: 'State is required' })} onChange={handleStateChange}>
                                 <option value="">Select State</option>
                                 {states.map((state) => (
                                     <option key={state.isoCode} value={state.isoCode}>
@@ -414,7 +425,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                         {/* City */}
                         <label htmlFor="city" className="input input-bordered bg-white text-black flex items-center gap-2">
                             <span className=" font-semibold text-green-700 flex justify-between items-center">City &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="city" value={watch('city')} className="grow bg-white" {...register('city', { required: 'City is required' })}>
+                            <select id="city" value={watch('city')} className="grow bg-white h-full" {...register('city', { required: 'City is required' })}>
                                 <option value="">Select City</option>
                                 {cities.map((city) => (
                                     <option key={city.id} value={city.name}>

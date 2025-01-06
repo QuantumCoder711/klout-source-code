@@ -125,7 +125,7 @@ const ForgotPassword: React.FC = () => {
                             </button>
                         </div>
 
-                        <hr className='!my-10 border border-zinc-200' />
+                        <hr className='!my-5 border border-zinc-200' />
 
                         <p>Already have an account ? <Link to={"/login"} className='text-klt_primary-900'>Login</Link></p>
                     </form>

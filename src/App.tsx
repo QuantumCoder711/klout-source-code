@@ -41,6 +41,7 @@ import DayTwoSameDayReminder from "./features/attendee/component/DayTwoSameDayRe
 import ThankYouMessage from "./features/attendee/component/ThankYouMessage";
 import EditAttendee from "./features/attendee/component/EditAttendee";
 import EditAgenda from "./features/event/component/EditAgenda";
+import SignupPage from "./pages/SignupPage";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -51,6 +52,7 @@ const App: React.FC = () => {
         {/* Login page without Layout */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
         {/* All other routes wrapped in Layout */}
         <Route
