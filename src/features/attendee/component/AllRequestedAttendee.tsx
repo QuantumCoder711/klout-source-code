@@ -60,12 +60,13 @@ const AllRequestedAttendee: React.FC = () => {
     // const [selectedAction, setSelectedAction] = useState('');
 
     const { token } = useSelector((state: RootState) => state.auth);
-    const { currentEventUUID, eventAttendee, loading, allEvents } = useSelector((state: RootState) => ({
+    const { currentEventUUID, loading, allEvents } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
-        eventAttendee: state.events.eventAttendee as attendeeType[],
         loading: state.events.attendeeLoader,
         allEvents: state.events.events,
     }));
+
+    const [eventAttendee, setEventAttendee] = useState<attendeeType[]>([]);
 
     const currentEvent = allEvents.find(event => uuid === event.uuid);
 
@@ -82,11 +83,14 @@ const AllRequestedAttendee: React.FC = () => {
 
     useEffect(() => {
         if (currentEvent && token) {
-            dispatch(allEventAttendee({ eventuuid: currentEvent.uuid, token }));
-        }
-
-        if (currentEvent) {
-            setDateDifference(calculateDateDifference(currentEvent?.event_start_date, currentEvent?.event_end_date));
+            axios.post(`${apiBaseUrl}/api/show-all-requested-attendees`, {}, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }).then(res => {
+                setEventAttendee(res.data.data);
+                console.log("The data is: ", eventAttendee);
+            })
         }
 
         // console.log("Checked Users are: ", checkedUsers);
@@ -116,20 +120,8 @@ const AllRequestedAttendee: React.FC = () => {
             const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
             return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
         })
-        // .sort((a, b) => new Date(b.check_in_time) - new Date(a.check_in_time)); // Sort in descending order
-        // Ensure check_in_time is parsed as a Date object for comparison
-        .sort((a, b) => {
-            const dateTimeA = new Date(a.check_in_time).getTime(); // Convert Date to timestamp (number)
-            const dateTimeB = new Date(b.check_in_time).getTime(); // Convert Date to timestamp (number)
-
-            return dateTimeB - dateTimeA; // Descending order
-        });
 
     // console.log("Checked Users are: ", checkedUsers2ndDay);
-
-    useEffect(() => {
-        // console.log(filteredAttendees)
-    }, [checkInFilter]);
 
     const totalPages = Math.ceil(filteredAttendees.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -151,18 +143,10 @@ const AllRequestedAttendee: React.FC = () => {
             'Designation': attendee.job_title,
             'Company': attendee.company_name,
             'Email': attendee.email_id,
+            'Alternate Email': attendee.alternate_email,
             'Mobile': attendee.phone_number,
+            'Altername Mobile': attendee.alternate_mobile_number,
             'Role': attendee.status,
-            'Check In': attendee.check_in === 1 ? 'Yes' : 'No',
-            "Check In Time": attendee.check_in_time,
-            'Check In 2nd': attendee.check_in_second === 2 ? 'Yes' : 'No',
-            "Check In Time 2nd": attendee.check_in_second_time,
-            'Check In 3rd': attendee.check_in_third === 3 ? 'Yes' : 'No',
-            "Check In Time 3rd": attendee.check_in_third_time,
-            'Check In 4th': attendee.check_in_forth === 4 ? 'Yes' : 'No',
-            "Check In Time 4th": attendee.check_in_forth_time,
-            'Check In 5th': attendee.check_in_fifth === 5 ? 'Yes' : 'No',
-            "Check In Time 5th": attendee.check_in_fifth_time,
             'Event Name': attendee.event_name,
         }));
 
@@ -209,7 +193,7 @@ const AllRequestedAttendee: React.FC = () => {
         );
     };
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (uuid: string) => {
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -221,7 +205,7 @@ const AllRequestedAttendee: React.FC = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 axios
-                    .delete(`${apiBaseUrl}/api/attendees/${id}`, {
+                    .delete(`${apiBaseUrl}/api/requested-attendee/${uuid}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -230,12 +214,9 @@ const AllRequestedAttendee: React.FC = () => {
                         Swal.fire({
                             icon: "success",
                             title: res.data.message,
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
+                            showConfirmButton: true,
+                        }).then(() => window.location.reload());
+
                         // setFilteredAgendaData(prevAgendas => prevAgendas.filter(agenda => agenda.uuid !== uuid));
                         // setCurrentAttendees(prevAttendee => prevAttendee.filter(attendee => attendee.id !== id));
                     })
@@ -243,27 +224,13 @@ const AllRequestedAttendee: React.FC = () => {
                         Swal.fire({
                             icon: "error",
                             title: "An Error Occured!",
-                            showConfirmButton: false,
-                            timer: 1500,
                         });
                     });
             }
         });
     }
 
-    const showQRCode = (title: string | undefined) => {
-        Swal.fire({
-            title: title || "QR Code",
-            // text: 'Here is your QR code',
-            imageUrl: qrCode,
-            imageHeight: "300px",
-            imageWidth: "300px",
-            confirmButtonText: 'OK'
-        });
-    }
-
     const showImage = (
-        img: string,
         firstName: string,
         lastName: string,
         email: string,
@@ -273,30 +240,23 @@ const AllRequestedAttendee: React.FC = () => {
         alternateEmail: string,
         status: string
     ) => {
-        const agendaImage = `${apiBaseUrl}/${img}`;
 
-        if (img === " ") {
-            img = "";
-        }
 
         // console.log(img);
 
         Swal.fire({
             title: `${firstName} ${lastName}`,
-            width: "750px",
+            width: "500px",
             text: email,
-            imageUrl: img ? agendaImage : dummyImage,  // Use provided image or fallback
-            imageHeight: "300px",
-            imageWidth: "300px",
             html: `
                 <div style="display: flex; font-size: 14px; gap: 64px; justify-content: center">
-                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px">
+                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px; margin-top: 30px;">
                 <div style="width:fit; text-align: left;"><strong>Job Title:</strong> ${jobTitle}</div>
                 <div style="width:fit; text-align: left;"><strong>Email:</strong> ${email}</div>
                 <div style="width:fit; text-align: left;"><strong>Company:</strong> ${companyName}</div>
                 </div>
     
-                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px">
+                <div style="min-width: fit; display: flex; flex-direction: column; gap: 12px; margin-top: 30px;">
                 <div style="width:fit; text-align: left;"><strong>Phone:</strong> ${phoneNumber}</div>
                 <div style="width:fit; text-align: left;"><strong>Alternate Email:</strong> ${alternateEmail || '-'}</div>
                 <div style="width:fit; text-align: left;"><strong>Status:</strong> ${status}</div>
@@ -409,7 +369,7 @@ const AllRequestedAttendee: React.FC = () => {
 
             <div className="flex items-center flex-wrap gap-2 mb-4">
                 <Link
-                    to={`/events/add-attendee/${uuid}`}
+                    to={`/events/add-requested-attendee/${uuid}`}
                     onClick={() => { dispatch(heading('Add Attendee')) }}
                     className="btn btn-secondary text-white btn-xs"
                     title="Add a new attendee"
@@ -478,20 +438,6 @@ const AllRequestedAttendee: React.FC = () => {
                             }}
                         />
 
-                        {/* Check-in filter */}
-                        <select
-                            className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
-                            value={checkInFilter}
-                            onChange={(e) => {
-                                setCheckInFilter(e.target.value);
-                                setCurrentPage(1); // Reset to the first page when filtering
-                            }}
-                        >
-                            <option value="">Checked In</option>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-
                         {/* Role filter */}
                         <select
                             className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
@@ -519,29 +465,6 @@ const AllRequestedAttendee: React.FC = () => {
                             Total Attendee: {eventAttendee.length}
                         </span>
                         <br />
-                        <span className="text-gray-800 font-semibold">
-                            {/* Checked In: {eventAttendee.filter((item) => item.check_in === 1).length} */}
-
-                            {dateDifference >= 0 && (
-                                <p>Checked In 1st: {eventAttendee.filter((item) => item.check_in === 1).length}</p>
-                            )}
-
-                            {dateDifference >= 1 && (
-                                <p>Checked In 2nd: {eventAttendee.filter((item) => item.check_in_second === 1).length}</p>
-                            )}
-
-                            {dateDifference >= 2 && (
-                                <p>Checked In 3rd: {eventAttendee.filter((item) => item.check_in_third === 1).length}</p>
-                            )}
-
-                            {dateDifference >= 3 && (
-                                <p>Checked In 4th: {eventAttendee.filter((item) => item.check_in_forth === 1).length}</p>
-                            )}
-
-                            {dateDifference >= 4 && (
-                                <p>Checked In 5th: {eventAttendee.filter((item) => item.check_in_fifth === 1).length}</p>
-                            )}
-                        </span>
 
                         <span className="text-gray-800 font-semibold">
                             Search Result: {filteredAttendees.length}
@@ -571,35 +494,6 @@ const AllRequestedAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Alternate Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
-                                    <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
-                                    <th className="py-3 px-4 text-start text-nowrap flex gap-3">Check In Time<br /> (1st)
-                                        {/* <span className='flex flex-col justify-between'><IoMdArrowDropup className='scale-105 cursor-pointer'/> <IoMdArrowDropup className='rotate-180 scale-105 cursor-pointer'/></span>  */}
-                                    </th>
-
-                                    {dateDifference > 0 && (
-                                        <>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (2nd)</th>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (2nd)</th>
-                                        </>
-                                    )}
-                                    {dateDifference > 1 && (
-                                        <>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (3rd)</th>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (3rd)</th>
-                                        </>
-                                    )}
-                                    {dateDifference > 2 && (
-                                        <>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (4th)</th>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (4th)</th>
-                                        </>
-                                    )}
-                                    {dateDifference > 3 && (
-                                        <>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (5th)</th>
-                                            <th className="py-3 px-4 text-start text-nowrap">Check In Time <br /> (5th)</th>
-                                        </>
-                                    )}
                                     <th className="py-3 px-4 text-start text-nowrap">Action</th>
                                 </tr>
                             </thead>
@@ -618,98 +512,14 @@ const AllRequestedAttendee: React.FC = () => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_email === "" ? attendee.alternate_email : "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_email ? attendee.alternate_email : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number === "" ? attendee.alternate_mobile_number : "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number ? attendee.alternate_mobile_number : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
-                                                {attendee.check_in === 1 ? 'Yes' : 'No'}
-                                            </td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
-                                                {attendee.check_in_time ? (
-                                                    <>
-                                                        {/* Date part */}
-                                                        {attendee.check_in_time.split(' ')[0]} <br />
-                                                        {/* Time part in bold */}
-                                                        <span style={{ fontWeight: 'bold' }}>
-                                                            {attendee.check_in_time.split(' ')[1]}
-                                                        </span>
-                                                    </>
-                                                ) : '-'}
-                                            </td>
 
-                                            {dateDifference > 0 && (
-                                                <>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_second === 1 ? 'Yes' : 'No'}
-                                                    </td>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_second === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_second_time ? (
-                                                            <>
-                                                                {attendee.check_in_second_time.split(' ')[0]} <br />
-                                                                <span style={{ fontWeight: 'bold' }}>
-                                                                    {attendee.check_in_second_time.split(' ')[1]}
-                                                                </span>
-                                                            </>
-                                                        ) : '-'}
-                                                    </td>
-                                                </>
-                                            )}
-                                            {dateDifference > 1 && (
-                                                <>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_third === 1 ? 'Yes' : 'No'}
-                                                    </td>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_third === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_third_time ? (
-                                                            <>
-                                                                {attendee.check_in_third_time.split(' ')[0]} <br />
-                                                                <span style={{ fontWeight: 'bold' }}>
-                                                                    {attendee.check_in_third_time.split(' ')[1]}
-                                                                </span>
-                                                            </>
-                                                        ) : '-'}
-                                                    </td>
-                                                </>
-                                            )}
-                                            {dateDifference > 2 && (
-                                                <>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_forth === 1 ? 'Yes' : 'No'}
-                                                    </td>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_forth === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_forth_time ? (
-                                                            <>
-                                                                {attendee.check_in_forth_time.split(' ')[0]} <br />
-                                                                <span style={{ fontWeight: 'bold' }}>
-                                                                    {attendee.check_in_forth_time.split(' ')[1]}
-                                                                </span>
-                                                            </>
-                                                        ) : '-'}
-                                                    </td>
-                                                </>
-                                            )}
-                                            {dateDifference > 3 && (
-                                                <>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_fifth === 1 ? 'Yes' : 'No'}
-                                                    </td>
-                                                    <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in_fifth === 1 ? 'green' : 'red' }}>
-                                                        {attendee.check_in_fifth_time ? (
-                                                            <>
-                                                                {attendee.check_in_fifth_time.split(' ')[0]} <br />
-                                                                <span style={{ fontWeight: 'bold' }}>
-                                                                    {attendee.check_in_fifth_time.split(' ')[1]}
-                                                                </span>
-                                                            </>
-                                                        ) : '-'}
-                                                    </td>
-                                                </>
-                                            )}
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-2">
                                                 <span
                                                     onClick={() => showImage(
-                                                        attendee.image,
                                                         attendee.first_name,
                                                         attendee.last_name,
                                                         attendee.email_id,
@@ -723,10 +533,10 @@ const AllRequestedAttendee: React.FC = () => {
                                                     <FaEye className='text-black/70' />
                                                 </span>
 
-                                                <Link to={`/events/edit-attendee/${attendee.uuid}/${currentEvent?.id}`} onClick={() => { dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
+                                                <Link to={`/events/edit-requested-attendee/${attendee.uuid}/${currentEvent?.id}`} onClick={() => { dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit />
                                                 </Link>
-                                                <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">
+                                                <button onClick={() => handleDelete(attendee.uuid)} className="text-red-500 hover:text-red-700">
                                                     <MdDelete />
                                                 </button>
                                             </td>

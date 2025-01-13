@@ -792,9 +792,9 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_email === "" ? attendee.alternate_email : "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_email ? attendee.alternate_email : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number === "" ? attendee.alternate_mobile_number : "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number ? attendee.alternate_mobile_number : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
                                                 {attendee.check_in === 1 ? 'Yes' : 'No'}

@@ -156,7 +156,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             </div>
 
             {/* Links */}
-            <div className='min-w-[110px]'>
+            <div className='min-w-fit'>
                 <Link to={`/events/view-event/${props.uuid}`} className="text-pink-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('View Event'));
                 }}>View Event</Link> <br />
@@ -170,7 +170,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                 }}>All Attendees</Link> <br />
                 <Link to={`/events/all-requested-attendees/${props.uuid}`} className="text-teal-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('All Requested Attendees'));
-                }}>All Attendees</Link> <br />
+                }}>Requested Attendees</Link> <br />
                 <Link to={`/events/view-agendas/${props.uuid}`} className="text-yellow-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
                     dispatch(heading('View Agendas')); dispatch(eventUUID(props.uuid));
                 }} >View Agendas</Link> <br />

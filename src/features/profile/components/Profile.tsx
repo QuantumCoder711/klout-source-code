@@ -199,10 +199,9 @@ const Profile: React.FC = () => {
                         <div className="space-y-2">
                             <h2 className="text-2xl font-semibold text-gray-800">{user?.first_name + " " + user?.last_name}</h2>
                             <h3 className="text-lg font-semibold text-gray-800">{user?.company_name}</h3>
-                            <p className="text-sm text-gray-600">{user?.designation}</p>
+                            <p className="text-sm text-gray-600">{user?.designation_name}</p>
                             <p className="text-gray-500 text-sm">{user?.email}</p>
                             <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
-                            <p className="text-gray-600 text-sm">{user?.designation_name}</p>
                             <p className="text-gray-500 text-sm">{user?.address + ", " + user?.pincode}</p>
                         </div>
                     </div>

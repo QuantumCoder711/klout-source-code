@@ -43,6 +43,8 @@ import EditAttendee from "./features/attendee/component/EditAttendee";
 import EditAgenda from "./features/event/component/EditAgenda";
 import SignupPage from "./pages/SignupPage";
 import AllRequestedAttendee from "./features/attendee/component/AllRequestedAttendee";
+import AddRequestedAttendee from "./features/attendee/component/AddRequestedAttendee";
+import EditRequestedAttendee from "./features/attendee/component/EditRequestedAttendee";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -74,9 +76,11 @@ const App: React.FC = () => {
           <Route path="/events/all-requested-attendees/:uuid" element={<AllRequestedAttendee />} />
           {/* <Route path="/events/edit-attendee/:attendee_uuid/:id" element={<EditAttendee />} /> */}
           <Route path="/events/edit-attendee/:uuid/:attendee_uuid" element={<EditAttendee />} />
+          <Route path="/events/edit-requested-attendee/:uuid/:attendee_uuid" element={<EditRequestedAttendee />} />
           <Route path="/events/pending-user-request/:uuid" element={<PendingUserRequest />} />
           <Route path="/events/send-to-app/:uuid" element={<SendToApp />} />
           <Route path="/events/add-attendee/:uuid" element={<AddEventAttendeePage />} />
+          <Route path="/events/add-requested-attendee/:uuid" element={<AddRequestedAttendee />} />
           <Route path="/events/send-reminder/:uuid" element={<SendReminder />} />
           <Route path="/events/send-poll/:uuid" element={<SendPoll />} />
           <Route path="/events/send-multiple-message/:uuid" element={<SendMultipleMessage />} />
