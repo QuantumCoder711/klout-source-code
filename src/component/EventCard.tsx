@@ -131,6 +131,7 @@ const EventCard: React.FC<eventCardProps> = (props) => {
                     <Link to={`/events/view-event/${props.eventuuid}`} onClick={() => { handleClick(props.eventuuid); dispatch(heading("View Event")); }} className="underline text-pink-500 hover:text-pink-600">View Event</Link>
                     <Link to={`/events/edit-event/${props.eventuuid}`}onClick={() => { handleClick(props.eventuuid); dispatch(heading("Edit Event")); }} className="underline text-sky-500 hover:text-sky-600">Edit Event</Link>
                     <Link to={`/events/all-attendee/${props.eventuuid}`} onClick={() => { handleClick(props.eventuuid); dispatch(heading("All Attendee")) }} className="underline text-blue-500 hover:text-blue-600">All Attendees</Link>
+                    <Link to={`/events/all-requested-attendees/${props.eventuuid}`} onClick={() => { handleClick(props.eventuuid); dispatch(heading("All Requested Attendee")) }} className="underline text-teal-500 hover:text-teal-600">All Requested Attendees</Link>
                     {/* <Link to='/events/view-sponsers/' onClick={() => handleClick(eventuuid)} className="underline text-green-500 hover:text-green-600">View Sponsers</Link> */}
                     <Link to={`/events/view-agendas/${props.eventuuid}`} onClick={() => { handleClick(props.eventuuid); dispatch(heading("View Agendas")); }} className="underline text-yellow-500 hover:text-yellow-600">View Agendas</Link>
                     <button onClick={() => {

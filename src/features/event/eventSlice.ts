@@ -40,6 +40,7 @@ type eventType = {
     more_information: string,
     t_and_conditions: string,
     pdf_path: string,
+    printer_count: number | null;
     total_attendee: number,
     total_accepted: number,
     total_not_accepted: number,

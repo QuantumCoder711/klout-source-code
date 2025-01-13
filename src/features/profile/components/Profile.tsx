@@ -21,10 +21,10 @@ type formInputType = {
     end_minute_time: string,
     end_time_type: string,
     priority: string;
-    company: string;
+    company_name: string;
     address: string;
     pincode: string;
-    designation: string;
+    designation_name: string;
     image: File | null,
 };
 
@@ -37,13 +37,13 @@ type jobTitleType = {
     uuid: string;
 }
 
-type companyType = {
-    created_at: string;
-    id: number;
-    name: string;
-    parent_id: number;
-    updated_at: string;
-}
+// type companyType = {
+//     created_at: string;
+//     id: number;
+//     name: string;
+//     parent_id: number;
+//     updated_at: string;
+// }
 
 const Profile: React.FC = () => {
 
@@ -127,6 +127,17 @@ const Profile: React.FC = () => {
         if (selectedUserImage !== "") {
             console.log("Selected User Image is: ", selectedUserImage);
             formData.append("image", selectedUserImage);
+        }
+
+        const cId: jobTitleType[] | undefined = companies.filter((company: jobTitleType) => company.name === selectedCompany);
+        if (cId) {
+            formData.append("company", String(cId[0].id));
+        }
+
+        const dId: jobTitleType[] | undefined = jobTitle.filter((job: jobTitleType) => job.name === selectedDesignation);
+        if (dId) {
+            formData.append("designation", String(dId[0].id));
+            console.log("The designation id: ", dId[0].id);
         }
 
         axios
@@ -294,15 +305,15 @@ const Profile: React.FC = () => {
                             <label htmlFor="company" className="input input-bordered bg-white text-black flex items-center gap-2">
                                 <span className="font-semibold text-green-700 min-w-fit flex items-center">Company &nbsp; <TiArrowRight className='mt-1' /></span>
                                 <select
-                                    id="company"
-                                    {...register("company", { required: "Company is required" })}
+                                    id="company_name"
+                                    {...register("company_name", { required: "Company is required" })}
                                     className="bg-white pl-3 w-full h-full"
-                                    defaultValue={user?.company_name || user?.company}
+                                    defaultValue={user?.company_name}
                                     value={selectedCompany}
                                     onChange={handleCompanyChange}
                                 >
-                                    <option>{user?.company_name || user?.company}</option>
-                                    {companies?.map((company: companyType) => (
+                                    <option>{user?.company_name}</option>
+                                    {companies?.map((company: jobTitleType) => (
                                         <option key={company.id} value={company.name}>
                                             {company.name}
                                         </option>
@@ -310,7 +321,7 @@ const Profile: React.FC = () => {
                                     <option value="Others">Others</option>
                                 </select>
                             </label>
-                            {errors.company && <p className="text-red-600">{errors.company.message}</p>}
+                            {errors.company_name && <p className="text-red-600">{errors.company_name.message}</p>}
                             {/* {errors.company && <p className="text-red-600">{errors.company.message}</p>} */}
                             {/* Custom Company Name */}
                             {selectedCompany === "Others" && (
@@ -322,10 +333,10 @@ const Profile: React.FC = () => {
                                             type="text"
                                             // value={customCompanyName}
                                             // onChange={handleCustomCompanyNameChange}
-                                            className="grow" {...register('company', { required: 'Company name is required' })}
+                                            className="grow" {...register('company_name', { required: 'Company name is required' })}
                                         />
                                     </label>
-                                    {errors.company && <p className="text-red-600">{errors.company.message}</p>}
+                                    {errors.company_name && <p className="text-red-600">{errors.company_name.message}</p>}
                                 </div>
                             )}
                         </div>
@@ -335,14 +346,14 @@ const Profile: React.FC = () => {
                             <label htmlFor="designation" className="input input-bordered bg-white text-black flex items-center gap-2">
                                 <span className="font-semibold text-green-700 min-w-fit flex items-center">Designation &nbsp; <TiArrowRight className='mt-1' /></span>
                                 <select
-                                    id="designation"
-                                    {...register("designation", { required: "Designation is required" })}
+                                    id="designation_name"
+                                    {...register("designation_name", { required: "Designation is required" })}
                                     className="bg-white pl-3 w-full h-full"
                                     // value={selectedDesignation}
                                     defaultValue={user?.designation}
                                     onChange={handleDesignationChange}
                                 >
-                                    <option>{user?.designation || user?.designation_name}</option>
+                                    <option>{user?.designation_name || user?.designation_name}</option>
                                     {jobTitle?.map((designation: jobTitleType) => (
                                         <option key={designation.id} value={designation.name}>
                                             {designation.name}
@@ -352,7 +363,7 @@ const Profile: React.FC = () => {
                                 </select>
                             </label>
 
-                            {errors.designation && <p className="text-red-600">{errors.designation.message}</p>}
+                            {errors.designation_name && <p className="text-red-600">{errors.designation_name.message}</p>}
 
                             {/* Custom Designation Name */}
                             {selectedDesignation === "Others" && (
@@ -364,10 +375,10 @@ const Profile: React.FC = () => {
                                             type="text"
                                             // value={customDesignationName}
                                             // onChange={handleCustomDesignationNameChange}
-                                            className="grow" {...register('designation', { required: 'Designation is required' })}
+                                            className="grow" {...register('designation_name', { required: 'Designation is required' })}
                                         />
                                     </label>
-                                    {errors.designation && <p className="text-red-600">{errors.designation.message}</p>}
+                                    {errors.designation_name && <p className="text-red-600">{errors.designation_name.message}</p>}
                                 </div>
                             )}
                         </div>

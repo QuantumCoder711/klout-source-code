@@ -1013,6 +1013,7 @@ const EditAttendee = () => {
               <option value="sponsor">Sponsor</option>
               <option value="delegate">Delegate</option>
               <option value="moderator">Moderator</option>
+              <option value="awardswinner">Awwards Winner</option>
             </select>
           </label>
           {errors.status && <p className="text-red-600">{errors.status.message}</p>}

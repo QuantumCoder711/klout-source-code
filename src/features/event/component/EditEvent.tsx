@@ -33,9 +33,11 @@ type formInputType = {
     image: File | null,
     feedback: number,
     status: number,
+    tabId: number,
     google_map_link: string,
     video_url: string;
     _method: string;
+    printer_count: number | null;
 };
 
 interface EditEventProps {
@@ -62,10 +64,21 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
     const [countries, setCountries] = useState<any[]>([]);
     const [states, setStates] = useState<any[]>([]);
     const [cities, setCities] = useState<any[]>([]);
+    const [printers, setPrinters] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState('');
     const [image, setImage] = useState();
     const selectedCountryCode = watch('country');
     const dummyImage = imageBaseUrl + '/' + currentEvent?.image;
+
+    useEffect(() => {
+        if (currentEvent) {
+            const printer = currentEvent.printer_count === null ? 0 : currentEvent.printer_count;
+            setPrinters(printer);
+            setValue("printer_count", printer);
+        }
+    }, [currentEvent]);
+
+    console.log(currentEvent);
 
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
@@ -87,8 +100,14 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
         }).then(res => {
             const countryList = Country.getAllCountries();
             setCountries(countryList);
-            
+
             const data = res.data.data;
+
+            const printersCount = data.printer_count === null ? 0 : data.printer_count;
+            setPrinters(printersCount);
+
+            console.log("The printer count is: ", printers);
+
             console.log("Data fetched from API is: ", res.data.data);
             const initialCountry = data.country;
             const initialState = data.state;
@@ -112,7 +131,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                 }
             }
         })
-    }, [setValue, currentEvent]);
+    }, [setValue, currentEvent, printers]);
 
     // useEffect(() => {
 
@@ -463,6 +482,15 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                         <input id="video_url" defaultValue={currentEvent?.video_url} className="grow" {...register('video_url')} />
                     </label>
                     {errors.video_url && <p className="text-red-600">{errors.video_url.message}</p>}
+                </div>
+
+                <div className='flex flex-col gap-3 my-4'>
+                    {/* Printer Count */}
+                    <label htmlFor="printer_count" className="input input-bordered bg-white text-black flex items-center gap-2">
+                        <span className="font-semibold text-green-700 flex justify-between items-center">No. Of Printers &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <input id="printer_count" defaultValue={printers} className="grow" {...register('printer_count')} />
+                    </label>
+                    {errors.printer_count && <p className="text-red-600">{errors.printer_count.message}</p>}
                 </div>
 
                 <div className="col-span-3 flex justify-center mt-4">

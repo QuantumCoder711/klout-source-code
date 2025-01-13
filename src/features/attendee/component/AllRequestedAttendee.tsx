@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { MdDelete } from 'react-icons/md';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
+import { Link } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+import { FaEdit, FaFileExcel, FaEye, FaUserFriends, FaUserClock, FaPoll } from 'react-icons/fa';
+import { useParams } from 'react-router-dom';
+import { heading } from '../../heading/headingSlice';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import { allEventAttendee } from '../../event/eventSlice';
-import { FaEdit, FaFileExcel, FaEye, FaUserFriends, FaUserClock, FaPoll } from 'react-icons/fa';
-import { MdDelete } from 'react-icons/md';
-import { Link } from 'react-router-dom';
-import HeadingH2 from '../../../component/HeadingH2';
-import * as XLSX from 'xlsx';  // Import the xlsx library
-import { heading } from '../../heading/headingSlice';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import HeadingH2 from '../../../component/HeadingH2';
 import Loader from '../../../component/Loader';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { BsSendFill } from 'react-icons/bs';
@@ -45,11 +46,8 @@ type attendeeType = {
     id: number;
 };
 
-interface AllEventAttendeeProps {
-    uuid: string | undefined;
-}
-
-const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
+const AllRequestedAttendee: React.FC = () => {
+    const { uuid } = useParams<{ uuid: string }>();
     const dispatch = useAppDispatch();
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -309,59 +307,6 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
         });
     }
 
-    // const deleteAttendee = (id: number, checked: boolean) => {
-    //     if (checked) {
-    //         const obj = { id };
-
-    //         // Check if the object already exists in the array
-    //         const exists = deleteArray.some((item) => item.id === id);
-
-    //         if (!exists) {
-    //             setDeleteArray([...deleteArray, obj]); // Add only if it doesn't already exist
-    //             console.log("The Delete Array is: ", [...deleteArray, obj]);
-    //         } else {
-    //             console.log("The item already exists in the delete array:", deleteArray);
-    //         }
-    //     }
-
-    //     else {
-    //         // Remove the object from array
-    //         const updatedArray = deleteArray.filter((item) => item.id !== id);
-    //         setDeleteArray(updatedArray);
-    //     }
-    // };
-
-    // const deleteAttendee = (id: number, checked: boolean) => {
-    //     if (checked) {
-    //         // Add the ID to the deleteArray if it doesn't already exist
-    //         if (!deleteArray.includes(id)) {
-    //             setDeleteArray([...deleteArray, id]); // Add ID to the array
-    //             console.log("The Delete Array is: ", [...deleteArray, id]);
-    //         } else {
-    //             console.log("The item already exists in the delete array:", deleteArray);
-    //         }
-    //     } else {
-    //         // Remove the ID from the deleteArray
-    //         const updatedArray = deleteArray.filter((item) => item !== id);
-    //         setDeleteArray(updatedArray);
-    //     }
-    // };
-
-    // const handleSelectAll = (isChecked: boolean) => {
-    //     console.log("Inside handle select all: ", isChecked);
-    //     // const isChecked = e.target.checked;
-
-    //     if (isChecked) {
-    //         const allIds = currentAttendees.map((attendee) => attendee.id);
-    //         setDeleteArray(allIds);
-    //         console.log("Delete Array is: ", deleteArray);
-
-    //     } else {
-    //         setDeleteArray([]);
-    //         console.log("Delete Array is: ", deleteArray);
-    //     }
-    // };
-
 
     const deleteAttendee = (id: number, checked: boolean) => {
         setDeleteArray((prevDeleteArray) => {
@@ -448,7 +393,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                 <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
 
                 <div className='flex items-center gap-3'>
-                    <button onClick={() => showQRCode(currentEvent?.title)} className='btn-sm text-white bg-amber-400 hover:bg-amber-500 btn'>QR Code</button>
+                    {/* <button onClick={() => showQRCode(currentEvent?.title)} className='btn-sm text-white bg-amber-400 hover:bg-amber-500 btn'>QR Code</button> */}
                     <Link
                         to="#"
                         onClick={() => {
@@ -470,125 +415,6 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                     title="Add a new attendee"
                 >
                     <FaUserFriends /> Add Attendee
-                </Link>
-
-                <Link
-                    to={`/events/send-reminder/${uuid}`}
-                    onClick={() => { dispatch(heading('Send Reminder')); }}
-                    className="btn btn-accent text-white btn-xs"
-                    title="Send a reminder to attendees"
-                >
-                    <BsSendFill /> Send Reminder
-                </Link>
-
-                <Link
-                    // to="/events/send-invitation"
-                    to={`/events/send-invitation/${uuid}`}
-                    onClick={() => { dispatch(heading('Send Invitation')); }}
-                    className="btn hidden btn-primary text-white btn-xs"
-                    title="Send an invitation to attendees"
-                >
-                    <FaMessage /> Send Invitation
-                </Link>
-
-                <Link
-                    // to="/events/same-day-reminder"
-                    to={`/events/same-day-reminder/${uuid}`}
-                    onClick={() => { dispatch(heading('Send Same Day Reminder')); }}
-                    className="btn btn-warning text-white btn-xs"
-                    title="Send a same day reminder"
-                >
-                    <BiSolidMessageSquareDots /> Send Same Day Reminder
-                </Link>
-
-                <Link
-                    // to="/events/send-poll"
-                    to={`/events/send-poll/${uuid}`}
-                    onClick={() => { dispatch(heading('Send Poll')); }}
-                    className="btn btn-info text-white btn-xs"
-                    title="Send a poll to attendees"
-                >
-                    <FaPoll /> Send Poll
-                </Link>
-
-                <Link
-                    // to="/events/send-to-app"
-                    to={`/events/send-to-app/${uuid}`}
-                    onClick={() => { dispatch(heading('Send In App Message')); }}
-                    className="btn btn-primary text-white btn-xs"
-                    title="Send an in-app message"
-                >
-                    <FaMessage /> Send In App Message
-                </Link>
-
-                <Link
-                    // to="/events/pending-user-request"
-                    to={`/events/pending-user-request/${uuid}`}
-                    onClick={() => { dispatch(heading("Pending Requests")) }}
-                    className="btn btn-error text-white btn-xs"
-                    title="View pending user requests"
-                >
-                    <FaUserClock /> Pending User Request
-                </Link>
-
-                <Link
-                    // to="/events/send-multiple-message"
-                    to={`/events/send-multiple-message/${uuid}`}
-                    onClick={() => { dispatch(heading('Send Template Message')); }}
-                    className="btn bg-orange-500 hover:bg-orange-600 text-white btn-xs"
-                    title="Send template message to multiple users"
-                >
-                    <BsSendFill /> Send Template Message
-                </Link>
-
-                <Link
-                    // to="/events/session-reminder"
-                    to={`/events/session-reminder/${uuid}`}
-                    onClick={() => { dispatch(heading('Session Reminder')); }}
-                    className="btn bg-fuchsia-500 hover:bg-fuchsia-600 text-white btn-xs"
-                    title="Send a session reminder"
-                >
-                    <BsSendFill /> Session Reminder
-                </Link>
-
-                <Link
-                    // to="/events/day-two-reminder"
-                    to={`/events/day-two-reminder/${uuid}`}
-                    onClick={() => { dispatch(heading('Day 2 Reminder')); }}
-                    className="btn bg-emerald-500 hover:bg-emerald-600 text-white btn-xs"
-                    title="Send a Day 2 reminder"
-                >
-                    <BsSendFill /> Day Two Reminder
-                </Link>
-
-                <Link
-                    // to="/events/reminder-to-visit-booth"
-                    to={`/events/reminder-to-visit-booth/${uuid}`}
-                    onClick={() => { dispatch(heading('Reminder Visit Booth')); }}
-                    className="btn bg-indigo-500 hover:bg-indigo-600 text-white btn-xs"
-                    title="Send reminder to visit booth"
-                >
-                    <BsSendFill /> Reminder Visit Booth
-                </Link>
-
-                <Link
-                    // to="/events/day_two_same_day_reminder"
-                    to={`/events/day_two_same_day_reminder/${uuid}`}
-                    onClick={() => { dispatch(heading('Day Two Same Day Reminder')); }}
-                    className="btn bg-purple-500 hover:bg-purple-600 text-white btn-xs"
-                    title="Send Day 2 same day reminder"
-                >
-                    <BsSendFill /> Day Two Same Day Reminder
-                </Link>
-
-                <Link
-                    // to="/events/thank-you-message"
-                    to={`/events/thank-you-message/${uuid}`}
-                    onClick={() => { dispatch(heading('Thank You Message')); }}
-                    className="btn bg-rose-500 hover:bg-rose-600 text-white btn-xs"
-                    title="Send a thank you message"
-                >
-                    <BsSendFill /> Thank You Message
                 </Link>
 
                 <button
@@ -916,60 +742,6 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                             </tbody>
                         </table>
 
-
-                        // <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
-                        //     <thead>
-                        //         <tr className="bg-klt_primary-500 text-white">
-                        //             {/* Select All Checkbox */}
-                        //             <th className="py-3 px-4 text-start text-nowrap">
-                        //                 <input
-                        //                     type="checkbox"
-                        //                     // onChange={(e) => handleSelectAll(e.target.checked)}
-                        //                     // checked={isAllSelected}
-                        //                 />
-                        //             </th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">#</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Name</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Designation</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Email</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Action</th>
-                        //         </tr>
-                        //     </thead>
-                        //     <tbody>
-                        //         {currentAttendees.length > 0 ? (
-                        //             currentAttendees.map((attendee, index) => (
-                        //                 <tr key={attendee.uuid}>
-                        //                     {/* Individual Checkbox */}
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">
-                        //                         <input
-                        //                             type="checkbox"
-                        //                             // checked={selectedAttendees.includes(attendee.uuid)}
-                        //                             // onChange={() => handleSelectAttendee(attendee.uuid)}
-                        //                         />
-                        //                     </td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{index + 1}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">
-                        //                         {`${attendee.first_name} ${attendee.last_name}`}
-                        //                     </td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-2">
-                        //                         {/* Actions */}
-                        //                         <button className="text-blue-500 hover:text-blue-700">Edit</button>
-                        //                         <button className="text-red-500 hover:text-red-700">Delete</button>
-                        //                     </td>
-                        //                 </tr>
-                        //             ))
-                        //         ) : (
-                        //             <tr>
-                        //                 <td colSpan={6} className="py-4 text-center text-gray-600">
-                        //                     No attendees found.
-                        //                 </td>
-                        //             </tr>
-                        //         )}
-                        //     </tbody>
-                        // </table>
-
                     )}
                 </div>
 
@@ -999,4 +771,5 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
     );
 };
 
-export default AllEventAttendee;
+
+export default AllRequestedAttendee;

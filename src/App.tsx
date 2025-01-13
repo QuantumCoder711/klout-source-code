@@ -42,6 +42,7 @@ import ThankYouMessage from "./features/attendee/component/ThankYouMessage";
 import EditAttendee from "./features/attendee/component/EditAttendee";
 import EditAgenda from "./features/event/component/EditAgenda";
 import SignupPage from "./pages/SignupPage";
+import AllRequestedAttendee from "./features/attendee/component/AllRequestedAttendee";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -70,6 +71,7 @@ const App: React.FC = () => {
           <Route path="/events/edit-agenda/:agenda_uuid/:id" element={<EditAgenda />} />
           <Route path="/events/edit-event/:uuid" element={<EditEventPage />} />
           <Route path="/events/all-attendee/:uuid" element={<AllEventAttendeePage />} />
+          <Route path="/events/all-requested-attendees/:uuid" element={<AllRequestedAttendee />} />
           {/* <Route path="/events/edit-attendee/:attendee_uuid/:id" element={<EditAttendee />} /> */}
           <Route path="/events/edit-attendee/:uuid/:attendee_uuid" element={<EditAttendee />} />
           <Route path="/events/pending-user-request/:uuid" element={<PendingUserRequest />} />

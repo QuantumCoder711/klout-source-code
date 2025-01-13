@@ -157,24 +157,27 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
             {/* Links */}
             <div className='min-w-[110px]'>
-                <Link to={`/events/view-event/${props.uuid}`} className="text-pink-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
+                <Link to={`/events/view-event/${props.uuid}`} className="text-pink-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('View Event'));
                 }}>View Event</Link> <br />
                 <Link 
                     to={`/events/edit-event/${props.uuid}`}
-                className="text-sky-500 hover:underline px-3 py-1 inline-block mb-1 rounded-md text-xs font-semibold" onClick={() => {
+                className="text-sky-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('Edit Event'));
                 }} >Edit Event</Link> <br />
-                <Link to={`/events/all-attendee/${props.uuid}`} className="text-blue-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
+                <Link to={`/events/all-attendee/${props.uuid}`} className="text-blue-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('All Attendee'));
                 }}>All Attendees</Link> <br />
-                <Link to={`/events/view-agendas/${props.uuid}`} className="text-yellow-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1" onClick={() => {
+                <Link to={`/events/all-requested-attendees/${props.uuid}`} className="text-teal-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('All Requested Attendees'));
+                }}>All Attendees</Link> <br />
+                <Link to={`/events/view-agendas/${props.uuid}`} className="text-yellow-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
                     dispatch(heading('View Agendas')); dispatch(eventUUID(props.uuid));
                 }} >View Agendas</Link> <br />
 
-                <button className="text-purple-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1"
+                <button className="text-purple-500 hover:underline px-3 rounded-md text-xs inline-block mb-1"
                     onClick={() => generatePDF(props.uuid)}>Generate PDF</button> <br />
-                <button className="text-red-500 hover:underline px-3 py-1 rounded-md text-xs font-semibold inline-block mb-1"
+                <button className="text-red-500 hover:underline px-3 rounded-md text-xs inline-block mb-1"
                     onClick={() => {
                         if (props.id !== undefined) {
                             handleDelete(props.id);
