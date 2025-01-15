@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
 import { MdOutlineFileDownload } from "react-icons/md";
@@ -7,9 +7,8 @@ import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
 // import { useNavigate } from "react-router-dom";
 import Loader from "../../../component/Loader";
-import Swal from "sweetalert2";
 import { useParams } from "react-router-dom";
-const dummyImage = "https://via.placeholder.com/150";
+import Swal from "sweetalert2";
 
 // Define the form data type
 type FormInputType = {
@@ -150,10 +149,28 @@ const AddRequestedAttendee: React.FC = () => {
                     },
                 })
                 .then((res) => {
+                    // console.log("The data is: ", res.data);
+                    // if (res.status ) {
+                    //     console.log("The error is occurred");
+                    // }
+
                     if (res.data.status) {
                         swal("Success", res.data.message, "success").then(() => window.history.back());
                     }
-                });
+                    else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.data.message,
+                            // text: 'Something went wrong!',
+                        });
+                    }
+                }).catch(res => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: res.data.message,
+                        // text: 'Something went wrong!',
+                    });
+                })
         } catch (error) {
             alert('An error occurred while submitting the form.');
             console.error('Error:', error);
@@ -196,21 +213,6 @@ const AddRequestedAttendee: React.FC = () => {
                         </label>
                         {errors.last_name && <p className="text-red-600">{errors.last_name.message}</p>}
                     </div>
-                    {/* 
-                    <div className="flex flex-col gap-3 my-4">
-                        <label htmlFor="image" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Profile Picture &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input
-                                id="image"
-                                type="file"
-                                accept="image/*"
-                                className="grow"
-                                onChange={handleImageUpload}
-                                ref={fileInputRef}
-                            />
-                        </label>
-
-                    </div> */}
 
                     <div className="flex flex-col gap-3 my-4">
                         <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
@@ -380,11 +382,11 @@ const AddRequestedAttendee: React.FC = () => {
                                     type="file"
                                     accept=".xlsx, .xls, .csv"
                                     className="grow"
-                                    onChange={(e) => { }}
+                                    onChange={() => { }}
                                 />
                             </label>
                             {/* {errors.excel_file && <p className="text-red-600">{errors.excel_file.message}</p>} */}
-                            <button type="button" className="btn btn-warning btn-sm" onClick={(e) => { }}>
+                            <button type="button" className="btn btn-warning btn-sm" onClick={() => { }}>
                                 Upload Excel Now
                             </button>
                         </div>

@@ -169,8 +169,8 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('All Attendee'));
                 }}>All Attendees</Link> <br />
                 <Link to={`/events/all-requested-attendees/${props.uuid}`} className="text-teal-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
-                    dispatch(eventUUID(props.uuid)); dispatch(heading('All Requested Attendees'));
-                }}>Requested Attendees</Link> <br />
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('Send Invitations'));
+                }}>Send Invitations</Link> <br />
                 <Link to={`/events/view-agendas/${props.uuid}`} className="text-yellow-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
                     dispatch(heading('View Agendas')); dispatch(eventUUID(props.uuid));
                 }} >View Agendas</Link> <br />

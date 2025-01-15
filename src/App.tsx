@@ -45,6 +45,7 @@ import SignupPage from "./pages/SignupPage";
 import AllRequestedAttendee from "./features/attendee/component/AllRequestedAttendee";
 import AddRequestedAttendee from "./features/attendee/component/AddRequestedAttendee";
 import EditRequestedAttendee from "./features/attendee/component/EditRequestedAttendee";
+import InviteResgistations from "./features/attendee/component/InviteResigtrations";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -83,6 +84,7 @@ const App: React.FC = () => {
           <Route path="/events/add-requested-attendee/:uuid" element={<AddRequestedAttendee />} />
           <Route path="/events/send-reminder/:uuid" element={<SendReminder />} />
           <Route path="/events/send-poll/:uuid" element={<SendPoll />} />
+          <Route path="/events/invite-registrations/:uuid" element={<InviteResgistations />} />
           <Route path="/events/send-multiple-message/:uuid" element={<SendMultipleMessage />} />
           <Route path="/events/session-reminder/:uuid" element={<SessionReminder />} />
           <Route path="/events/day-two-reminder/:uuid" element={<DayTwoReminder />} />

@@ -3,20 +3,16 @@ import { MdDelete } from 'react-icons/md';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { Link } from 'react-router-dom';
 import * as XLSX from 'xlsx';
-import { FaEdit, FaFileExcel, FaEye, FaUserFriends, FaUserClock, FaPoll } from 'react-icons/fa';
+import { FaEdit, FaFileExcel, FaEye, FaUserFriends } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { heading } from '../../heading/headingSlice';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
-import { allEventAttendee } from '../../event/eventSlice';
 import Swal from 'sweetalert2';
 import axios from 'axios';
 import HeadingH2 from '../../../component/HeadingH2';
 import Loader from '../../../component/Loader';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { BsSendFill } from 'react-icons/bs';
-import { FaMessage } from 'react-icons/fa6';
-import { BiSolidMessageSquareDots } from 'react-icons/bi';
 
 type attendeeType = {
     uuid: string;
@@ -51,7 +47,6 @@ const AllRequestedAttendee: React.FC = () => {
     const dispatch = useAppDispatch();
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    const dummyImage = "https://via.placeholder.com/150";
 
     const [deleteArray, setDeleteArray] = useState<number[]>([]);
 
@@ -69,17 +64,6 @@ const AllRequestedAttendee: React.FC = () => {
     const [eventAttendee, setEventAttendee] = useState<attendeeType[]>([]);
 
     const currentEvent = allEvents.find(event => uuid === event.uuid);
-
-    const qrCode = `${apiBaseUrl}/${currentEvent?.qr_code}`;
-
-    const [dateDifference, setDateDifference] = useState<number>(0);
-
-    // Helper function to calculate the difference in days
-    const calculateDateDifference = (startDate: string, endDate: string): number => {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
-    };
 
     useEffect(() => {
         if (currentEvent && token) {
@@ -102,7 +86,6 @@ const AllRequestedAttendee: React.FC = () => {
     const [searchName, setSearchName] = useState('');
     const [searchCompany, setSearchCompany] = useState('');
     const [searchDesignation, setSearchDesignation] = useState('');
-    const [checkInFilter, setCheckInFilter] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
 
     // Filter attendees based on the search terms
@@ -111,14 +94,8 @@ const AllRequestedAttendee: React.FC = () => {
             const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
             const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
             const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
-            const matchesCheckIn = checkInFilter === '' ||
-                attendee.check_in === Number(checkInFilter) ||
-                attendee.check_in_second === Number(checkInFilter) ||
-                attendee.check_in_third === Number(checkInFilter) ||
-                attendee.check_in_forth === Number(checkInFilter) ||
-                attendee.check_in_fifth === Number(checkInFilter);
             const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
-            return matchesName && matchesCompany && matchesDesignation && matchesCheckIn && matchesRole;
+            return matchesName && matchesCompany && matchesDesignation && matchesRole;
         })
 
     // console.log("Checked Users are: ", checkedUsers2ndDay);
@@ -375,6 +352,15 @@ const AllRequestedAttendee: React.FC = () => {
                     title="Add a new attendee"
                 >
                     <FaUserFriends /> Add Attendee
+                </Link>
+
+                <Link
+                    to={`/events/invite-registrations/${uuid}`}
+                    onClick={() => { dispatch(heading('Invited Registrations')) }}
+                    className="btn btn-accent text-white btn-xs"
+                    title="Invited Registration"
+                >
+                    <FaUserFriends /> Invite Registrations
                 </Link>
 
                 <button
