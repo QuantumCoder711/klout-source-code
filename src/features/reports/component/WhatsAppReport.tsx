@@ -116,6 +116,9 @@ const WhatsAppReport: React.FC = () => {
                                 case 9:
                                     setSelectedTemplate("post_thank_you_messageevent");
                                     break;
+                                case 10:
+                                    setSelectedTemplate("event_invitation");
+                                    break;
                                 default:
                                     break;
                             }
@@ -131,6 +134,7 @@ const WhatsAppReport: React.FC = () => {
                         <option value={7}>Day 2 Reminder</option>
                         <option value={8}>Day 2 Same Day Reminder</option>
                         <option value={9}>Thank You Message</option>
+                        <option value={10}>Requested Attendees</option>
                     </select>
                 </div>
             </div>

@@ -48,6 +48,8 @@ const AllRequestedAttendee: React.FC = () => {
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
+    const { user } = useSelector((state: RootState) => state.auth);
+
     const [deleteArray, setDeleteArray] = useState<number[]>([]);
 
     const [deletingAttendee, setDeletingAttendee] = useState<boolean>(false);
@@ -67,7 +69,10 @@ const AllRequestedAttendee: React.FC = () => {
 
     useEffect(() => {
         if (currentEvent && token) {
-            axios.post(`${apiBaseUrl}/api/show-all-requested-attendees`, {}, {
+            axios.post(`${apiBaseUrl}/api/show-all-requested-attendees`, {
+                user_id: user?.id,
+                event_id: currentEvent.id,
+            }, {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
@@ -117,13 +122,13 @@ const AllRequestedAttendee: React.FC = () => {
         const data = filteredAttendees.map((attendee) => ({
             'First Name': attendee.first_name,
             'Last Name': attendee.last_name,
+            'Email': attendee.email_id,
+            'Mobile': attendee.phone_number,
+            'Role': attendee.status,
+            'Altername Mobile': attendee.alternate_mobile_number,
+            'Alternate Email': attendee.alternate_email,
             'Designation': attendee.job_title,
             'Company': attendee.company_name,
-            'Email': attendee.email_id,
-            'Alternate Email': attendee.alternate_email,
-            'Mobile': attendee.phone_number,
-            'Altername Mobile': attendee.alternate_mobile_number,
-            'Role': attendee.status,
             'Event Name': attendee.event_name,
         }));
 
@@ -287,8 +292,11 @@ const AllRequestedAttendee: React.FC = () => {
         }).then((res) => {
             if (res.isConfirmed) {
                 setDeletingAttendee(true);
-                axios.post(`${apiBaseUrl}/api/delete-multiple-attendees`, {
-                    ids: deleteArray
+                console.log("The array is going to delete is: ", deleteArray);
+                axios.post(`${apiBaseUrl}/api/bulk-delete-requested-attendee`, {
+                    ids: deleteArray,
+                    user_id: user?.id,
+                    event_id: currentEvent?.id,
                 },
                     {
                         headers: {
@@ -327,7 +335,7 @@ const AllRequestedAttendee: React.FC = () => {
     return (
         <>
             <div className='flex justify-between items-center'>
-                <HeadingH2 title={eventAttendee[0]?.event_name || 'Event Attendees'} />
+                <HeadingH2 title={currentEvent?.title} />
 
                 <div className='flex items-center gap-3'>
                     {/* <button onClick={() => showQRCode(currentEvent?.title)} className='btn-sm text-white bg-amber-400 hover:bg-amber-500 btn'>QR Code</button> */}

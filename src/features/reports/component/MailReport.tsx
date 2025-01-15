@@ -157,29 +157,29 @@ const MailReport: React.FC = () => {
                                     setSelectedTemplate("event_downloadapp");
                                     break;
                                 case 2:
-                                    setSelectedTemplate("event_reminder_today");
+                                    setSelectedTemplate("event_invitation");
                                     break;
-                                case 3:
-                                    setSelectedTemplate("event_poll_feedback");
-                                    break;
-                                case 4:
-                                    setSelectedTemplate("reminder_iimm_v1");
-                                    break;
-                                case 5:
-                                    setSelectedTemplate("session_reminder");
-                                    break;
-                                case 6:
-                                    setSelectedTemplate("reminder_to_visit_booth");
-                                    break;
-                                case 7:
-                                    setSelectedTemplate("day_2_reminder");
-                                    break;
-                                case 8:
-                                    setSelectedTemplate("day_2_same_day_reminder");
-                                    break;
-                                case 9:
-                                    setSelectedTemplate("post_thank_you_messageevent");
-                                    break;
+                                // case 3:
+                                //     setSelectedTemplate("event_poll_feedback");
+                                //     break;
+                                // case 4:
+                                //     setSelectedTemplate("reminder_iimm_v1");
+                                //     break;
+                                // case 5:
+                                //     setSelectedTemplate("session_reminder");
+                                //     break;
+                                // case 6:
+                                //     setSelectedTemplate("reminder_to_visit_booth");
+                                //     break;
+                                // case 7:
+                                //     setSelectedTemplate("day_2_reminder");
+                                //     break;
+                                // case 8:
+                                //     setSelectedTemplate("day_2_same_day_reminder");
+                                //     break;
+                                // case 9:
+                                //     setSelectedTemplate("post_thank_you_messageevent");
+                                //     break;
                                 default:
                                     break;
                             }
@@ -187,6 +187,7 @@ const MailReport: React.FC = () => {
                         }}
                     >
                         <option value={1}>Reminder</option>
+                        <option value={2}>Requested Attendees</option>
                         {/* <option value={2}>Same Day Invitation</option>
                         <option value={3}>Event Poll</option>
                         <option value={4}>Send Template Message</option>

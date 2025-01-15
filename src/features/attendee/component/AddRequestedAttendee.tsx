@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { TiArrowRight } from "react-icons/ti";
 import { MdOutlineFileDownload } from "react-icons/md";
@@ -21,6 +21,7 @@ type FormInputType = {
     alternate_mobile_number: string;
     status: string;
     event_id: number;
+    excel_file: File | null;
 };
 
 
@@ -36,15 +37,15 @@ type ApiType = {
 const AddRequestedAttendee: React.FC = () => {
     const { uuid } = useParams<{ uuid: string }>();
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    const { user } = useSelector((state: RootState) => (state.auth));
     // const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => (state.auth));
     const allEvents = useSelector((state: RootState) => (state.events.events));
-    // const { currentEventUUID } = useSelector((state: RootState) => (state.events));
     const currentEvent = allEvents.find((event) => event.uuid === uuid);
     // const { currentAttendeeUUID } = useSelector((state: RootState) => (state.attende));
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
-    // const [selectedExcelFile, setSelectedExcelFile] = useState<File | null>(null);
-    // const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [selectedExcelFile, setSelectedExcelFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [jobTitles, setJobTitles] = useState<ApiType[] | undefined>();
     const [selectedCompany, setSelectedCompany] = useState<string | number>(''); // Track selected company
 
@@ -53,21 +54,22 @@ const AddRequestedAttendee: React.FC = () => {
 
     const [loading, setLoading] = useState<boolean>(false);
 
-    // const [, setErrorsExcel] = useState({});
-    // const [, setInvalidMessage] = useState("");
-    // const [, setIsLoadingExcel] = useState(false);
-    // const [, setColumnData] = useState({});
-    // const [, setInValidData] = useState({});
-    // const [, setDownloadInvalidExcel] = useState(false);
+    const [, setErrorsExcel] = useState({});
+    const [, setInvalidMessage] = useState("");
+    const [, setIsLoadingExcel] = useState(false);
+    const [, setColumnData] = useState({});
+    const [, setInValidData] = useState({});
+    const [, setDownloadInvalidExcel] = useState(false);
+
 
     // const [showAlert, setShowAlert] = useState(true);
     // const [companyInput, setCompanyInput] = useState(false);
     // const [companyData, setCompanyData] = useState([]);
     // const [designationData, setDesignationData] = useState([]);
     // const [designationInput, setDesignationInput] = useState(false);
-    // const [excelInput, setExcelInput] = useState({
-    //     file: null,
-    // });
+    const [excelInput, setExcelInput] = useState({
+        file: null,
+    });
 
     console.log(currentEvent);
 
@@ -81,24 +83,24 @@ const AddRequestedAttendee: React.FC = () => {
             [
                 "first_name",
                 "last_name",
-                "job_title",
-                "company_name",
-                "email",
-                "alternate_email",
+                "email_id",
                 "phone_number",
-                "alternate_mobile_number",
                 "status",
+                "alternate_mobile_number",
+                "alternate_email_id",
+                "company_name",
+                "job_title",
             ],
             [
                 "John",
                 "Doe",
-                "CEO",
-                "Digimantra",
                 "johndoe@example.com",
-                "johndoe@alternatemail.com",
                 "8709289369",
-                "7865656575",
                 "Speaker",
+                "7865656575",
+                "johndoe@alternatemail.com",
+                "Digimantra",
+                "CEO",
             ],
         ];
 
@@ -110,10 +112,133 @@ const AddRequestedAttendee: React.FC = () => {
         // Create a virtual anchor element and trigger download
         const link = document.createElement("a");
         link.setAttribute("href", encodeURI(csvContent));
-        link.setAttribute("download", "attendee_list_data.csv");
+        link.setAttribute("download", "request_attendee_list.csv");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+
+    const handleExcelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Logic for handling Excel file uploads
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedExcelFile(file);  // Store the selected file in state
+            setValue('excel_file', file);  // Set it in the form data as well
+        }
+    };
+
+
+    const handleFileUpload = async (e: any) => {
+        if (selectedExcelFile) {
+            setLoading(true);
+        }
+        e.preventDefault();
+
+        setDownloadInvalidExcel(false);
+
+        if (!selectedExcelFile) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Please select an excel file',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        setIsLoadingExcel(true);
+
+        const formData = new FormData();
+
+        formData.append("excel_file", selectedExcelFile);
+
+        if (currentEvent) {
+            formData.append("event_id", String(currentEvent.id));
+        }
+
+        if (user) {
+            formData.append("user_id", String(user?.id));
+        }
+
+        console.log(formData);
+
+        await axios
+            .post(`${apiBaseUrl}/api/bulk-upload-requested-attendee`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Authorization": `Bearer ${token}`
+                },
+            })
+            .then((res) => {
+                if (res.data.status) {
+                    swal("Success", res.data.message, "success").then(()=>window.history.back());
+
+                    setColumnData({});
+
+                    setInValidData({});
+
+                    setErrorsExcel({});
+
+                    setDownloadInvalidExcel(false);
+
+                    setSelectedExcelFile(null);
+
+                    // history.push(`/organiser/admin/all-attendee/${event_id}`);
+                } else if (res.data.status === 400) {
+                    setDownloadInvalidExcel(true);
+
+                    setColumnData(res.data.column_data);
+
+                    setInValidData(res.data.invalid_data);
+
+                    setInvalidMessage(res.data.message);
+
+                    setErrorsExcel(res.data.errors);
+
+                    setSelectedExcelFile(null);
+
+                    setExcelInput({ ...excelInput, file: null });
+
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                    }
+                } else if (res.data.status === 422) {
+                    setColumnData({});
+
+                    setInValidData({});
+
+                    setErrorsExcel({ message: res.data.error });
+
+                    setSelectedExcelFile(null);
+
+                    setExcelInput({ ...excelInput, file: null });
+
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                    }
+                } else if (res.data.status === 401) {
+                    setColumnData({});
+
+                    setInValidData({});
+
+                    setDownloadInvalidExcel(false);
+
+                    setErrorsExcel({ message: res.data.message });
+
+                    setSelectedExcelFile(null);
+
+                    setExcelInput({ ...excelInput, file: null });
+
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = "";
+                    }
+                }
+            }).then(() => {
+                setLoading(false);
+            })
+
+        setIsLoadingExcel(false);
     };
 
 
@@ -382,11 +507,11 @@ const AddRequestedAttendee: React.FC = () => {
                                     type="file"
                                     accept=".xlsx, .xls, .csv"
                                     className="grow"
-                                    onChange={() => { }}
+                                    onChange={(e) => handleExcelUpload(e)}
                                 />
                             </label>
-                            {/* {errors.excel_file && <p className="text-red-600">{errors.excel_file.message}</p>} */}
-                            <button type="button" className="btn btn-warning btn-sm" onClick={() => { }}>
+                            {errors.excel_file && <p className="text-red-600">{errors.excel_file.message}</p>}
+                            <button type="button" className="btn btn-warning btn-sm" onClick={(e) => handleFileUpload(e)}>
                                 Upload Excel Now
                             </button>
                         </div>
