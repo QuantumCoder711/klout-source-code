@@ -52,8 +52,11 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus, type }) => {
     const cardStatusMatch = cardStatus
       ? cardStatus === "Sent"
         ? data.messageID && ["Sent", "Delivered", "Read", "Bounce", "Delivery"].includes(data.messageID.messageStatus || "")
-        : data.messageID && data.messageID.messageStatus === cardStatus
+        : cardStatus === "Delivered"
+          ? data.messageID && ["Delivered", "Read"].includes(data.messageID.messageStatus || "")
+          : data.messageID && data.messageID.messageStatus === cardStatus
       : true;
+
 
     // Ensure that records with missing fields like messageID or messageStatus are still included in filtering
     if (type === "email") {

@@ -62,7 +62,7 @@ const PendingUserRequest: React.FC = () => {
 
     const event_id: string | undefined = currentEvent?.uuid;
 
-    const [, setRequests] = useState<PendingRequestType[]>();
+    // const [requests, setRequests] = useState<PendingRequestType[]>(pendingRequests);
 
     useEffect(() => {
         if (currentEventUUID && token && user_id) {
@@ -109,13 +109,12 @@ const PendingUserRequest: React.FC = () => {
                         Swal.fire({
                             icon: "success",
                             title: res.data.message,
-                            showConfirmButton: false,
-                            timer: 1500,
-                        })
-                        setTimeout(() => {
-                            // navigate("/events/all-attendee");
-                            window.history.back();
-                        }, 1500);
+                            showConfirmButton: true,
+                        }).then(() => window.location.reload());
+                        // setTimeout(() => {
+                        //     // navigate("/events/all-attendee");
+                        //     window.history.back();
+                        // }, 1500);
                         // latestData.
                         // setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
                     })
@@ -146,13 +145,10 @@ const PendingUserRequest: React.FC = () => {
                             title: res.data.message,
                             showConfirmButton: true,  // Show the "OK" button
                             confirmButtonText: "OK",  // You can customize the button text if needed
-                        });
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
+                        }).then(() => window.location.reload());
 
                         // Optionally update state or reload the page after success
-                        setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
+                        // setRequests(prevRequests => prevRequests?.filter(req => req.id !== id));
                     })
                     .catch(function (error) {
                         Swal.fire({
@@ -331,29 +327,21 @@ const PendingUserRequest: React.FC = () => {
                         <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
                             <thead>
                                 <tr className="bg-klt_primary-500 text-white">
-                                    <th className="py-3 px-4 text-start text-nowrap">Attendee-ID</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Action</th>
+                                    {/* <th className="py-3 px-4 text-start text-nowrap">Attendee-ID</th> */}
+                                    <th className="py-3 px-4 text-start text-nowrap">Status</th>
                                     <th className="py-3 px-4 text-start text-nowrap">First Name</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Last Name</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Designation</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Company</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Email</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile No.</th>
-                                    <th className="py-3 px-4 text-start text-nowrap">Status</th>
-                                    <th className="py-3 px-4 text-start text-nowrap">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
                                     (filteredAttendees?.length != undefined) && filteredAttendees.map((data: PendingRequestType, index: number) => (
                                         <tr key={index}>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.id}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.first_name}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.last_name}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.job_title}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.company_name}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.email_id}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.phone_number}</td>
-                                            <td>{data.user_invitation_request === 0 ? "Pending" : data.user_invitation_request === 2 ? "Disapprove" : "Approved"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
                                                 {/* <Link to={"/events/edit-agenda"} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit size={20} />
@@ -364,6 +352,14 @@ const PendingUserRequest: React.FC = () => {
                                                     </button>
                                                 }
                                             </td>
+                                            {/* <td className="py-3 px-4 text-gray-800 text-nowrap">{data.id}</td> */}
+                                            <td>{data.user_invitation_request === 0 ? "Pending" : data.user_invitation_request === 2 ? "Disapprove" : "Approved"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.first_name}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.last_name}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.job_title}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.company_name}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.email_id}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{data.phone_number}</td>
                                         </tr>
                                     ))
                                 }

@@ -29,7 +29,7 @@ type ReciptState = {
 
 
 const WhatsAppReport: React.FC = () => {
-    const {uuid} = useParams<{uuid: string}>();
+    const { uuid } = useParams<{ uuid: string }>();
 
     const [activeTab, setActiveTab] = useState<number>(1);
     const [selectedTemplate, setSelectedTemplate] = useState('event_downloadapp');
@@ -138,19 +138,6 @@ const WhatsAppReport: React.FC = () => {
                     </select>
                 </div>
             </div>
-            {/* Custom Tab Menu */}
-            {/* <div className='flex justify-center mx-auto rounded-md gap-3 flex-wrap w-fit'>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer grid place-content-center ${activeTab === 1 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(1); setSelectedTemplate("event_downloadapp");  setChangeCartStatus("Sent")}}>Reminder</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 2 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(2); setSelectedTemplate("event_reminder_today");  setChangeCartStatus("Sent")}}>Same Day Invitation</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 3 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(3); setSelectedTemplate("event_poll_feedback");  setChangeCartStatus("Sent")}}>Event Poll</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 4 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(4); setSelectedTemplate("reminder_iimm_v1");  setChangeCartStatus("Sent")}}>Send Template Message</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 5 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(5); setSelectedTemplate("session_reminder");  setChangeCartStatus("Sent")}}>Session Reminder</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 6 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(6); setSelectedTemplate("reminder_to_visit_booth");  setChangeCartStatus("Sent")}}>Visit Booth</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 7 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(7); setSelectedTemplate("day_2_reminder");  setChangeCartStatus("Sent")}}>Day 2 Reminder</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-x-md grid place-content-center ${activeTab === 8 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(8); setSelectedTemplate("day_2_same_day_reminder");  setChangeCartStatus("Sent")}}>Day 2 Same Day Reminder</div>
-                    <div className={`font-medium rounded-md text-sm text-nowrap p-2 border border-klt_primary-600 cursor-pointer rounded-r-md grid place-content-center ${activeTab === 9 ? "text-white bg-klt_primary-500" : "text-black"}`} onClick={() => { setActiveTab(9); setSelectedTemplate("post_thank_you_messageevent");  setChangeCartStatus("Sent")}}>Thank You Message</div>
-                </div> */}
-
 
             {/* Rendering Cards */}
             <div className='flex gap-5'>
@@ -171,7 +158,7 @@ const WhatsAppReport: React.FC = () => {
             </div>
 
             {/* Rendering Table */}
-            <DataTable data={allData} cardStatus={changeCardStatus} type="whatsapp"/>
+            <DataTable data={allData} cardStatus={changeCardStatus} type="whatsapp" />
 
         </div>
     )
