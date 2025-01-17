@@ -16,6 +16,34 @@ import Loader from '../../../component/Loader';
 import { FaFileImport } from "react-icons/fa6";
 import { FaEye } from "react-icons/fa";
 
+type attendeeType = {
+  uuid: string;
+  title: string;
+  first_name: string;
+  job_title: string;
+  company_name: string;
+  email_id: string;
+  alternate_email: string;
+  phone_number: string;
+  alternate_mobile_number: string;
+  status: string;
+  last_name: string;
+  check_in: number;
+  check_in_time: string;
+  check_in_second: number;
+  check_in_second_time: string;
+  check_in_third: number;
+  check_in_third_time: string;
+  check_in_forth: number;
+  check_in_forth_time: string;
+  check_in_fifth: number;
+  check_in_fifth_time: string;
+  event_name: string;
+  not_invited: boolean;
+  image: string;
+  id: number;
+};
+
 // Define the AgendaType interface
 type AgendaType = {
   id: number;
@@ -34,6 +62,7 @@ type AgendaType = {
   start_minute_time: string;
   end_minute_time: string;
   position: number;
+  speakers: attendeeType[];
 };
 
 interface ViewAgendasProps {
@@ -74,6 +103,8 @@ const ViewAgendas: React.FC<ViewAgendasProps> = ({ uuid }) => {
         .then((res) => {
           if (res.data) {
             console.log(currentEvent);
+
+            console.log("The data is: ", res.data);
 
             // Sort the data in descending order to show the highest position at the top
             const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
@@ -282,7 +313,6 @@ const ViewAgendas: React.FC<ViewAgendasProps> = ({ uuid }) => {
     });
   }
 
-
   if (loading) {
     return <Loader />
   }
@@ -307,7 +337,7 @@ const ViewAgendas: React.FC<ViewAgendasProps> = ({ uuid }) => {
       </div>
 
       <div className='flex gap-3'>
-        <Link to="/events/add-agenda" onClick={() => dispatch(heading("Add Agenda"))} className="btn mt-5 btn-secondary w-fit flex items-center text-white btn-sm">
+        <Link to={`/events/add-agenda/${uuid}`} onClick={() => dispatch(heading("Add Agenda"))} className="btn mt-5 btn-secondary w-fit flex items-center text-white btn-sm">
           <TiPlus size={20} /> Add Agenda
         </Link>
         <button
@@ -395,6 +425,7 @@ const ViewAgendas: React.FC<ViewAgendasProps> = ({ uuid }) => {
                 <tr className="bg-klt_primary-500 text-white">
                   <th className="py-3 px-4 text-start text-nowrap">S.No</th>
                   <th className="py-3 px-4 text-start text-nowrap">Title</th>
+                  <th className="py-3 px-4 text-start text-nowrap">Speakers</th>
                   <th className="py-3 px-4 text-start text-nowrap">Event Date</th>
                   <th className="py-3 px-4 text-start text-nowrap">Time</th>
                   <th className="py-3 px-4 text-start text-nowrap">Priority</th>
@@ -413,6 +444,19 @@ const ViewAgendas: React.FC<ViewAgendasProps> = ({ uuid }) => {
                   <tr key={data.uuid}>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{indexOfFirstRow + index + 1}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.title}</td>
+                    <td className="py-3 px-4 text-gray-800 text-nowrap">
+                      <td className="py-3 px-4 text-gray-800">
+                        {Array.isArray(data.speakers) && data.speakers.length > 0
+                          ? data.speakers
+                            .map((speaker: { first_name: string; last_name: string }) =>
+                              [speaker.first_name, speaker.last_name].filter(Boolean).join(' ')
+                            )
+                            .join(', ')
+                          : ''}
+                      </td>
+
+                    </td>
+
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.event_date}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.start_time + ':' + data.start_minute_time + ' ' + data.start_time_type.toUpperCase() + ' ' + '-' + ' ' + data.end_time + ':' + data.end_minute_time + ' ' + data.end_time_type.toUpperCase()}</td>
                     <td className="py-3 px-4 text-gray-800 text-nowrap">{data.position}</td>

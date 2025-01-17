@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { IoMdArrowRoundBack } from 'react-icons/io';
+import { IoIosClose, IoMdArrowRoundBack } from 'react-icons/io';
 import { TiArrowRight } from "react-icons/ti";
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
@@ -24,6 +24,35 @@ type formInputType = {
     position: number;
     image_path: string | null,
     event_id: string;
+    speakers: attendeeType[];
+};
+
+type attendeeType = {
+    uuid: string;
+    title: string;
+    first_name: string;
+    job_title: string;
+    company_name: string;
+    email_id: string;
+    alternate_email: string;
+    phone_number: string;
+    alternate_mobile_number: string;
+    status: string;
+    last_name: string;
+    check_in: number;
+    check_in_time: string;
+    check_in_second: number;
+    check_in_second_time: string;
+    check_in_third: number;
+    check_in_third_time: string;
+    check_in_forth: number;
+    check_in_forth_time: string;
+    check_in_fifth: number;
+    check_in_fifth_time: string;
+    event_name: string;
+    not_invited: boolean;
+    image: string;
+    id: number;
 };
 
 const EditAgenda: React.FC = () => {
@@ -45,36 +74,84 @@ const EditAgenda: React.FC = () => {
 
     // const currentEvent = events.find((event) => event.uuid === id); // Use find() to directly get the current event
 
+    const [availableSpeakers, setAvailableSpeakers] = useState<attendeeType[]>([]);
+    const [taggedSpeakers, setTaggedSpeakers] = useState<attendeeType[]>([]);
+
+    const handleAddSpeaker = (id: number) => {
+        const selectedSpeaker = availableSpeakers.find((speaker) => speaker.id === id);
+        if (selectedSpeaker) {
+            setTaggedSpeakers((prev) => [...prev, selectedSpeaker]);
+            setAvailableSpeakers((prev) => prev.filter((speaker) => speaker.id !== id));
+        }
+    };
+
+    const handleRemoveSpeaker = (id: number) => {
+        const removedSpeaker = taggedSpeakers.find((speaker) => speaker.id === id);
+        if (removedSpeaker) {
+            setAvailableSpeakers((prev) => [...prev, removedSpeaker]);
+            setTaggedSpeakers((prev) => prev.filter((speaker) => speaker.id !== id));
+        }
+    };
+
     useEffect(() => {
         if (agenda_uuid) {
-            axios.get(`${apiBaseUrl}/api/agendas/${agenda_uuid}`)
-                .then((res) => {
-                    if (res.data) {
-                        const agendaData: formInputType = res.data.data;
-                        setAgendaData(agendaData);
-                        console.log(agendaData);
+            // Fetching All Speakers
+            axios.post(`${apiBaseUrl}/api/speaker-attendee/${id}`, {}, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }).then(res => {
+                const allSpeakers = res.data.data; // All available speakers
+                console.log("All speakers: ", allSpeakers);
 
-                        // Set the default form values using react-hook-form's setValue
-                        setValue('title', agendaData.title);
-                        setValue('description', agendaData.description);
-                        setValue('event_date', agendaData.event_date);
-                        setValue('start_time', agendaData.start_time);
-                        setValue('start_minute_time', agendaData.start_minute_time);
-                        setValue('start_time_type', agendaData.start_time_type);
-                        setValue('end_time', agendaData.end_time);
-                        setValue('end_minute_time', agendaData.end_minute_time);
-                        setValue('end_time_type', agendaData.end_time_type);
-                        setValue('position', agendaData.position);
-                        setValue('event_id', agendaData.event_id);
+                // Fetching Agenda Data
+                axios.get(`${apiBaseUrl}/api/agendas/${agenda_uuid}`)
+                    .then((res) => {
+                        if (res.data) {
+                            const agendaData: formInputType = res.data.data;
 
-                        // If the agenda has an image path, set it as the selected image
-                        if (agendaData.image_path) {
-                            setAgendaImage(`${apiBaseUrl}/${agendaData.image_path}`);
+                            // Set tagged speakers
+                            if (agendaData.speakers) {
+                                setTaggedSpeakers(agendaData.speakers);
+                            }
+
+                            setAgendaData(agendaData);
+
+                            // Remove already tagged speakers from available speakers
+                            const taggedSpeakerIds = new Set(
+                                (agendaData.speakers || []).map(speaker => speaker.id) // Assuming each speaker has a unique 'id'
+                            );
+
+                            const filteredAvailableSpeakers = allSpeakers.filter(
+                                (speaker:attendeeType) => !taggedSpeakerIds.has(speaker.id)
+                            );
+
+                            setAvailableSpeakers(filteredAvailableSpeakers);
+                            console.log("Filtered available speakers: ", filteredAvailableSpeakers);
+
+                            // Set the default form values using react-hook-form's setValue
+                            setValue('title', agendaData.title);
+                            setValue('description', agendaData.description);
+                            setValue('event_date', agendaData.event_date);
+                            setValue('start_time', agendaData.start_time);
+                            setValue('start_minute_time', agendaData.start_minute_time);
+                            setValue('start_time_type', agendaData.start_time_type);
+                            setValue('end_time', agendaData.end_time);
+                            setValue('end_minute_time', agendaData.end_minute_time);
+                            setValue('end_time_type', agendaData.end_time_type);
+                            setValue('position', agendaData.position);
+                            setValue('event_id', agendaData.event_id);
+
+                            // If the agenda has an image path, set it as the selected image
+                            if (agendaData.image_path) {
+                                setAgendaImage(`${apiBaseUrl}/${agendaData.image_path}`);
+                            }
                         }
-                    }
-                });
+                    });
+            });
         }
     }, [agenda_uuid, setValue]);
+
 
     console.log(agenda);
 
@@ -128,6 +205,11 @@ const EditAgenda: React.FC = () => {
             // Log the FormData for debugging (FormData can't be logged directly, so you will need to inspect it)
             for (let [key, value] of formData.entries()) {
                 console.log(key, value);
+            }
+
+            if (taggedSpeakers) {
+                const allIds = taggedSpeakers.map((speaker) => String(speaker.id));
+                formData.append("tag_speakers", String(allIds));
             }
 
             console.log("Form Data is: ", formData);
@@ -232,6 +314,60 @@ const EditAgenda: React.FC = () => {
                         <textarea id="description" className="grow bg-white" {...register('description', { required: 'Description is required' })} />
                     </label>
                     {errors.description && <p className="text-red-600">{errors.description.message}</p>}
+
+
+                    {/* Tag Speakers */}
+                    <div className="flex gap-3">
+                        <div className="w-full">
+                            <div
+                                id="tag_speaker"
+                                className="grow bg-white rounded-md border h-full flex flex-wrap gap-2 p-2"
+                            >
+                                <label
+                                    htmlFor="tag_speaker"
+                                    className=""
+                                >
+                                    <span className="font-semibold text-green-700 flex items-center">
+                                        Tag Speaker &nbsp; <TiArrowRight className="mt-1" />
+                                    </span>
+                                </label>
+                                {taggedSpeakers.map((speaker) => (
+                                    <span
+                                        key={speaker.id}
+                                        className="bg-green-200 inline-block relative text-green-900 p-2 rounded cursor-pointer"
+                                        onClick={() => handleRemoveSpeaker(speaker.id)}
+                                    >
+                                        <IoIosClose className='absolute top-0 right-0' />
+                                        {speaker.first_name} {speaker.last_name}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="flex gap-3 max-w-fit">
+                            <div>
+                                <label className="input w-fit overflow-hidden input-bordered bg-white outline-none text-black flex items-center gap-2">
+                                    <span className="font-semibold text-green-700 flex justify-between items-center min-w-fit">
+                                        Speakers List &nbsp; <TiArrowRight className="mt-1" />
+                                    </span>
+                                    <select
+                                        id="speakers"
+                                        className="grow h-full bg-white w-fit min-w-40 outline-none"
+                                        onChange={(e) => {
+                                            const id = parseInt(e.target.value, 10);
+                                            if (id) handleAddSpeaker(id);
+                                        }}
+                                    >
+                                        <option value="">Select</option>
+                                        {availableSpeakers.map((speaker) => (
+                                            <option key={speaker.id} value={speaker.id}>
+                                                {speaker.first_name + ' ' + speaker.last_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-2 gap-3">

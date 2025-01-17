@@ -9,7 +9,7 @@ import { TbClockHour9Filled } from "react-icons/tb";
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../../redux/store';
-import { fetchAllPendingUserRequests } from '../../event/eventSlice';
+// import { fetchAllPendingUserRequests } from '../../event/eventSlice';
 import Loader from '../../../component/Loader';
 import Swal from 'sweetalert2';
 import axios from 'axios';
@@ -49,8 +49,7 @@ const PendingUserRequest: React.FC = () => {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     // const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => state.auth);
-    const { pendingRequests, user_id, loading, events } = useSelector((state: RootState) => ({
-        pendingRequests: state.events.pendingRequests,
+    const { user_id, loading, events } = useSelector((state: RootState) => ({
         user_id: state.auth.user?.id,
         loading: state.events.loading,
         events: state.events.events,
@@ -62,11 +61,27 @@ const PendingUserRequest: React.FC = () => {
 
     const event_id: string | undefined = currentEvent?.uuid;
 
-    // const [requests, setRequests] = useState<PendingRequestType[]>(pendingRequests);
+    const [pendingRequests, setPendingRequests] = useState<PendingRequestType[]>([]);
 
     useEffect(() => {
         if (currentEventUUID && token && user_id) {
-            dispatch(fetchAllPendingUserRequests({ eventuuid: currentEventUUID, token, user_id }));
+            // dispatch(fetchAllPendingUserRequests({ eventuuid: currentEventUUID, token, user_id }));
+
+            try {
+                axios.post(`${apiBaseUrl}/api/pending_event_requests/${currentEventUUID}`, { user_id }, {
+                    headers: {
+                        // 'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`,
+                    }
+                }).then(res => {
+                    console.log(res.data);
+                    setPendingRequests(res.data.data);
+                })
+            } catch (error) {
+                {
+                    throw error;
+                }
+            }
         }
 
     }, [currentEventUUID, token, dispatch]);

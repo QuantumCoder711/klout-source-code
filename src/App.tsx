@@ -70,7 +70,8 @@ const App: React.FC = () => {
           <Route path="/events/add-event" element={<AddEventPage />} />
           <Route path="/events/view-event/:uuid" element={<ViewEventPage />} />
           <Route path="/events/view-agendas/:uuid" element={<ViewAgendasPage />} />
-          <Route path="/events/add-agenda/" element={<AddAgendaPage />} />
+          {/* <Route path="/events/add-agenda/" element={<AddAgendaPage />} /> */}
+          <Route path="/events/add-agenda/:uuid" element={<AddAgendaPage />} />
           <Route path="/events/edit-agenda/:agenda_uuid/:id" element={<EditAgenda />} />
           <Route path="/events/edit-event/:uuid" element={<EditEventPage />} />
           <Route path="/events/all-attendee/:uuid" element={<AllEventAttendeePage />} />

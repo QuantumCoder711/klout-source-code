@@ -757,7 +757,7 @@ const EditAttendee = () => {
         <div className='flex gap-3 w-full'>
           <div className="w-full">
             <label htmlFor="first_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">First Name &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">First Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <input id="first_name" type="text" className="grow" {...register('first_name', { required: 'First Name is required' })} />
             </label>
             {errors.first_name && <p className="text-red-600">{errors.first_name.message}</p>}
@@ -765,7 +765,7 @@ const EditAttendee = () => {
 
           <div className="w-full">
             <label htmlFor="last_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">Last Name &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">Last Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <input id="last_name" type="text" className="grow" {...register('last_name', { required: 'Last Name is required' })} />
             </label>
             {errors.last_name && <p className="text-red-600">{errors.last_name.message}</p>}
@@ -793,7 +793,7 @@ const EditAttendee = () => {
         <div className='flex w-full gap-3'>
           <div className="w-full">
             <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex items-center">Email &nbsp; <TiArrowRight className='ml-1' /> </span>
+              <span className="font-semibold text-green-700 flex items-center">Email <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='ml-1' /> </span>
               <input id="email_id" className="w-full grow" type="email" {...register('email_id', { required: 'Email is required' })} />
             </label>
             {errors.email_id && <p className="text-red-600">{errors.email_id.message}</p>}
@@ -804,11 +804,11 @@ const EditAttendee = () => {
             <div className="w-full">
               <label htmlFor="industry" className="input input-bordered bg-white text-black flex items-center gap-2">
                 <span className="font-semibold text-green-700 flex justify-between items-center">
-                  Industry Name &nbsp; <TiArrowRight className="mt-1" />
+                  Industry Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
                 </span>
                 <select
                   id="industry"
-                  className="grow w-full bg-white"
+                  className="grow w-full h-full bg-white"
                   // {...register('industry', { required: 'Company Name is required' })}
                   {...register('industry')}
                   onChange={(e) => { setIndustryFilled(e.target.value) }} // Track company selection
@@ -854,7 +854,7 @@ const EditAttendee = () => {
             <div className="w-full">
               <label htmlFor="company_name" className="input input-bordered bg-white text-black flex items-center gap-2">
                 <span className="font-semibold text-green-700 flex justify-between items-center">
-                  Company Name &nbsp; <TiArrowRight className="mt-1" />
+                  Company Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className="mt-1" />
                 </span>
                 <select
                   id="company_name"
@@ -904,7 +904,7 @@ const EditAttendee = () => {
             <div className="w-full">
               <label htmlFor="job_title" className="input input-bordered bg-white text-black flex items-center gap-2">
                 <span className="font-semibold text-green-700 flex justify-between items-center">
-                  Job Title &nbsp;
+                  Job Title <span className="text-red-600 ml-1">*</span> &nbsp;
                   <TiArrowRight className="mt-1" />
                 </span>
                 <select
@@ -952,7 +952,7 @@ const EditAttendee = () => {
         <div className='flex w-full gap-3'>
           <div className="w-full">
             <label htmlFor="phone_number" className="input input-bordered bg-white text-black flex items-center gap-2">
-              <span className="font-semibold text-green-700 flex justify-between items-center">Phone Number &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <span className="font-semibold text-green-700 flex justify-between items-center">Phone Number <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
               <input id="phone_number" type="tel" className="grow" {...register('phone_number', { required: 'Phone Number is required' })} />
             </label>
             {errors.phone_number && <p className="text-red-600">{errors.phone_number.message}</p>}
@@ -1005,7 +1005,7 @@ const EditAttendee = () => {
 
         <div className="w-1/2">
           <label htmlFor="status" className="input input-bordered bg-white text-black flex items-center gap-2">
-            <span className="font-semibold text-green-700 flex justify-between items-center">Status &nbsp; <TiArrowRight className='mt-1' /> </span>
+            <span className="font-semibold text-green-700 flex justify-between items-center">Status <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
             <select id="status" className="grow h-full bg-white" {...register('status', { required: 'Status is required' })}>
               {/* <option value={status}>{status}</option> */}
               <option value="speaker">Speaker</option>
