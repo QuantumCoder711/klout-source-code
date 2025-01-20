@@ -566,6 +566,7 @@ type FormInputType = {
   status: string;
   event_id: number | string | null | undefined;
   image: File;
+  award_winner: number;
 };
 
 type ApiType = {
@@ -678,6 +679,7 @@ const EditAttendee = () => {
         setValue("company_name", attendeeData.company_name);
         setValue("industry", attendeeData.industry);
         setValue("job_title", attendeeData.job_title);
+        setValue("award_winner", attendeeData.award_winner);
         setCompanyFilled(attendeeData.company_name);
         setIndustryFilled(attendeeData.industry);
         setJobFilled(attendeeData.job_title);
@@ -685,7 +687,7 @@ const EditAttendee = () => {
         if (attendeeData.image) {
           setAttendeeImage(`${apiBaseUrl}/${attendeeData.image}`);
         }
-        
+
         setStatus(attendeeData.status);
       });
     }
@@ -862,9 +864,9 @@ const EditAttendee = () => {
                   // {...register('company_name', { required: 'Company Name is required' })}
                   {...register('company_name')}
                   // value={selectedCompany} // Bind selected value
-                  onChange={(e)=>setCompanyFilled(e.target.value)} // Track company selection
+                  onChange={(e) => setCompanyFilled(e.target.value)} // Track company selection
                   value={companyFilled}
-                  // defaultValue={companyFilled}
+                // defaultValue={companyFilled}
                 >
                   <option value="">{companyFilled}</option>
                   {companies?.map((company: ApiType) => (
@@ -1003,21 +1005,35 @@ const EditAttendee = () => {
           </div>
         </div>
 
-        <div className="w-1/2">
-          <label htmlFor="status" className="input input-bordered bg-white text-black flex items-center gap-2">
-            <span className="font-semibold text-green-700 flex justify-between items-center">Status <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-            <select id="status" className="grow h-full bg-white" {...register('status', { required: 'Status is required' })}>
-              {/* <option value={status}>{status}</option> */}
-              <option value="speaker">Speaker</option>
-              <option value="panelist">Panellist</option>
-              <option value="sponsor">Sponsor</option>
-              <option value="delegate">Delegate</option>
-              <option value="moderator">Moderator</option>
-              <option value="awardswinner">Awwards Winner</option>
-            </select>
-          </label>
-          {errors.status && <p className="text-red-600">{errors.status.message}</p>}
+        <div className='w-full flex gap-3'>
+          <div className="w-full">
+            <label htmlFor="status" className="input input-bordered bg-white text-black flex items-center gap-2">
+              <span className="font-semibold text-green-700 flex justify-between items-center">Status <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <select id="status" className="grow h-full bg-white" {...register('status', { required: 'Status is required' })}>
+                {/* <option value={status}>{status}</option> */}
+                <option value="speaker">Speaker</option>
+                <option value="panelist">Panellist</option>
+                <option value="sponsor">Sponsor</option>
+                <option value="delegate">Delegate</option>
+                <option value="moderator">Moderator</option>
+                <option value="others">Others</option>
+              </select>
+            </label>
+            {errors.status && <p className="text-red-600">{errors.status.message}</p>}
+          </div>
+
+          <div className="w-full">
+            <label htmlFor="award_winner" className="input input-bordered bg-white text-black flex items-center gap-2">
+              <span className="font-semibold text-green-700 flex justify-between items-center">Award Winner &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <select id="awards_winner" className="grow bg-white h-full" {...register('award_winner')}>
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </label>
+            {errors.award_winner && <p className="text-red-600">{errors.award_winner.message}</p>}
+          </div>
         </div>
+
 
         <div className="col-span-3 flex justify-center mt-4">
           <button type="submit" className="btn btn-primary">

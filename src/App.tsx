@@ -46,6 +46,8 @@ import AllRequestedAttendee from "./features/attendee/component/AllRequestedAtte
 import AddRequestedAttendee from "./features/attendee/component/AddRequestedAttendee";
 import EditRequestedAttendee from "./features/attendee/component/EditRequestedAttendee";
 import InviteResgistations from "./features/attendee/component/InviteResigtrations";
+import AITranscribers from "./features/ai-transcriber/AITranscribers";
+import Transcriber from "./features/ai-transcriber/Transcriber";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -67,6 +69,8 @@ const App: React.FC = () => {
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventPage />} />
+          <Route path="/ai-transcribers" element={<AITranscribers />} />
+          <Route path="/ai-transcribers/transcriber/:uuid" element={<Transcriber />} />
           <Route path="/events/add-event" element={<AddEventPage />} />
           <Route path="/events/view-event/:uuid" element={<ViewEventPage />} />
           <Route path="/events/view-agendas/:uuid" element={<ViewAgendasPage />} />

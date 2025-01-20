@@ -28,6 +28,7 @@ type FormInputType = {
   event_id: number;
   image: File | null;
   excel_file: File | null;
+  award_winner: number;
 };
 
 
@@ -44,7 +45,7 @@ interface AddEventAttendeeProps {
   uuid: string | undefined;
 }
 
-const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({uuid}) => {
+const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({ uuid }) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   // const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState('');
@@ -173,6 +174,7 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({uuid}) => {
         "employee_size",
         "company_turn_over",
         "linkedin_page_link",
+        "award_winner"
       ],
       [
         "John",
@@ -188,6 +190,7 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({uuid}) => {
         "200",
         "5M",
         "https://linkedin/company/digimantra",
+        "YES"
       ],
     ];
 
@@ -588,10 +591,22 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({uuid}) => {
                 <option value="sponsor">Sponsor</option>
                 <option value="delegate">Delegate</option>
                 <option value="moderator">Moderator</option>
+                <option value="others">Others</option>
                 {/* <option value="Awwards Winner">Awwards Winner</option> */}
               </select>
             </label>
             {errors.status && <p className="text-red-600">{errors.status.message}</p>}
+          </div>
+
+          <div className="flex flex-col gap-3 my-4">
+            <label htmlFor="award_winner" className="input input-bordered bg-white text-black flex items-center gap-2">
+              <span className="font-semibold text-green-700 flex justify-between items-center">Award Winner &nbsp; <TiArrowRight className='mt-1' /> </span>
+              <select id="awards_winner" className="grow bg-white h-full" {...register('award_winner')}>
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </label>
+            {errors.award_winner && <p className="text-red-600">{errors.award_winner.message}</p>}
           </div>
 
           <div className="col-span-3 flex justify-center mt-4">

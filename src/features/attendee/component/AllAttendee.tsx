@@ -14,6 +14,7 @@ type attendeeType = {
   phone_number: string;
   status: string;
   last_name: string;
+  award_winner: number;
 };
 
 const AllAttendee: React.FC = () => {
@@ -186,6 +187,7 @@ const AllAttendee: React.FC = () => {
               <th className="py-3 px-4 text-start text-nowrap">Email</th>
               <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
               <th className="py-3 px-4 text-start text-nowrap">Status</th>
+              <th className="py-3 px-4 text-start text-nowrap">Award Winner</th>
             </tr>
           </thead>
           <tbody>
@@ -200,6 +202,7 @@ const AllAttendee: React.FC = () => {
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
+                  <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.award_winner ? "Yes" : "No"}</td>
                 </tr>
               ))
             ) : (

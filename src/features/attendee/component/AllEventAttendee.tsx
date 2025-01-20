@@ -43,6 +43,7 @@ type attendeeType = {
     not_invited: boolean;
     image: string;
     id: number;
+    award_winner: number;
 };
 
 interface AllEventAttendeeProps {
@@ -140,7 +141,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
     // const [currentAttendees, setCurrentAttendees] = useState<attendeeType[]>(filteredAttendees.slice(startIndex, endIndex));
 
     const currentAttendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
-    // console.log(currentAttendees);
+    console.log(currentAttendees);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -745,6 +746,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Alternate Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Award Winner</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Check In <br /> (1st) </th>
                                     <th className="py-3 px-4 text-start text-nowrap flex gap-3">Check In Time<br /> (1st)
                                         {/* <span className='flex flex-col justify-between'><IoMdArrowDropup className='scale-105 cursor-pointer'/> <IoMdArrowDropup className='rotate-180 scale-105 cursor-pointer'/></span>  */}
@@ -796,6 +798,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number ? attendee.alternate_mobile_number : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.award_winner ? "Yes":"No"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap" style={{ color: attendee.check_in === 1 ? 'green' : 'red' }}>
                                                 {attendee.check_in === 1 ? 'Yes' : 'No'}
                                             </td>

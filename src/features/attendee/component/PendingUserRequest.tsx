@@ -209,6 +209,12 @@ const PendingUserRequest: React.FC = () => {
     // Calculate total pages
     const totalPages = Math.ceil(filteredAttendees.length / rowsPerPage);
 
+    const paginatedAttendees = filteredAttendees.slice(
+        (currentPage - 1) * rowsPerPage,
+        currentPage * rowsPerPage
+    );
+    
+
     // Handle page change
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -342,8 +348,8 @@ const PendingUserRequest: React.FC = () => {
                         <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
                             <thead>
                                 <tr className="bg-klt_primary-500 text-white">
+                                    {/* <th className="py-3 px-4 text-start text-nowrap">Id</th> */}
                                     <th className="py-3 px-4 text-start text-nowrap">Action</th>
-                                    {/* <th className="py-3 px-4 text-start text-nowrap">Attendee-ID</th> */}
                                     <th className="py-3 px-4 text-start text-nowrap">Status</th>
                                     <th className="py-3 px-4 text-start text-nowrap">First Name</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Last Name</th>
@@ -355,8 +361,9 @@ const PendingUserRequest: React.FC = () => {
                             </thead>
                             <tbody>
                                 {
-                                    (filteredAttendees?.length != undefined) && filteredAttendees.map((data: PendingRequestType, index: number) => (
+                                    (paginatedAttendees?.length != undefined) && paginatedAttendees.map((data: PendingRequestType, index: number) => (
                                         <tr key={index}>
+                                                {/* <td className="py-3 px-4 text-gray-800 text-nowrap">{data.id}</td> */}
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
                                                 {/* <Link to={"/events/edit-agenda"} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit size={20} />
@@ -367,7 +374,6 @@ const PendingUserRequest: React.FC = () => {
                                                     </button>
                                                 }
                                             </td>
-                                            {/* <td className="py-3 px-4 text-gray-800 text-nowrap">{data.id}</td> */}
                                             <td>{data.user_invitation_request === 0 ? "Pending" : data.user_invitation_request === 2 ? "Disapprove" : "Approved"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{data.first_name}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{data.last_name}</td>
