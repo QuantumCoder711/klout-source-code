@@ -117,7 +117,7 @@ const Login: React.FC = () => {
 
                         <hr className='!my-5 border border-zinc-200' />
 
-                        <span>Don't have an account ? <Link to={"/signup"} className='text-klt_primary-900'>Signup Here</Link></span>
+                        {/* <span>Don't have an account ? <Link to={"/signup"} className='text-klt_primary-900'>Signup Here</Link></span> */}
                     </form>
                 </div>
             </div>

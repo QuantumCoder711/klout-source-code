@@ -6,7 +6,7 @@ import { heading } from "../features/heading/headingSlice";
 import { RootState } from "../redux/store";
 import { useSelector } from "react-redux";
 import { MdDashboard, MdOutlinePhotoSizeSelectActual } from "react-icons/md";
-// import { LuBrainCircuit } from "react-icons/lu";
+import { LuBrainCircuit } from "react-icons/lu";
 import { MdEmojiEvents } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
 import { GoSponsorTiers } from "react-icons/go";
@@ -207,7 +207,7 @@ const Sidebar: React.FC = () => {
             </div>
           </Link>
         </li>
-        {/* <li>
+        <li>
           <Link
             to="/ai-transcribers"
             onClick={handlePageTitle}
@@ -220,7 +220,7 @@ const Sidebar: React.FC = () => {
               </span>}
             </div>
           </Link>
-        </li> */}
+        </li>
       </ul>
     </div>
   );

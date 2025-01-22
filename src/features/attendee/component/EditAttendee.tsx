@@ -704,20 +704,22 @@ const EditAttendee = () => {
   };
 
 
-
-
-
   // Submit form data
   const onSubmit: SubmitHandler<FormInputType> = async (data) => {
     const formData = new FormData();
     Object.keys(data).forEach((key) => {
       const value = data[key as keyof FormInputType];
-      if (key === "image" && value instanceof File) {
+
+      // Check for the 'award_winner' key
+      if (key === "award_winner" && (!value || value === "")) {
+        formData.append(key, "0");  // Set to 0 if nothing is selected
+      } else if (key === "image" && value instanceof File) {
         formData.append(key, value);  // Append the image file
       } else {
         formData.append(key, value ? value.toString() : ""); // Append other form data as strings
       }
     });
+
 
     if (currentEvent?.id) {
       formData.append("event_id", currentEvent.id.toString());

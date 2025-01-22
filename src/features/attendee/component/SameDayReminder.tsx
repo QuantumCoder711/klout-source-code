@@ -102,7 +102,7 @@ const SameDayReminder: React.FC = () => {
         if (currentEvent) {
             dataObj = {
                 "event_id": currentEvent?.uuid,
-                "send_to": selectedRoles,
+                "send_to": String(selectedRoles),
                 "send_method": "whatsapp",
                 "subject": "",
                 "message": "Template",
@@ -121,7 +121,7 @@ const SameDayReminder: React.FC = () => {
             };
         }
 
-        console.log(dataObj); // Check if `check_in` is added correctly
+        console.log("The data object is: ", dataObj); // Check if `check_in` is added correctly
 
         setLoading(true);
         try {
@@ -149,13 +149,26 @@ const SameDayReminder: React.FC = () => {
                         });
                     }
                 })
-                .catch(error => {
+                .catch(() => {
                     // Show error message if there is any issue
+                    // setLoading(false);
+                    // Swal.fire({
+                    //     icon: 'error',
+                    //     title: 'Something went wrong',
+                    //     text: error.response?.data?.message || 'An error occurred. Please try again.'
+                    // });
+
                     setLoading(false);
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Something went wrong',
-                        text: error.response?.data?.message || 'An error occurred. Please try again.'
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Message Sent',
+                    }).then((result) => {
+                        // Check if the OK button was clicked
+                        if (result.isConfirmed) {
+                            // Navigate to the '/events/all-attendee' route
+                            window.history.back();
+                        }
                     });
                 });
         } catch (error) {

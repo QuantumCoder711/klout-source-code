@@ -62,6 +62,10 @@ const PendingUserRequest: React.FC = () => {
     const event_id: string | undefined = currentEvent?.uuid;
 
     const [pendingRequests, setPendingRequests] = useState<PendingRequestType[]>([]);
+    const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+    const [statusFilter, setStatusFilter] = useState<string>("");
+
+
 
     useEffect(() => {
         if (currentEventUUID && token && user_id) {
@@ -188,7 +192,6 @@ const PendingUserRequest: React.FC = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 10;  // Display 10 rows per page
 
     // Filter States
     const [firstNameFilter, setFirstNameFilter] = useState('');
@@ -196,24 +199,38 @@ const PendingUserRequest: React.FC = () => {
     const [companyFilter, setCompanyFilter] = useState('');
 
     // Calculate filtered data based on the filters
+    // const filteredAttendees = pendingRequests.filter((attendee) => {
+    //     console.log(attendee.status);
+    //     return (
+    //         attendee.first_name.toLowerCase().includes(firstNameFilter.toLowerCase()) &&
+    //         attendee.email_id.toLowerCase().includes(emailFilter.toLowerCase()) &&
+    //         attendee.company_name.toLowerCase().includes(companyFilter.toLowerCase()) &&
+    //         attendee.user_invitation_request === statusFilter
+    //     );
+    // });
+
     const filteredAttendees = pendingRequests.filter((attendee) => {
+        const matchesStatus =
+            statusFilter === "" || String(attendee.user_invitation_request) == statusFilter;
         return (
             attendee.first_name.toLowerCase().includes(firstNameFilter.toLowerCase()) &&
             attendee.email_id.toLowerCase().includes(emailFilter.toLowerCase()) &&
-            attendee.company_name.toLowerCase().includes(companyFilter.toLowerCase())
+            attendee.company_name.toLowerCase().includes(companyFilter.toLowerCase()) &&
+            matchesStatus
         );
     });
 
 
+
     // Calculate the data to display for the current page
     // Calculate total pages
-    const totalPages = Math.ceil(filteredAttendees.length / rowsPerPage);
+    const totalPages = Math.ceil(filteredAttendees.length / itemsPerPage);
 
     const paginatedAttendees = filteredAttendees.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
     );
-    
+
 
     // Handle page change
     const handlePageChange = (page: number) => {
@@ -310,7 +327,35 @@ const PendingUserRequest: React.FC = () => {
                 <div className='mt-4'>
                     <div className='flex justify-between items-baseline flex-wrap gap-3'>
                         {/* Filters */}
-                        <div className='space-x-3 flex'>
+                        <div className='flex flex-wrap gap-3'>
+
+                            {/* Filter by rows */}
+                            <div className='flex  items-center gap-2'>
+                                <span className='font-bold'>Show: </span>
+                                <select
+                                    value={itemsPerPage}
+                                    onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                                    className='p-2 rounded border border-gray-500'>
+                                    <option value={10}>10</option>
+                                    <option value={25}>25</option>
+                                    <option value={50}>50</option>
+                                    <option value={100}>100</option>
+                                </select>
+                            </div>
+
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => {
+                                    setStatusFilter(e.target.value);
+                                    setCurrentPage(1); // Reset to the first page when filtering
+                                }}
+                                className="p-2 rounded border border-gray-500"
+                            >
+                                <option value="">Status</option>
+                                <option value="2">Disapproved</option>
+                                <option value="0">Pending</option>
+                            </select>
+
                             {/* Filter by first name */}
                             <input
                                 type="text"
@@ -363,7 +408,7 @@ const PendingUserRequest: React.FC = () => {
                                 {
                                     (paginatedAttendees?.length != undefined) && paginatedAttendees.map((data: PendingRequestType, index: number) => (
                                         <tr key={index}>
-                                                {/* <td className="py-3 px-4 text-gray-800 text-nowrap">{data.id}</td> */}
+                                            {/* <td className="py-3 px-4 text-gray-800 text-nowrap">{data.id}</td> */}
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex gap-3">
                                                 {/* <Link to={"/events/edit-agenda"} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit size={20} />

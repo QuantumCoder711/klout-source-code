@@ -7,11 +7,13 @@ import HeadingH2 from "../../component/HeadingH2";
 import { heading } from "../heading/headingSlice";
 import { useDispatch } from "react-redux";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import axios from "axios";
 // import axios from "axios";
 
 const Transcriber: React.FC = () => {
     const { uuid } = useParams<{ uuid: string }>();
-    // const photApiBaseUrl = import.meta.env.VITE_PHOTO_API_URL;
+    // const { token } = useSelector((state: RootState) => state.auth);
+    const photApiBaseUrl = import.meta.env.VITE_PHOTO_API_URL;
     const dispatch = useDispatch<AppDispatch>();
 
     const { user } = useSelector((state: RootState) => state.auth);
@@ -20,20 +22,36 @@ const Transcriber: React.FC = () => {
 
     const currentEvent = events.find((event) => event.uuid === uuid);
 
-    const email:string = user?.email || "";
+    const [link, setLink] = useState<string>("");
+
+    const email: string = user?.email || "";
 
     const [isSubmitting] = useState<boolean>(false);
 
-    const handleSubmit = async () => {
-        // try {
-        //     const res = axios.post(`${photApiBaseUrl}/get-video-detail`, {}, {
-        //         headers: {
-        //             "Content-Type": "application/x-www-form-urlencoded"
-        //         }
-        //     })
-        // } catch (error) {
-            
-        // }
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        console.log("The Link is: ", link);
+
+        console.log("The user is: ", user);
+
+        if (user && currentEvent) {
+            const fileName = user?.id + "-" + currentEvent?.uuid + ".mp3";
+
+            const formData = new FormData();
+            formData.append("video_url", link);
+            formData.append("file_name", fileName);
+
+            try {
+                const res = await axios.post(`${photApiBaseUrl}/get-video-detail`, formData, {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    }
+                });
+                console.log(res);
+            } catch (error) {
+                console.log(error);
+            }
+        }
     }
 
     return (
@@ -42,7 +60,7 @@ const Transcriber: React.FC = () => {
             <div className="mb-4 flex justify-between items-center">
                 <HeadingH2 title={currentEvent?.title} />
                 <div className='flex items-center gap-3'>
-                    <Link to="/all-photos/" onClick={() => dispatch(heading("All Photos"))} className="btn btn-error text-white btn-sm">
+                    <Link to="/ai-transcribers/" onClick={() => dispatch(heading("AI Transcriber"))} className="btn btn-error text-white btn-sm">
                         <IoMdArrowRoundBack size={20} /> Go Back
                     </Link>
                 </div>
@@ -62,7 +80,7 @@ const Transcriber: React.FC = () => {
                                 type="url"
                                 required
                                 className="grow"
-                                onChange={() => { }}
+                                onChange={(e) => setLink(e.target.value)}
                             />
                         </label>
 
