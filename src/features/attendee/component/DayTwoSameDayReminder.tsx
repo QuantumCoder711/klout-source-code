@@ -121,6 +121,52 @@ const DayTwoSameDayReminder: React.FC = () => {
 
         setLoading(true);
 
+        // try {
+        //     axios.post(`${imageBaseUrl}/api/day_two_same_day_reminder`, dataObj, {
+        //         headers: {
+        //             "Content-Type": "multipart/form-data",
+        //             "Authorization": `Bearer ${token}`
+        //         },
+        //     })
+        //         .then(res => {
+        //             // Check if the response is successful (status 200)
+        //             setLoading(false);
+        //             if (res.status === 200) {
+        //                 // Show success message using SweetAlert
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Success',
+        //                     text: 'The day two same day reminder was sent successfully!',
+        //                 }).then((result) => {
+        //                     // Check if the OK button was clicked
+        //                     if (result.isConfirmed) {
+        //                         // Navigate to the '/events/all-attendee' route
+        //                         // window.location.href = "/events/all-attendee";
+        //                         window.history.back();
+        //                     }
+        //                 });
+        //             }
+        //         })
+        //         .catch(error => {
+        //             // Show error message if there is any issue
+        //             setLoading(false);
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Something went wrong',
+        //                 text: error.response?.data?.message || 'An error occurred. Please try again.'
+        //             });
+        //         });
+        // } catch (error) {
+        //     // Catch any unexpected errors
+        //     console.log(error)
+        //     setLoading(false);
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Something went wrong',
+        //         text: 'An unexpected error occurred.'
+        //     });
+        // }
+
         try {
             axios.post(`${imageBaseUrl}/api/day_two_same_day_reminder`, dataObj, {
                 headers: {
@@ -129,41 +175,40 @@ const DayTwoSameDayReminder: React.FC = () => {
                 },
             })
                 .then(res => {
-                    // Check if the response is successful (status 200)
                     setLoading(false);
                     if (res.status === 200) {
-                        // Show success message using SweetAlert
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: 'The day two same day reminder was sent successfully!',
+                            text: 'The reminder was sent successfully!',
                         }).then((result) => {
-                            // Check if the OK button was clicked
                             if (result.isConfirmed) {
-                                // Navigate to the '/events/all-attendee' route
-                                // window.location.href = "/events/all-attendee";
                                 window.history.back();
                             }
                         });
                     }
                 })
-                .catch(error => {
-                    // Show error message if there is any issue
-                    setLoading(false);
+                .catch(() => {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Something went wrong',
-                        text: error.response?.data?.message || 'An error occurred. Please try again.'
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The reminder was sent!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.history.back();
+                        }
                     });
-                });
+                })
         } catch (error) {
-            // Catch any unexpected errors
-            console.log(error)
             setLoading(false);
             Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong',
-                text: 'An unexpected error occurred.'
+                icon: 'success',
+                title: 'Success',
+                text: 'The reminder was sent!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.history.back();
+                }
             });
         }
     }

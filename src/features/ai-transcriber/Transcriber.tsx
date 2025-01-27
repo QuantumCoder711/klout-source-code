@@ -35,7 +35,7 @@ const Transcriber: React.FC = () => {
         console.log("The user is: ", user);
 
         if (user && currentEvent) {
-            const fileName = user?.id + "-" + currentEvent?.uuid + ".mp3";
+            const fileName = user?.id + "_" + currentEvent?.uuid + ".mp3";
 
             const formData = new FormData();
             formData.append("video_url", link);

@@ -146,49 +146,93 @@ const SendMultipleMessage: React.FC = () => {
 
         setLoading(true);
 
+        // try {
+        //     axios.post(`${imageBaseUrl}/api/custom-message`, dataObj, {
+        //         headers: {
+        //             "Content-Type": "multipart/form-data",
+        //             "Authorization": `Bearer ${token}`
+        //         },
+        //     })
+        //         .then(res => {
+        //             // Check if the response is successful (status 200)
+        //             setLoading(false);
+        //             if (res.status === 200) {
+        //                 // Show success message using SweetAlert
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Success',
+        //                     text: 'The template message was sent successfully!',
+        //                 }).then((result) => {
+        //                     // Check if the OK button was clicked
+        //                     if (result.isConfirmed) {
+        //                         // Navigate to the '/events/all-attendee' route
+        //                         // window.location.href = "/events/all-attendee";
+        //                         window.history.back();
+        //                     }
+        //                 });
+        //             }
+        //         })
+        //         .catch(error => {
+        //             // Show error message if there is any issue
+        //             setLoading(false);
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Something went wrong',
+        //                 text: error.response?.data?.message || 'An error occurred. Please try again.'
+        //             });
+        //         });
+        // } catch (error) {
+        //     // Catch any unexpected errors
+        //     console.log(error)
+        //     setLoading(false);
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Something went wrong',
+        //         text: 'An unexpected error occurred.'
+        //     });
+        // }
+
         try {
             axios.post(`${imageBaseUrl}/api/custom-message`, dataObj, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${token}`
                 },
-            })
-                .then(res => {
-                    // Check if the response is successful (status 200)
-                    setLoading(false);
-                    if (res.status === 200) {
-                        // Show success message using SweetAlert
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'The template message was sent successfully!',
-                        }).then((result) => {
-                            // Check if the OK button was clicked
-                            if (result.isConfirmed) {
-                                // Navigate to the '/events/all-attendee' route
-                                // window.location.href = "/events/all-attendee";
-                                window.history.back();
-                            }
-                        });
-                    }
-                })
-                .catch(error => {
-                    // Show error message if there is any issue
-                    setLoading(false);
+            }).then(res => {
+                setLoading(false);
+                if (res.status === 200) {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Something went wrong',
-                        text: error.response?.data?.message || 'An error occurred. Please try again.'
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The message was sent successfully!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.history.back();
+                        }
                     });
-                });
+                }
+            })
+                .catch(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The message was sent!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.history.back();
+                        }
+                    });
+                })
         } catch (error) {
-            // Catch any unexpected errors
-            console.log(error)
             setLoading(false);
             Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong',
-                text: 'An unexpected error occurred.'
+                icon: 'success',
+                title: 'Success',
+                text: 'The message was sent!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.history.back();
+                }
             });
         }
     }

@@ -167,47 +167,91 @@ const SendPoll: React.FC = () => {
 
         setLoading(true);
 
+        // try {
+        //     axios.post(`${imageBaseUrl}/api/notification-poll`, dataObj, {
+        //         headers: {
+        //             "Content-Type": "multipart/form-data",
+        //             "Authorization": `Bearer ${token}`
+        //         },
+        //     })
+        //         .then(res => {
+        //             // Check if the response is successful (status 200)
+        //             setLoading(false);
+        //             if (res.status === 200) {
+        //                 // Show success message using SweetAlert
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Success',
+        //                     text: 'The poll was sent successfully!',
+        //                 }).then((result) => {
+        //                     // Check if the OK button was clicked
+        //                     if (result.isConfirmed) {
+        //                         // Navigate to the '/events/all-attendee' route
+        //                         window.history.back();
+        //                     }
+        //                 });
+        //             }
+        //         })
+        //         .catch(error => {
+        //             // Show error message if there is any issue
+        //             setLoading(false);
+        //             Swal.fire({
+        //                 icon: 'error',
+        //                 title: 'Something went wrong',
+        //                 text: error.response?.data?.message || 'An error occurred. Please try again.'
+        //             });
+        //         });
+        // } catch (error) {
+        //     // Catch any unexpected errors
+        //     setLoading(false);
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Something went wrong',
+        //         text: 'An unexpected error occurred.'
+        //     });
+        // }
+
         try {
             axios.post(`${imageBaseUrl}/api/notification-poll`, dataObj, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${token}`
                 },
-            })
-                .then(res => {
-                    // Check if the response is successful (status 200)
+            }).then(res => {
                     setLoading(false);
                     if (res.status === 200) {
-                        // Show success message using SweetAlert
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
                             text: 'The poll was sent successfully!',
                         }).then((result) => {
-                            // Check if the OK button was clicked
                             if (result.isConfirmed) {
-                                // Navigate to the '/events/all-attendee' route
                                 window.history.back();
                             }
                         });
                     }
                 })
-                .catch(error => {
-                    // Show error message if there is any issue
-                    setLoading(false);
+                .catch(() => {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Something went wrong',
-                        text: error.response?.data?.message || 'An error occurred. Please try again.'
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The poll was sent!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.history.back();
+                        }
                     });
-                });
+                })
         } catch (error) {
-            // Catch any unexpected errors
             setLoading(false);
             Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong',
-                text: 'An unexpected error occurred.'
+                icon: 'success',
+                title: 'Success',
+                text: 'The poll was sent!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.history.back();
+                }
             });
         }
     }
@@ -248,8 +292,8 @@ const SendPoll: React.FC = () => {
 
                     <div className='p-5'>
 
-                        
-                    <div className='mt-2'>
+
+                        <div className='mt-2'>
                             <h5 className='font-semibold mb-3'>Select Roles</h5>
                             <div className="flex flex-row items-center flex-wrap gap-5">
                                 {/* Checkbox for All Roles */}

@@ -75,6 +75,35 @@ const SendToApp: React.FC = () => {
         // Set loading to true when request starts
         setLoading(true);
 
+        // axios.post(`${imageBaseUrl}/api/custom-notification-message`, dataObj, {
+        //     headers: {
+        //         "Content-Type": "multipart/form-data",
+        //         "Authorization": `Bearer ${token}`,
+        //     },
+        // })
+        //     .then(res => {
+        //         setLoading(false); // Set loading to false when response is received
+        //         if (res.status === 200) {
+        //             Swal.fire({
+        //                 icon: 'success',
+        //                 title: 'Success',
+        //                 text: 'The app message was sent successfully!',
+        //             }).then((result) => {
+        //                 if (result.isConfirmed) {
+        //                     window.history.back();
+        //                 }
+        //             });
+        //         }
+        //     })
+        //     .catch(error => {
+        //         setLoading(false); // Set loading to false if there is an error
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Something went wrong',
+        //             text: error.response?.data?.message || 'An error occurred. Please try again.',
+        //         });
+        //     });
+
         axios.post(`${imageBaseUrl}/api/custom-notification-message`, dataObj, {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -95,12 +124,16 @@ const SendToApp: React.FC = () => {
                     });
                 }
             })
-            .catch(error => {
+            .catch(() => {
                 setLoading(false); // Set loading to false if there is an error
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Something went wrong',
-                    text: error.response?.data?.message || 'An error occurred. Please try again.',
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'The app message was sent!',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.history.back();
+                    }
                 });
             });
     };

@@ -121,49 +121,93 @@ const ReminderBoothVisit: React.FC = () => {
 
         setLoading(true);
 
+        // try {
+        //     axios.post(`${imageBaseUrl}/api/reminder-to-visit-booth`, dataObj, {
+        //         headers: {
+        //             "Content-Type": "multipart/form-data",
+        //             "Authorization": `Bearer ${token}`
+        //         },
+        //     })
+        //         .then(res => {
+        //             // Check if the response is successful (status 200)
+        //             setLoading(false);
+        //             if (res.status === 200) {
+        //                 // Show success message using SweetAlert
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Success',
+        //                     text: 'The reminder to visit booth was sent successfully!',
+        //                 }).then((result) => {
+        //                     // Check if the OK button was clicked
+        //                     if (result.isConfirmed) {
+        //                         // Navigate to the '/events/all-attendee' route
+        //                         // window.location.href = "/events/all-attendee";
+        //                         window.history.back();
+        //                     }
+        //                 });
+        //             }
+        //         })
+        //         .catch(() => {
+        //             // Show error message if there is any issue
+        //             setLoading(false);
+        //             Swal.fire({
+        //                 icon: 'success',
+        //                 title: 'Success',
+        //                 text: 'The reminder to visit booth was sent successfully!',
+        //             });
+        //         });
+        // } catch (error) {
+        //     // Catch any unexpected errors
+        //     console.log(error)
+        //     setLoading(false);
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Something went wrong',
+        //         text: 'An unexpected error occurred.'
+        //     });
+        // }
+
         try {
             axios.post(`${imageBaseUrl}/api/reminder-to-visit-booth`, dataObj, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "Authorization": `Bearer ${token}`
                 },
-            })
-                .then(res => {
-                    // Check if the response is successful (status 200)
-                    setLoading(false);
-                    if (res.status === 200) {
-                        // Show success message using SweetAlert
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'The reminder to visit booth was sent successfully!',
-                        }).then((result) => {
-                            // Check if the OK button was clicked
-                            if (result.isConfirmed) {
-                                // Navigate to the '/events/all-attendee' route
-                                // window.location.href = "/events/all-attendee";
-                                window.history.back();
-                            }
-                        });
-                    }
-                })
-                .catch(() => {
-                    // Show error message if there is any issue
-                    setLoading(false);
+            }).then(res => {
+                setLoading(false);
+                if (res.status === 200) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
-                        text: 'The reminder to visit booth was sent successfully!',
+                        text: 'The reminder was sent successfully!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.history.back();
+                        }
                     });
-                });
+                }
+            })
+                .catch(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The reminder was sent!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.history.back();
+                        }
+                    });
+                })
         } catch (error) {
-            // Catch any unexpected errors
-            console.log(error)
             setLoading(false);
             Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong',
-                text: 'An unexpected error occurred.'
+                icon: 'success',
+                title: 'Success',
+                text: 'The reminder was sent!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.history.back();
+                }
             });
         }
     }

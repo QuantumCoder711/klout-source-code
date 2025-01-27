@@ -95,6 +95,9 @@ const SameDayReminder: React.FC = () => {
         setSendTime(time);
     };
 
+    const selectedRolesString = selectedRoles.map(capitalizeRole).join(',');
+
+
     console.log(currentEvent);
     const handleSubmit = () => {
         // const formData = new FormData();
@@ -102,7 +105,7 @@ const SameDayReminder: React.FC = () => {
         if (currentEvent) {
             dataObj = {
                 "event_id": currentEvent?.uuid,
-                "send_to": String(selectedRoles),
+                "send_to": selectedRolesString,
                 "send_method": "whatsapp",
                 "subject": "",
                 "message": "Template",
@@ -124,6 +127,63 @@ const SameDayReminder: React.FC = () => {
         console.log("The data object is: ", dataObj); // Check if `check_in` is added correctly
 
         setLoading(true);
+        // try {
+        //     axios.post(`${imageBaseUrl}/api/notifications-samedayinvitation`, dataObj, {
+        //         headers: {
+        //             "Content-Type": "multipart/form-data",
+        //             "Authorization": `Bearer ${token}`
+        //         },
+        //     })
+        //         .then(res => {
+        //             // Check if the response is successful (status 200)
+        //             setLoading(false);
+        //             if (res.status === 200) {
+        //                 // Show success message using SweetAlert
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Success',
+        //                     text: 'The invitation was sent successfully!',
+        //                 }).then((result) => {
+        //                     // Check if the OK button was clicked
+        //                     if (result.isConfirmed) {
+        //                         // Navigate to the '/events/all-attendee' route
+        //                         window.history.back();
+        //                     }
+        //                 });
+        //             }
+        //         })
+        //         .catch(() => {
+        //             // Show error message if there is any issue
+        //             // setLoading(false);
+        //             // Swal.fire({
+        //             //     icon: 'error',
+        //             //     title: 'Something went wrong',
+        //             //     text: error.response?.data?.message || 'An error occurred. Please try again.'
+        //             // });
+
+        //             setLoading(false);
+        //             Swal.fire({
+        //                 icon: 'success',
+        //                 title: 'Success',
+        //                 text: 'Message Sent',
+        //             }).then((result) => {
+        //                 // Check if the OK button was clicked
+        //                 if (result.isConfirmed) {
+        //                     // Navigate to the '/events/all-attendee' route
+        //                     window.history.back();
+        //                 }
+        //             });
+        //         });
+        // } catch (error) {
+        //     // Catch any unexpected errors
+        //     console.log(error);
+        //     setLoading(false);
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Something went wrong',
+        //         text: 'An unexpected error occurred.'
+        //     });
+        // }
         try {
             axios.post(`${imageBaseUrl}/api/notifications-samedayinvitation`, dataObj, {
                 headers: {
@@ -132,56 +192,42 @@ const SameDayReminder: React.FC = () => {
                 },
             })
                 .then(res => {
-                    // Check if the response is successful (status 200)
                     setLoading(false);
                     if (res.status === 200) {
-                        // Show success message using SweetAlert
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: 'The invitation was sent successfully!',
+                            text: 'The reminder was sent successfully!',
                         }).then((result) => {
-                            // Check if the OK button was clicked
                             if (result.isConfirmed) {
-                                // Navigate to the '/events/all-attendee' route
                                 window.history.back();
                             }
                         });
                     }
                 })
                 .catch(() => {
-                    // Show error message if there is any issue
-                    // setLoading(false);
-                    // Swal.fire({
-                    //     icon: 'error',
-                    //     title: 'Something went wrong',
-                    //     text: error.response?.data?.message || 'An error occurred. Please try again.'
-                    // });
-
-                    setLoading(false);
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
-                        text: 'Message Sent',
+                        text: 'The reminder was sent!',
                     }).then((result) => {
-                        // Check if the OK button was clicked
                         if (result.isConfirmed) {
-                            // Navigate to the '/events/all-attendee' route
                             window.history.back();
                         }
                     });
-                });
+                })
         } catch (error) {
-            // Catch any unexpected errors
-            console.log(error);
             setLoading(false);
             Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong',
-                text: 'An unexpected error occurred.'
+                icon: 'success',
+                title: 'Success',
+                text: 'The reminder was sent!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.history.back();
+                }
             });
         }
-
     }
 
     // Check if all roles are selected

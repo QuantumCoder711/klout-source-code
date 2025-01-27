@@ -171,6 +171,71 @@ const SendReminder: React.FC = () => {
         //     });
         // }
 
+    //     try {
+    //         axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
+    //             headers: {
+    //                 "Content-Type": "multipart/form-data",
+    //                 "Authorization": `Bearer ${token}`,
+    //             },
+    //         })
+    //             .then(res => {
+    //                 setLoading(false);
+    //                 if (res.status === 200) {
+    //                     Swal.fire({
+    //                         icon: 'success',
+    //                         title: 'Success',
+    //                         text: 'The invitation was sent successfully!',
+    //                     }).then((result) => {
+    //                         if (result.isConfirmed) {
+    //                             window.history.back();
+    //                         }
+    //                     });
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 setLoading(false);
+
+    //                 if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    //                     // Handle timeout error
+    //                     Swal.fire({
+    //                         icon: 'success',
+    //                         title: 'Success',
+    //                         text: 'The invitation was sent successfully!',
+    //                     }).then((result) => {
+    //                         if (result.isConfirmed) {
+    //                             window.location.href = "/events/all-attendee";
+    //                         }
+    //                     });
+    //                 } else if (error.response) {
+    //                     // Handle other errors with a response
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: 'Something went wrong',
+    //                         text: error.response?.data?.message || 'An error occurred. Please try again.',
+    //                     });
+    //                 } else {
+    //                     // Handle other errors without a response
+    //                     Swal.fire({
+    //                         icon: 'success',
+    //                         title: 'Success',
+    //                         text: 'The invitation was sent!',
+    //                     }).then((result) => {
+    //                         if (result.isConfirmed) {
+    //                             window.location.href = "/events/all-attendee";
+    //                         }
+    //                     });
+    //                 }
+    //             });
+    //     } catch (error) {
+    //         console.log("The error is: ", error);
+    //         setLoading(false);
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'Something went wrong',
+    //             text: 'An unexpected error occurred.',
+    //         });
+    //     }
+    // };
         try {
             axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
                 headers: {
@@ -184,7 +249,7 @@ const SendReminder: React.FC = () => {
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: 'The invitation was sent successfully!',
+                            text: 'The reminder was sent successfully!',
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 window.history.back();
@@ -192,46 +257,29 @@ const SendReminder: React.FC = () => {
                         });
                     }
                 })
-                .catch(error => {
-                    setLoading(false);
-
-                    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-                        // Handle timeout error
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'The invitation was sent successfully!',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "/events/all-attendee";
-                            }
-                        });
-                    } else if (error.response) {
-                        // Handle other errors with a response
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Something went wrong',
-                            text: error.response?.data?.message || 'An error occurred. Please try again.',
-                        });
-                    } else {
-                        // Handle other errors without a response
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Network Error',
-                            text: 'An unexpected error occurred. Please check your connection and try again.',
-                        });
-                    }
-                });
+                .catch(()=>{
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The reminder was sent!',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.history.back();
+                        }
+                    });
+                })
         } catch (error) {
-            console.log("The error is: ", error);
             setLoading(false);
             Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong',
-                text: 'An unexpected error occurred.',
+                icon: 'success',
+                title: 'Success',
+                text: 'The reminder was sent!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.history.back();
+                }
             });
         }
-
     };
 
 

@@ -12,6 +12,7 @@ type attendeeType = {
   company_name: string;
   email_id: string;
   phone_number: string;
+  alternate_phone_number: string;
   status: string;
   last_name: string;
   award_winner: number;
@@ -30,10 +31,10 @@ const AllAttendee: React.FC = () => {
   const [searchEmail, setSearchEmail] = useState('');
   const [searchPhone, setSearchPhone] = useState('');
 
-  
+
   const currentAttendees: attendeeType[] = allAttendees;
   // console.log(currentAttendees);
-  
+
   // Filter attendees based on the search terms
   const filteredAttendees = currentAttendees.filter((attendee) => {
     const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
@@ -43,13 +44,13 @@ const AllAttendee: React.FC = () => {
     const matchesPhone = (attendee.phone_number ?? '').toLowerCase().includes(searchPhone.toLowerCase());
     return matchesName && matchesCompany && matchesDesignation && matchesEmail && matchesPhone;
   });
-  
+
   const totalPages = Math.ceil(filteredAttendees.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
   const attendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
-    console.log(currentAttendees);
+  console.log(currentAttendees);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -186,6 +187,7 @@ const AllAttendee: React.FC = () => {
               <th className="py-3 px-4 text-start text-nowrap">Company</th>
               <th className="py-3 px-4 text-start text-nowrap">Email</th>
               <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
+              <th className="py-3 px-4 text-start text-nowrap">Alternate Mobile</th>
               <th className="py-3 px-4 text-start text-nowrap">Status</th>
               <th className="py-3 px-4 text-start text-nowrap">Award Winner</th>
             </tr>
@@ -201,6 +203,7 @@ const AllAttendee: React.FC = () => {
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
+                  <td className="py-3 px-4 text-gray-800 text-nowrap">{!attendee.alternate_phone_number ? "-" : attendee.alternate_phone_number}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
                   <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.award_winner ? "Yes" : "No"}</td>
                 </tr>
