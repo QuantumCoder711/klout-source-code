@@ -53,7 +53,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus, type }) => {
       ? cardStatus === "Sent"
         ? data.messageID && ["Sent", "Delivered", "Read", "Bounce", "Delivery"].includes(data.messageID.messageStatus || "")
         : cardStatus === "Delivered"
-          ? data.messageID && ["Delivered", "Read"].includes(data.messageID.messageStatus || "")
+          ? data.messageID && ["Delivered", "Delivery"].includes(data.messageID.messageStatus || "")
           : data.messageID && data.messageID.messageStatus === cardStatus
       : true;
 
@@ -143,7 +143,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, cardStatus, type }) => {
   };
 
   return (
-    <div className="text-black py-10 bg-white p-6 rounded-lg shadow-md">
+    <div className="text-black bg-white p-6 rounded-lg shadow-md">
       <div className="flex justify-between items-center">
         <div className="mb-2 flex items-center">
           <label htmlFor="itemsPerPage" className="mr-2 text-gray-800 font-semibold">

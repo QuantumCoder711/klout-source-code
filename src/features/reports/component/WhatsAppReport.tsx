@@ -61,7 +61,7 @@ const WhatsAppReport: React.FC = () => {
                 console.log(res.data.data);
                 setAllData(res.data.data);
                 setTotalMessage(res.data.data.length)
-                const delivered = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus !== "Failed");
+                const delivered = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus === "Delivered");
                 setTotalDelivered(delivered.length);
                 const read = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus === "Read");
                 setTotalRead(read.length)

@@ -407,7 +407,7 @@ const DayTwoSameDayReminder: React.FC = () => {
                                     <span>Now</span>
                                 </label>
 
-                                <label className="flex items-center gap-2 cursor-pointer">
+                                {/* <label className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="radio"
                                         name="sendTime"
@@ -416,7 +416,7 @@ const DayTwoSameDayReminder: React.FC = () => {
                                         className="bg-transparent border-zinc-400"
                                     />
                                     <span>Later</span>
-                                </label>
+                                </label> */}
                             </div>
                         </div>
 

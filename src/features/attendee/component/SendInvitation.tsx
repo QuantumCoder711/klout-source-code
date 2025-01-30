@@ -189,7 +189,7 @@ const SendInvitation: React.FC = () => {
                                 </label>
 
                                 {/* Radio button for Later */}
-                                <label className="flex items-center gap-2 cursor-pointer">
+                                {/* <label className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="radio"
                                         name="sendTime"
@@ -198,7 +198,7 @@ const SendInvitation: React.FC = () => {
                                         className="bg-transparent border-zinc-400"
                                     />
                                     <span>Later</span>
-                                </label>
+                                </label> */}
                             </div>
                         </div>
                         <button className='px-4 py-3 mt-10 bg-klt_primary-500 text-white font-semibold rounded-md'>Submit Now</button>

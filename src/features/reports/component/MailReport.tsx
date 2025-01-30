@@ -125,11 +125,11 @@ const MailReport: React.FC = () => {
                 console.log(res.data.data);
                 setAllData(res.data.data);
                 setTotalMessage(res.data.data.length)
-                const delivered = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus !== "Failed");
+                const delivered = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus !== "Bounce");
                 setTotalDelivered(delivered.length);
                 const read = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus === "Read");
                 setTotalRead(read.length)
-                const failed = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus === "Failed");
+                const failed = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus === "Bounce");
                 setTotalFailed(failed.length)
             })
     }, [selectedTemplate]);
@@ -214,19 +214,19 @@ const MailReport: React.FC = () => {
 
 
             {/* Rendering Cards */}
-            <div className='flex gap-5'>
-                <div className='w-full grid grid-cols-4 gap-3'>
+            <div className='flex gap-5 mb-10'>
+                <div className='w-full grid grid-cols-3 gap-3'>
                     <div onClick={() => { setChangeCartStatus("Sent") }} className='cursor-pointer hover:scale-105 duration-500'>
-                        <ScoreCard cardColor='blue' content={totalMessage} title='Sent Messages' />
+                        <ScoreCard cardColor='blue' content={totalMessage} title='Sent Mails' />
                     </div>
                     <div onClick={() => { setChangeCartStatus("Delivered") }} className='cursor-pointer hover:scale-105 duration-500'>
-                        <ScoreCard cardColor='green' content={totalDelivered} title='Delivered Messages' />
+                        <ScoreCard cardColor='green' content={totalDelivered} title='Delivered Mails' />
                     </div>
-                    <div onClick={() => { setChangeCartStatus("Read") }} className='cursor-pointer hover:scale-105 duration-500'>
+                    {/* <div onClick={() => { setChangeCartStatus("Read") }} className='cursor-pointer hover:scale-105 duration-500'>
                         <ScoreCard cardColor='yellow' content={totalRead} title='Read Messages' />
-                    </div>
-                    <div onClick={() => { setChangeCartStatus("Failed") }} className='cursor-pointer hover:scale-105 duration-500'>
-                        <ScoreCard cardColor='red' content={totalFailed} title='Failed Messages' />
+                    </div> */}
+                    <div onClick={() => { setChangeCartStatus("Bounce") }} className='cursor-pointer hover:scale-105 duration-500'>
+                        <ScoreCard cardColor='red' content={totalFailed} title='Failed Mails' />
                     </div>
                 </div>
             </div>
