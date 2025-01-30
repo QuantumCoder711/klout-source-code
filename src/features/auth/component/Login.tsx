@@ -18,7 +18,7 @@ type LoginFormInputs = {
 
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { token, loading, loginError } = useSelector((state: RootState) => state.auth);
+    const { token, loginError } = useSelector((state: RootState) => state.auth);
     const { register, handleSubmit, formState: { errors } } = useForm<LoginFormInputs>();
 
     const textToType = "Step into the Future of Event Management with Klout Club - Your Event, Your Way!";
@@ -109,9 +109,8 @@ const Login: React.FC = () => {
                             <button
                                 type="submit"
                                 className="w-full bg-klt_primary-900 text-white py-2 rounded-md"
-                                disabled={loading}
                             >
-                                {loading ? 'Logging in...' : 'Login'}
+                                Login
                             </button>
                         </div>
 

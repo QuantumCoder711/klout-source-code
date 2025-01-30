@@ -8,10 +8,29 @@ import { logout, fetchUser } from '../features/auth/authSlice';
 import { Navigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { heading } from "../features/heading/headingSlice";
+import socket from "../socket";
+import { useGlobalContext } from "../GlobalContext";
+
+type eventType = {
+  title: string,
+  image: string,
+  event_start_date: string,
+  uuid: string,
+  event_venue_name: string,
+  id: number,
+  start_time?: string,
+  start_minute_time?: string,
+  start_time_type?: string,
+  end_time?: string,
+  end_minute_time?: string,
+  end_time_type?: string,
+}
 
 
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
+
+  const { setCount } = useGlobalContext();
 
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,7 +39,28 @@ const Navbar: React.FC = () => {
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const dummyImage:string = "https://via.placeholder.com/40";
+  const dummyImage: string = "https://via.placeholder.com/40";
+
+  const { events } = useSelector((state: RootState) => state.events);
+
+  const today: Date = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const pastEvents = events.filter((event: eventType) => {
+    const eventDate: Date = new Date(event.event_start_date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate < today;
+  }).slice(0, 4);
+
+  const upcomingEvents = events.filter((event: eventType) => {
+    const eventDate: Date = new Date(event.event_start_date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate >= today;
+  }).slice(0, 4);
+
+  console.log(pastEvents);
+
+
 
   useEffect(() => {
     if (token) {
@@ -33,6 +73,51 @@ const Navbar: React.FC = () => {
       }
     }
   }, [dispatch, currentEventUUID, token]);
+
+
+  useEffect(() => {
+    if (!events) {
+      return;
+    }
+
+    const joinRoom = () => {
+      // console.log("Joining room with:", { userId, eventUuid, tabId });
+      upcomingEvents.forEach((event) => {
+        const userId = event.user_id;
+        const eventUuid = event.uuid;
+        socket.emit('joinEvent', { userId, eventUuid });
+        console.log(`${event.user_id} connected, ${event.uuid}`);
+      })
+    };
+
+    if (socket.connected) {
+      console.log("Already connected to the server", socket.id);
+      joinRoom();
+    }
+
+    socket.on("connect", () => {
+      console.log("Connected to the server", socket.id);
+      joinRoom();
+    });
+
+    socket.on("checkInCountUpdated", (data) => {
+      const event = events.filter(event => event.uuid === data.eventUuid);
+      console.log("The Event is: ", event);
+      console.log("Received data:", data);
+      setCount(data.updatedCheckInCount);
+    });
+    // socket.on("checkInCountUpdated", (data) => {
+    //   const event = events.filter(event => event.uuid === data.eventUuid);
+    //   console.log("The Event is: ", event);
+    //   console.log("Received data:", data);
+    //   setCount(data.updatedCheckInCount);
+    // });
+
+    return () => {
+      socket.off("connect");
+      socket.off("joinEvent");
+    };
+  }, [events]);
 
   const [isOpen, setIsOpen] = useState(false);
 

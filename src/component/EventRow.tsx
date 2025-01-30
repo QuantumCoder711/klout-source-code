@@ -7,6 +7,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { RootState } from '../redux/store';
 import { useSelector } from 'react-redux';
+import { useGlobalContext } from '../GlobalContext';
 
 interface EventRowProps {
     title?: string,
@@ -34,6 +35,8 @@ const EventRow: React.FC<EventRowProps> = (props) => {
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const [isLive, setIsLive] = useState(false);
+
+    const {count} = useGlobalContext();
 
     const eventStartTime: string = `${props.start_time}:${props.start_minute_time} ${props.start_time_type}`;
     const eventEndTime: string = `${props.end_time}:${props.end_minute_time} ${props.end_time_type}`;
@@ -64,6 +67,50 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             setIsLive(false);
         }
     }, [eventStartTime, eventEndTime, props.date]);
+
+    // useEffect(() => {
+    //     console.log("Inside Use Effect Hook");
+
+    //     // const joinRoom = () => {
+    //     //     // console.log("Joining room with:", { userId, eventUuid });
+    //     //     socket.emit('joinRoom', { 4: "hi" });
+    //     // };
+
+
+
+    //     if (socket.connected) {
+    //         console.log("Already connected to the server", socket.id);
+    //         socket.on('joinEvent', ({ userId, eventUuid }) => {
+    //             const room = `${userId}:${eventUuid}`; // Use backticks for template literal
+    //             socket.emit(room);
+    //             console.log(`User with ID ${userId} joined event room: ${room}`);
+    //         });
+    //     }
+
+    //     socket.on("connect", () => {
+    //         console.log("Connected to the server", socket.id);
+    //         joinRoom();
+    //     });
+    //     // socket.on("connect", () => {
+    //     //     console.log("Connected to the server", socket.id);
+    //     // })
+
+    //     // socket.on('joinEvent', ({ userId, eventUuid }) => {
+    //     //     const room = `${userId}:${eventUuid}`; // Use backticks for template literal
+    //     //     socket.emit(room);
+    //     //     console.log(`User with ID ${userId} joined event room: ${room}`);
+    //     // });
+
+    // }, []);
+
+
+    // User joins a specific event room
+    // socket.on('joinEvent', ({ userId, eventUuid }) => {
+    //     const room = `${userId}:${eventUuid}`; // Use backticks for template literal
+    //     socket.join(room);
+    //     console.log(`User with ID ${userId} joined event room: ${room}`);
+    // });
+
 
     const { token } = useSelector((state: RootState) => state.auth);
     const dispatch = useDispatch();
@@ -148,8 +195,8 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
             {/* Event Joiners Info */}
             <div className='h-full flex flex-col gap-y-2 min-w-40 text-sm 2xl:text-base'>
-                <div className='flex items-center gap-2 font-semibold'>Total Registrations: <p className='font-medium'>{props.total_attendee}</p></div>
-                <div className='flex items-center gap-2 font-semibold'>Total Attendees: <p className='font-medium'>{props.total_checkedin}</p></div>
+                <div className='flex items-center gap-2 font-semibold'>Total Registrations: <p className='font-medium'>{count||props.total_attendee}</p></div>
+                <div className='flex items-center gap-2 font-semibold'>Total Attendees: <p className='font-medium'>{count || props.total_checkedin}</p></div>
                 <div className='flex items-center gap-2 font-semibold'>Checked In Speakers: <p className='font-medium'>{props.total_checkedin_speaker}</p></div>
                 <div className='flex items-center gap-2 font-semibold'>Checked In Sponsors: <p className='font-medium'>{props.total_checkedin_sponsor}</p></div>
                 <div className='flex items-center gap-2 font-semibold'>Pending Delegates: <p className='font-medium'>{props.total_pending_delegate}</p></div>
@@ -160,11 +207,11 @@ const EventRow: React.FC<EventRowProps> = (props) => {
                 <Link to={`/events/view-event/${props.uuid}`} className="text-pink-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('View Event'));
                 }}>View Event</Link> <br />
-                <Link 
+                <Link
                     to={`/events/edit-event/${props.uuid}`}
-                className="text-sky-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
-                    dispatch(eventUUID(props.uuid)); dispatch(heading('Edit Event'));
-                }} >Edit Event</Link> <br />
+                    className="text-sky-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
+                        dispatch(eventUUID(props.uuid)); dispatch(heading('Edit Event'));
+                    }} >Edit Event</Link> <br />
                 <Link to={`/events/all-attendee/${props.uuid}`} className="text-blue-500 hover:underline px-3 rounded-md text-xs inline-block mb-1" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('All Attendee'));
                 }}>All Attendees</Link> <br />

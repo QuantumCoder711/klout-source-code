@@ -297,12 +297,10 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                     </div>
                 </div>
 
-                <div className='flex flex-col gap-3 my-4'>
+                <div className='flex flex-col gap-3 my-4 bg-white rounded-lg p-4'>
                     {/* Description */}
-                    <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Description &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <textarea id="description" defaultValue={currentEvent?.description} className="grow bg-white" {...register('description', { required: 'Description is required' })} />
-                    </label>
+                    <label htmlFor='description' className="font-semibold text-green-700 flex">Description <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </label>
+                    <textarea id="description" className="grow bg-white input-bordered input h-auto p-2" rows={4} {...register('description', { required: 'Description is required' })}>{currentEvent?.description}</textarea>
                     {errors.description && <p className="text-red-600">{errors.description.message}</p>}
                 </div>
 

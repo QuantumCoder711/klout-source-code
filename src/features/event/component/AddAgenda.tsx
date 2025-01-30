@@ -52,7 +52,7 @@ type attendeeType = {
     id: number;
 };
 
-const AddAgenda:React.FC = () => {
+const AddAgenda: React.FC = () => {
     // const navigate = useNavigate();
     const { token } = useSelector((state: RootState) => (state.auth));
     // const dispatch = useDispatch<AppDispatch>();
@@ -190,7 +190,7 @@ const AddAgenda:React.FC = () => {
                     </Link>
                 </div>
             </div>
-            
+
             {/* <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
             <form onSubmit={handleSubmit(onSubmit)} className="gap-4 mt-10">
                 <div className='flex flex-col gap-3 my-4'>
@@ -231,11 +231,19 @@ const AddAgenda:React.FC = () => {
 
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Description */}
-                    <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
+                    {/* <label htmlFor="description" className="input input-bordered bg-white text-black flex items-center gap-2">
                         <span className=" font-semibold text-green-700 flex justify-between items-center">Description <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <textarea id="description" className="grow bg-white outline-none" {...register('description', { required: 'Description is required' })} />
                     </label>
-                    {errors.description && <p className="text-red-600">{errors.description.message}</p>}
+                    {errors.description && <p className="text-red-600">{errors.description.message}</p>} */}
+
+
+                    <div className='flex flex-col gap-3 my-4 bg-white rounded-lg p-4'>
+                        {/* Description */}
+                        <label htmlFor='description' className="font-semibold text-green-700 flex">Description <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </label>
+                        <textarea id="description" className="grow bg-white input-bordered input h-auto p-2" rows={4} {...register('description', { required: 'Description is required' })} />
+                        {errors.description && <p className="text-red-600">{errors.description.message}</p>}
+                    </div>
 
                     {/* Tag Speakers */}
                     <div className="flex gap-3">

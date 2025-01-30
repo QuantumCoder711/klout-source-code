@@ -10,7 +10,6 @@ import { MdAdd } from "react-icons/md";
 import { heading } from '../../heading/headingSlice';
 import Loader from '../../../component/Loader';
 
-
 const Dashboard: React.FC = () => {
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
   const dispatch = useDispatch();
@@ -28,25 +27,12 @@ const Dashboard: React.FC = () => {
     end_time?: string,
     end_minute_time?: string,
     end_time_type?: string,
+    total_checkedin: number,
   }
 
   const { events, loading, error } = useSelector((state: RootState) => state.events);
   const { allAttendees } = useSelector((state: RootState) => state.attendee);
   const { totalSponsors } = useSelector((state: RootState) => state.sponsor);
-
-  // // filter past events from all events
-  // const today: Date = new Date();
-  // const pastEvents = events.filter((event: eventType) => {
-  //   const eventDate: Date = new Date(event.event_start_date);
-  //   return eventDate < today;
-  // });
-
-  // const upcomingEvents = events.filter((event: eventType) => {
-  //   const eventDate: Date = new Date(event.event_start_date);
-  //   return eventDate >= today;
-  // });
-
-  // console.log(pastEvents);
 
   // filter past events from all events
   const today: Date = new Date();
@@ -63,8 +49,6 @@ const Dashboard: React.FC = () => {
     eventDate.setHours(0, 0, 0, 0);
     return eventDate >= today;
   }).slice(0, 4);
-
-  console.log(pastEvents);
 
   if (loading) return <p>loading...</p>;
   if (error) return <p>Errror:  {error}</p>
@@ -137,6 +121,7 @@ const Dashboard: React.FC = () => {
                 end_time={upcomingEvent.end_time}
                 end_time_type={upcomingEvent.end_time_type}
                 imageAlt={upcomingEvent.title}
+                total_checkedin={upcomingEvent.total_checkedin}
                 date={upcomingEvent.event_start_date}
                 venue={upcomingEvent.event_venue_name}
                 eventuuid={upcomingEvent.uuid}

@@ -43,7 +43,7 @@ const Event: React.FC = () => {
 
     const pastEvents = events.filter((event: eventType) => {
         const eventDate = event.event_start_date;
-        return eventDate <= today;
+        return eventDate < today;
     });
 
     const upcomingEvents = events.filter((event: eventType) => {
