@@ -10,6 +10,7 @@ import swal from "sweetalert";
 import Loader from "../../../component/Loader";
 import { useDispatch } from "react-redux";
 import { heading } from "../../heading/headingSlice";
+import dummyImage from "/dummyImage.jpg";
 
 type formInputType = {
     first_name: string,
@@ -68,7 +69,6 @@ const Profile: React.FC = () => {
     const [, setCustomDesignationName] = useState<string>(user?.designation_name || "");
     const [selectedCompany, setSelectedCompany] = useState<string>();
     const [selectedDesignation, setSelectedDesignation] = useState<string>();
-    const dummyImage = "https://via.placeholder.com/150";
 
     useEffect(() => {
         axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data || []));

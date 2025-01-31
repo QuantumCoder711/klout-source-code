@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { RootState } from '../../../redux/store';
 import Swal from 'sweetalert2';
+import dummyImage from "/dummyImage.jpg";
 
 type formInputType = {
     title: string,
@@ -61,7 +62,6 @@ const AddAgenda: React.FC = () => {
     const [, setSpeakers] = useState<attendeeType[]>([]);
     const [image, setImage] = useState(null);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    const dummyImage = "https://via.placeholder.com/150";
 
     const { currentEventUUID } = useSelector((state: RootState) => state.events);
     const { events } = useSelector((state: RootState) => state.events);

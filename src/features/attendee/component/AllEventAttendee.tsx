@@ -17,6 +17,7 @@ import { BsSendFill } from 'react-icons/bs';
 import { FaMessage } from 'react-icons/fa6';
 import { BiSolidMessageSquareDots } from 'react-icons/bi';
 import { useGlobalContext } from '../../../GlobalContext';
+import dummyImage from "/dummyImage.jpg";
 
 type attendeeType = {
     uuid: string;
@@ -47,6 +48,27 @@ type attendeeType = {
     award_winner: number;
 };
 
+interface AttendeeExportData {
+    'First Name': string;
+    'Last Name': string;
+    'Designation': string;
+    'Company': string;
+    'Email': string;
+    'Mobile': string;
+    'Role': string;
+    'Check In'?: string;
+    'Check In Time'?: string;
+    'Event Name'?: string;
+    'Check In 2nd'?: string;  // Optional, will only exist if dateDifference > 1
+    'Check In Time 2nd'?: string;
+    'Check In 3rd'?: string;
+    'Check In Time 3rd'?: string;
+    'Check In 4th'?: string;
+    'Check In Time 4th'?: string;
+    'Check In 5th'?: string;
+    'Check In Time 5th'?: string;
+}
+
 interface AllEventAttendeeProps {
     uuid: string | undefined;
 }
@@ -57,7 +79,6 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
     const { count } = useGlobalContext();
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    const dummyImage = "https://via.placeholder.com/150";
 
     const [deleteArray, setDeleteArray] = useState<number[]>([]);
 
@@ -151,26 +172,44 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
     };
 
     const handleExport = () => {
-        const data = filteredAttendees.map((attendee) => ({
-            'First Name': attendee.first_name,
-            'Last Name': attendee.last_name,
-            'Designation': attendee.job_title,
-            'Company': attendee.company_name,
-            'Email': attendee.email_id,
-            'Mobile': attendee.phone_number,
-            'Role': attendee.status,
-            'Check In': attendee.check_in === 1 ? 'Yes' : 'No',
-            "Check In Time": attendee.check_in_time,
-            'Check In 2nd': attendee.check_in_second === 2 ? 'Yes' : 'No',
-            "Check In Time 2nd": attendee.check_in_second_time,
-            'Check In 3rd': attendee.check_in_third === 3 ? 'Yes' : 'No',
-            "Check In Time 3rd": attendee.check_in_third_time,
-            'Check In 4th': attendee.check_in_forth === 4 ? 'Yes' : 'No',
-            "Check In Time 4th": attendee.check_in_forth_time,
-            'Check In 5th': attendee.check_in_fifth === 5 ? 'Yes' : 'No',
-            "Check In Time 5th": attendee.check_in_fifth_time,
-            'Event Name': attendee.event_name,
-        }));
+        const data = filteredAttendees.map((attendee) => {
+            console.log("The date difference is: ", dateDifference);
+            const result: AttendeeExportData = {
+                'First Name': attendee.first_name,
+                'Last Name': attendee.last_name,
+                'Designation': attendee.job_title,
+                'Company': attendee.company_name,
+                'Email': attendee.email_id,
+                'Mobile': attendee.phone_number,
+                'Role': attendee.status,
+            };
+
+            // Conditionally add check-ins based on dateDifference
+            if (dateDifference >= 0) {
+                result['Check In'] = attendee.check_in === 1 ? 'Yes' : 'No',
+                    result["Check In Time"] = attendee.check_in_time;
+            }
+            if (dateDifference >= 1) {
+                result['Check In 2nd'] = attendee.check_in_second === 2 ? 'Yes' : 'No';
+                result["Check In Time 2nd"] = attendee.check_in_second_time;
+            }
+            if (dateDifference >= 2) {
+                result['Check In 3rd'] = attendee.check_in_third === 3 ? 'Yes' : 'No';
+                result["Check In Time 3rd"] = attendee.check_in_third_time;
+            }
+            if (dateDifference >= 3) {
+                result['Check In 4th'] = attendee.check_in_forth === 4 ? 'Yes' : 'No';
+                result["Check In Time 4th"] = attendee.check_in_forth_time;
+            }
+            if (dateDifference >= 4) {
+                result['Check In 5th'] = attendee.check_in_fifth === 5 ? 'Yes' : 'No';
+                result["Check In Time 5th"] = attendee.check_in_fifth_time;
+            }
+
+            result["Event Name"] = attendee.event_name;
+            return result;
+        });
+
 
         // Create a new workbook and a worksheet
         const worksheet = XLSX.utils.json_to_sheet(data);

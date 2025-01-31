@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { heading } from "../features/heading/headingSlice";
 import socket from "../socket";
 import { useGlobalContext } from "../GlobalContext";
+import dummyImage from "/dummyImage.jpg";
 
 type eventType = {
   title: string,
@@ -38,8 +39,6 @@ const Navbar: React.FC = () => {
   const { pageHeading } = useSelector((state: RootState) => state.pageHeading);
   const { currentEventUUID } = useSelector((state: RootState) => state.events);
   const { user } = useSelector((state: RootState) => state.auth);
-
-  const dummyImage: string = "https://via.placeholder.com/40";
 
   const { events } = useSelector((state: RootState) => state.events);
 

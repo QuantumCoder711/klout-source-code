@@ -15,6 +15,7 @@ import Swal from 'sweetalert2';
 import Loader from '../../../component/Loader';
 import { FaFileImport } from "react-icons/fa6";
 import { FaEye } from "react-icons/fa";
+import dummyImage from "/dummyImage.jpg";
 
 type attendeeType = {
   uuid: string;
@@ -71,7 +72,6 @@ interface ViewAgendasProps {
 
 const ViewAgendas: React.FC<ViewAgendasProps> = ({ uuid }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const dummyImage = "https://via.placeholder.com/150";
 
   const { token } = useSelector((state: RootState) => (state.auth));
   const [agendaData, setAgendaData] = useState<AgendaType[]>([]); // Fix agendaData to be an array

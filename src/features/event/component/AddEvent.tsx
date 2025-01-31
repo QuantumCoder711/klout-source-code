@@ -7,6 +7,7 @@ import '../component/style/addEvent.css';
 import { addNewEvent, fetchEvents } from '../eventSlice';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
+import dummyImage from "/dummyImage.jpg";
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Loader from '../../../component/Loader';
@@ -41,8 +42,6 @@ type formInputType = {
     printer_count: number;
 };
 
-
-
 const AddEvent: React.FC = () => {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const { token, user } = useSelector((state: RootState) => state.auth);
@@ -57,7 +56,7 @@ const AddEvent: React.FC = () => {
     const [, setImage] = useState<File | null>(null);
     const [eventBannerImage, setEventBannerImage] = useState<File | null>(null);
     const selectedCountryCode = watch('country');
-    const dummyImage = "https://via.placeholder.com/150";
+    // const dummyImage = "https://via.placeholder.com/150";
 
     const eventDetailsRef = useRef<HTMLDivElement>(null);
 

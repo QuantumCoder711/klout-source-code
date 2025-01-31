@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 // import { useNavigate } from "react-router-dom";
 import Loader from "../../../component/Loader";
 import Swal from "sweetalert2";
-const dummyImage = "https://via.placeholder.com/150";
+import dummyImage from "/dummyImage.jpg";
 
 // Define the form data type
 type FormInputType = {

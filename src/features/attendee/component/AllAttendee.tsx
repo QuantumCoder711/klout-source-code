@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import Loader from '../../../component/Loader';
+import * as XLSX from 'xlsx';
 import { RootState } from '../../../redux/store';
 
 type attendeeType = {
@@ -30,6 +31,7 @@ const AllAttendee: React.FC = () => {
   const [searchDesignation, setSearchDesignation] = useState('');
   const [searchEmail, setSearchEmail] = useState('');
   const [searchPhone, setSearchPhone] = useState('');
+  const [exportLoading, setExportLoading] = useState<boolean>(false);
 
 
   const currentAttendees: attendeeType[] = allAttendees;
@@ -51,6 +53,32 @@ const AllAttendee: React.FC = () => {
 
   const attendees: attendeeType[] = filteredAttendees.slice(startIndex, endIndex);
   console.log(currentAttendees);
+
+  const handleExportData = () => {
+    setExportLoading(true);
+
+    const data = attendees.map((attendee) => ({
+      "Event Name": attendee.title,
+      'First Name': attendee.first_name,
+      'Last Name': attendee.last_name,
+      'Designation': attendee.job_title,
+      'Company': attendee.company_name,
+      'Email': attendee.email_id,
+      'Phone No.': attendee.phone_number,
+      'Alternate Phone No.': attendee.alternate_phone_number,
+      "Status": attendee.status,
+      "Award Winner": attendee.award_winner ? "Yes" : "No"
+    }));
+
+    // Create a new workbook and a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendees');
+
+    // Generate Excel file and offer download
+    XLSX.writeFile(workbook, "All Attendees" + '.xlsx');
+    setExportLoading(false);
+  }
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -89,7 +117,7 @@ const AllAttendee: React.FC = () => {
     );
   };
 
-  if (loading) {
+  if (loading || exportLoading) {
     return <Loader />;
   }
 
@@ -171,6 +199,8 @@ const AllAttendee: React.FC = () => {
                 setCurrentPage(1); // Reset to the first page when searching
               }}
             />
+
+            <button onClick={handleExportData} className='btn-primary px-4 bg-klt_primary-500 text-white rounded'>Export Data</button>
           </div>
         </div>
       </div>

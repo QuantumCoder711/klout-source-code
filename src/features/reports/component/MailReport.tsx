@@ -102,7 +102,7 @@ const MailReport: React.FC = () => {
     // const { currentEventUUID } = useSelector((state: RootState) => (state.events));
     const [totalMessage, setTotalMessage] = useState(0);
     const [totalDelivered, setTotalDelivered] = useState(0);
-    const [totalRead, setTotalRead] = useState(0);
+    const [, setTotalRead] = useState(0);
     const [totalFailed, setTotalFailed] = useState(0);
     const [changeCardStatus, setChangeCartStatus] = useState<string>("Sent");
 

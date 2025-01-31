@@ -547,6 +547,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { TiArrowRight } from 'react-icons/ti';
 import Loader from '../../../component/Loader';
 import { useParams } from 'react-router-dom';
+import dummyImage from "/dummyImage.jpg";
 
 // Define the form data type
 type FormInputType = {
@@ -582,7 +583,6 @@ const EditAttendee = () => {
   const { attendee_uuid, uuid } = useParams<{ attendee_uuid: string, uuid: string }>();
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const dummyImage = "https://via.placeholder.com/150";
 
   const { token } = useSelector((state: RootState) => (state.auth));
   const [selectedImage, setSelectedImage] = useState<string>("");

@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import { AppDispatch, RootState } from '../../../redux/store';
 import Swal from 'sweetalert2';
+import dummyImage from "/dummyImage.jpg";
 import Loader from '../../../component/Loader';
 import { useDispatch } from 'react-redux';
 import { heading } from '../../heading/headingSlice';
@@ -57,7 +58,6 @@ type attendeeType = {
 
 const EditAgenda: React.FC = () => {
     const { agenda_uuid, id } = useParams<{ agenda_uuid: string, id: string }>();
-    const dummyImage = "https://via.placeholder.com/150";
     // const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<formInputType>();
