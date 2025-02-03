@@ -11,13 +11,12 @@ const AllPhotos: React.FC = () => {
   const { events, loading } = useSelector((state: RootState) => state.events);
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
 
-  if(loading) {
+  if (loading) {
     return <Loader />
   }
 
   return (
     <div>
-
       {/* For displaying all reports */}
       <div className='grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5'>
         {

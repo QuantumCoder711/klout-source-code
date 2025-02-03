@@ -22,6 +22,12 @@ body {
 /* Hide scrollbar in Firefox */
 html, body {
   scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for Chrome, Safari, Edge */
+::-webkit-scrollbar {
+  display: none;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {

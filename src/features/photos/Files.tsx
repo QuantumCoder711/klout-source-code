@@ -75,6 +75,7 @@ const Files: React.FC<FileProps> = (props) => {
                     {currentImages.map((item, index) => {
                         console.log("Image URL:", item.url); // Log each image URL
                         return (
+
                             <a key={index} data-src={item.url} data-lg-size="1600-1200" className='inline-block'>
                                 <img
                                     src={item.url}

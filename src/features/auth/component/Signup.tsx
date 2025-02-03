@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux'; // Use the custom hook
-import { login } from '../authSlice';
-import { RootState, useAppDispatch } from '../../../redux/store'; // Your Redux store type
-import { Navigate } from 'react-router-dom';
+import { RootState } from '../../../redux/store'; // Your Redux store type
+import { Navigate, useNavigate } from 'react-router-dom';
 import signinBanner from '../../../assets/images/signinbanner.webp';
 import typingEffect from '../../../utils/typingEffect';
 import HeadingH2 from '../../../component/HeadingH2';
@@ -43,12 +42,12 @@ type ApiType = {
 }
 
 const Signup: React.FC = () => {
-  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const { token, loading, loginError } = useSelector((state: RootState) => state.auth);
   const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
-  const { register, handleSubmit, formState: { errors }, setValue, control } = useForm<Signup>();
-
+  const { register, handleSubmit, formState: { errors }, control } = useForm<Signup>();
+  const [steps, setSteps] = useState<number>(1);
   const [companies, setCompanies] = useState<ApiType[] | undefined>();
   const [selectedCompany, setSelectedCompany] = useState<string | number>(''); // Track selected company
   const [companyID, setCompanyID] = useState<string | number>(''); // Track selected company
@@ -134,9 +133,14 @@ const Signup: React.FC = () => {
         formData.append("designation", designationID as string);
       }
 
-      formData.append("mobile_otp", "");
-      formData.append("email_otp", "");
-      formData.append("step", "1");
+      // formData.append("mobile_otp", );
+      // formData.append("email_otp", "");
+      if (steps === 1) {
+        formData.append("step", "1");
+      }
+      else {
+        formData.append("step", "2");
+      }
       formData.append("confirm_password", "");
 
       // console.log("The form data is:", formData);
@@ -145,26 +149,74 @@ const Signup: React.FC = () => {
         console.log(`${key}: ${value}`);
       });
 
-      try {
-        const res = await axios.post(`${apiBaseUrl}/api/register`, formData, {
-          headers: {
-            "Content-Type": "application/json"
+      if (steps === 1) {
+        try {
+          const res = await axios.post(`${apiBaseUrl}/api/register`, formData, {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+
+          console.log("The response is: ", res.data);
+          if (res.data.status === 200) {
+            setSteps(2);
           }
-        });
 
-        console.log("The response is: ", res.data);
+          if (res.data.status === 422) {
+            const errors = [];
+            if (res.data.error.email) {
+              errors.push(res.data.error.email[0]);
+            }
+            if (res.data.error.mobile_number) {
+              errors.push(res.data.error.mobile_number[0]);
+            }
 
-        if (res.data.status === 422) {
-          Swal.fire({
-            title: res.data.message,
-            icon: "error",
-            text: res.data.error.email[0]
-          })
+            Swal.fire({
+              title: res.data.message,
+              icon: "error",
+              html: errors.join('<br class="mt-4">')  // This will create a line break between errors
+            });
+          }
+
+        } catch (error) {
+          console.log("The error is: ", error);
+        } finally {
+          setFormSubmitting(false);
         }
-      } catch (error) {
-        console.log("The error is: ", error);
-      } finally {
-        setFormSubmitting(false);
+      }
+
+      else {
+        try {
+          const res = await axios.post(`${apiBaseUrl}/api/register`, formData, {
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+
+          console.log("The response is: ", res.data);
+          if (res.data.status === 200) {
+            Swal.fire({
+              title: res.data.message,
+              text: "Your account has been created successfully !",
+              icon: 'success',
+            }).then(() => navigate("/login"));
+          }
+
+          if (res.data.status === 422) {
+            Swal.fire({
+              title: res.data.error.message,
+              icon: "error",
+            });
+          }
+
+        } catch (error: any) {
+          Swal.fire({
+            title: error.data.message,
+            icon: "error",
+          });
+        } finally {
+          setFormSubmitting(false);
+        }
       }
     }
   };
@@ -191,229 +243,261 @@ const Signup: React.FC = () => {
       {/* Right side with form */}
       <div className="w-1/3 flex items-center justify-center bg-gray-100 overflow-scroll">
         <div className="w-full p-8 space-y-4 h-full">
-          <div className='min-h-fit'>
+          {steps === 1 && <div className='min-h-fit'>
             <HeadingH2 title='Create Your Account' className='text-center' />
-          </div>
+          </div>}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 overflow-scroll">
+          {steps === 2 && <div className='min-h-fit'>
+            <HeadingH2 title='OTP Verification' className='text-center' />
+          </div>}
 
-            {/* First Name & Last Name */}
-            <div className='flex gap-3'>
+          <form onSubmit={handleSubmit(onSubmit)} style={steps === 2 ? { height: "100%" } : {}} className="space-y-4 flex flex-col justify-center overflow-scroll">
 
-              {/* First Name */}
-              <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700">First Name</label>
-                <input
-                  type="text"
-                  {...register('first_name', { required: 'First name is required' })}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                />
-                {errors.first_name && <p className="text-red-500 text-sm">{errors.first_name.message}</p>}
+            {steps === 1 && <>
+              {/* First Name & Last Name */}
+              <div className='flex gap-3'>
+
+                {/* First Name */}
+                <div className='w-full'>
+                  <label className="block text-sm font-medium text-gray-700">First Name</label>
+                  <input
+                    type="text"
+                    {...register('first_name', { required: 'First name is required' })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                  />
+                  {errors.first_name && <p className="text-red-500 text-sm">{errors.first_name.message}</p>}
+                </div>
+
+                {/* Last Name */}
+                <div className='w-full'>
+                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                  <input
+                    type="text"
+                    {...register('last_name', { required: 'Last name is required' })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                  />
+                  {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name.message}</p>}
+                </div>
               </div>
 
-              {/* Last Name */}
-              <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700">Last Name</label>
+              {/* Mobile Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Mobile No.</label>
                 <input
                   type="text"
-                  {...register('last_name', { required: 'Last name is required' })}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                />
-                {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name.message}</p>}
-              </div>
-            </div>
-
-            {/* Mobile Number */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Mobile No.</label>
-              <input
-                type="text"
-                {...register('mobile_number', {
-                  required: 'Mobile No. is required',
-                  pattern: {
-                    value: /^[0-9]{10}$/, // Regular expression to match exactly 10 digits
-                    message: 'Mobile number must be exactly 10 digits'
-                  }
-                })}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-              />
-              {errors.mobile_number && <p className="text-red-500 text-sm">{errors.mobile_number.message}</p>}
-            </div>
-
-
-            {/* Email Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                type="email"
-                {...register('email', { required: 'Email is required' })}
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-              />
-              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
-            </div>
-
-            {/* Password Field with Eye Icon */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-gray-700">Password</label>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 10,
-                    message: 'Password must be at least 10 characters long'
-                  }
-                })}
-                className="mt-1 block relative w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-              />
-              {/* Eye Icon */}
-              <span
-                className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-                onClick={() => setShowPassword(!showPassword)} // Toggle visibility
-              >
-                {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
-              </span>
-              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-              <Link to={"/forgot-password"} className="text-klt_primary-900 text-sm mt-3">Forgot Password ?</Link>
-            </div>
-
-
-            {/* Company */}
-            <div className='flex gap-3'>
-              {/* Company Field */}
-              <div className='w-full'>
-                <label className='block text-sm font-medium text-gray-700'>Company</label>
-                <select
-                  {...register("company_name", {
-                    required: "Company Name is required", onChange: (e) => {
-                      setSelectedCompany(e.target.value); // Update state for selected company
-                      // setValue("company_name", e.target.value);  // Update form value for company name
+                  {...register('mobile_number', {
+                    required: 'Mobile No. is required',
+                    pattern: {
+                      value: /^[0-9]{10}$/, // Regular expression to match exactly 10 digits
+                      message: 'Mobile number must be exactly 10 digits'
                     }
-                  })} className="mt-1 block relative w-full  p-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500">
-                  <option value="">Select Company</option>
-                  {companies?.map((company) => (
-                    <option key={company.id} value={company.name}>
-                      {company.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Custom Company */}
-              {companyID === 439 && <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700">Company</label>
-                <input
-                  type="text"
-                  {...register('company_name', { required: 'Company is required' })}
+                  })}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
                 />
-                {errors.company_name && <p className="text-red-500 text-sm">{errors.company_name.message}</p>}
-              </div>}
-            </div>
-
-            {/* Designation */}
-            <div className='flex gap-3 w-full'>
-              {/* Designation Field */}
-              <div className='w-full'>
-                <label className='block text-sm font-medium text-gray-700'>Designation</label>
-                <select
-                  {...register("designation_name", {
-                    required: "Designation is required", onChange: (e) => {
-                      // console.log(selectedDesignation);
-                      setSelectedDesignation(e.target.value);
-                    }
-                  })} className="mt-1 block relative w-full  p-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500">
-                  <option value="">Select Designation</option>
-                  {designations?.map((designation) => (
-                    <option key={designation.id} value={designation.name}>
-                      {designation.name}
-                    </option>
-                  ))}
-                </select>
+                {errors.mobile_number && <p className="text-red-500 text-sm">{errors.mobile_number.message}</p>}
               </div>
 
-              {/* Custom Designation */}
-              {designationID === 252 && <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700">Designation</label>
-                <input
-                  type="text"
-                  {...register('designation_name', { required: 'Designation is required' })}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                />
-                {errors.designation_name && <p className="text-red-500 text-sm">{errors.designation_name.message}</p>}
-              </div>}
-            </div>
 
-            {/* Address & Pincode */}
-            <div className='flex flex-col gap-3'>
-              {/* Address */}
-              <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700">Address</label>
+              {/* Email Field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
                 <input
-                  type="text"
-                  {...register('address', { required: 'Address is required' })}
+                  type="email"
+                  {...register('email', { required: 'Email is required' })}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
                 />
-                {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
+                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
               </div>
 
-              {/* Pincode */}
+              {/* Password Field with Eye Icon */}
+              <div className="relative">
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <div className='relative'>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    {...register('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 10,
+                        message: 'Password must be at least 10 characters long'
+                      }
+                    })}
+                    className="mt-1 block relative w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                  />
+                  {/* Eye Icon */}
+                  <span
+                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)} // Toggle visibility
+                  >
+                    {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
+                  </span>
+                </div>
+                  {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+                  {/* <Link to={"/forgot-password"} className="text-klt_primary-900 text-sm mt-3">Forgot Password ?</Link> */}
+              </div>
+
+
+              {/* Company */}
+              <div className='flex gap-3'>
+                {/* Company Field */}
+                <div className='w-full'>
+                  <label className='block text-sm font-medium text-gray-700'>Company</label>
+                  <select
+                    {...register("company_name", {
+                      required: "Company Name is required", onChange: (e) => {
+                        setSelectedCompany(e.target.value); // Update state for selected company
+                        // setValue("company_name", e.target.value);  // Update form value for company name
+                      }
+                    })} className="mt-1 block relative w-full  p-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500">
+                    <option value="">Select Company</option>
+                    {companies?.map((company) => (
+                      <option key={company.id} value={company.name}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Custom Company */}
+                {companyID === 439 && <div className='w-full'>
+                  <label className="block text-sm font-medium text-gray-700">Company</label>
+                  <input
+                    type="text"
+                    {...register('company_name', { required: 'Company is required' })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                  />
+                  {errors.company_name && <p className="text-red-500 text-sm">{errors.company_name.message}</p>}
+                </div>}
+              </div>
+
+              {/* Designation */}
+              <div className='flex gap-3 w-full'>
+                {/* Designation Field */}
+                <div className='w-full'>
+                  <label className='block text-sm font-medium text-gray-700'>Designation</label>
+                  <select
+                    {...register("designation_name", {
+                      required: "Designation is required", onChange: (e) => {
+                        // console.log(selectedDesignation);
+                        setSelectedDesignation(e.target.value);
+                      }
+                    })} className="mt-1 block relative w-full  p-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500">
+                    <option value="">Select Designation</option>
+                    {designations?.map((designation) => (
+                      <option key={designation.id} value={designation.name}>
+                        {designation.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Custom Designation */}
+                {designationID === 252 && <div className='w-full'>
+                  <label className="block text-sm font-medium text-gray-700">Designation</label>
+                  <input
+                    type="text"
+                    {...register('designation_name', { required: 'Designation is required' })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                  />
+                  {errors.designation_name && <p className="text-red-500 text-sm">{errors.designation_name.message}</p>}
+                </div>}
+              </div>
+
+              {/* Address & Pincode */}
+              <div className='flex flex-col gap-3'>
+                {/* Address */}
+                <div className='w-full'>
+                  <label className="block text-sm font-medium text-gray-700">Address</label>
+                  <input
+                    type="text"
+                    {...register('address', { required: 'Address is required' })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                  />
+                  {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
+                </div>
+
+                {/* Pincode */}
+                <div className='w-full'>
+                  <label className="block text-sm font-medium text-gray-700">Pincode</label>
+                  <input
+                    type="number"
+                    {...register('pincode', { required: 'Pincode is required' })}
+                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
+                  />
+                  {errors.pincode && <p className="text-red-500 text-sm">{errors.pincode.message}</p>}
+                </div>
+              </div>
+
+              {/* Company's Conditions */}
+              <div className='flex flex-col gap-3'>
+                {/* Terms & Conditions */}
+                <div className='flex gap-3 items-center'>
+                  <Controller
+                    name="tnc"
+                    control={control}
+                    rules={{ required: "You must agree to the Terms & Conditions" }} // Validation rule
+                    render={({ field }) => (
+                      <input
+                        type="checkbox"
+                        {...field}
+                        id="tnc"
+                        className="checkbox rounded size-4"
+                        checked={field.value === "on"} // Check if the value is "on"
+                        onChange={(e) => field.onChange(e.target.checked ? "on" : "off")} // Set value to "on" or "off"
+                      />
+                    )}
+                  />
+                  <p className="text-sm">I agree to company T&C and Privacy Policy</p>
+                </div>
+                {errors.tnc && <p className="text-red-500 text-sm">{errors.tnc.message}</p>} {/* Error message */}
+
+                {/* Notifications */}
+                <div className="flex gap-3 items-center">
+                  <Controller
+                    name="notifications"
+                    control={control}
+                    rules={{ required: "You must agree to receive notifications" }} // Validation rule
+                    render={({ field }) => (
+                      <input
+                        type="checkbox"
+                        {...field}
+                        id="notifications"
+                        className="checkbox rounded size-4"
+                        checked={field.value === "on"} // Check if the value is "on"
+                        onChange={(e) => field.onChange(e.target.checked ? "on" : "off")} // Set value to "on" or "off"
+                      />
+                    )}
+                  />
+                  <p className="text-sm">I agree to receive Important updates on SMS, Email & Whatsapp.</p>
+                </div>
+                {errors.notifications && <p className="text-red-500 text-sm">{errors.notifications.message}</p>} {/* Error message */}
+              </div>
+            </>}
+
+            {/* OTP's */}
+            {steps === 2 && <div className='flex flex-col gap-3'>
+              {/* Email OTP */}
               <div className='w-full'>
-                <label className="block text-sm font-medium text-gray-700">Pincode</label>
+                <label className="block text-sm font-medium text-gray-700">Email OTP</label>
                 <input
                   type="number"
-                  {...register('pincode', { required: 'Pincode is required' })}
+                  {...register('email_otp', { required: 'Email OTP is required' })}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
                 />
-                {errors.pincode && <p className="text-red-500 text-sm">{errors.pincode.message}</p>}
+                {errors.email_otp && <p className="text-red-500 text-sm">{errors.email_otp.message}</p>}
               </div>
-            </div>
 
-            {/* Company's Conditions */}
-            <div className='flex flex-col gap-3'>
-              {/* Terms & Conditions */}
-              <div className='flex gap-3 items-center'>
-                <Controller
-                  name="tnc"
-                  control={control}
-                  rules={{ required: "You must agree to the Terms & Conditions" }} // Validation rule
-                  render={({ field }) => (
-                    <input
-                      type="checkbox"
-                      {...field}
-                      id="tnc"
-                      className="checkbox rounded size-4"
-                      checked={field.value === "on"} // Check if the value is "on"
-                      onChange={(e) => field.onChange(e.target.checked ? "on" : "off")} // Set value to "on" or "off"
-                    />
-                  )}
+              {/* Mobile OTP */}
+              <div className='w-full'>
+                <label className="block text-sm font-medium text-gray-700">Mobile OTP</label>
+                <input
+                  type="number"
+                  {...register('mobile_otp', { required: 'Mobile OTP is required' })}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
                 />
-                <p className="text-sm">I agree to company T&C and Privacy Policy</p>
+                {errors.mobile_otp && <p className="text-red-500 text-sm">{errors.mobile_otp.message}</p>}
               </div>
-              {errors.tnc && <p className="text-red-500 text-sm">{errors.tnc.message}</p>} {/* Error message */}
-
-              {/* Notifications */}
-              <div className="flex gap-3 items-center">
-                <Controller
-                  name="notifications"
-                  control={control}
-                  rules={{ required: "You must agree to receive notifications" }} // Validation rule
-                  render={({ field }) => (
-                    <input
-                      type="checkbox"
-                      {...field}
-                      id="notifications"
-                      className="checkbox rounded size-4"
-                      checked={field.value === "on"} // Check if the value is "on"
-                      onChange={(e) => field.onChange(e.target.checked ? "on" : "off")} // Set value to "on" or "off"
-                    />
-                  )}
-                />
-                <p className="text-sm">I agree to receive Important updates on SMS, Email & Whatsapp.</p>
-              </div>
-              {errors.notifications && <p className="text-red-500 text-sm">{errors.notifications.message}</p>} {/* Error message */}
-            </div>
-
+            </div>}
 
             {/* Submit Button */}
             <div>
@@ -422,7 +506,7 @@ const Signup: React.FC = () => {
                 className="w-full bg-klt_primary-900 text-white py-2 rounded-md"
                 disabled={loading}
               >
-                {loading ? 'Creating...' : 'Create Account'}
+                {steps === 1 ? "Proceed to Next Step" : "Verify OTP's"}
               </button>
             </div>
 
