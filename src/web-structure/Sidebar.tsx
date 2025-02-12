@@ -202,7 +202,7 @@ const Sidebar: React.FC = () => {
             <div className="flex items-center gap-3 ">
               <MdOutlinePhotoSizeSelectActual className="size-6" />
               {collapse && <span>
-                All Photos
+                AI Photos
               </span>}
             </div>
           </Link>

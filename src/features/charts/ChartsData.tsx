@@ -22,6 +22,7 @@ type attendeeType = {
     phone_number: string;
     alternate_mobile_number: string;
     status: string;
+    industry: string;
     last_name: string;
     check_in: number;
     check_in_time: string;
@@ -40,7 +41,7 @@ type attendeeType = {
 };
 
 const ChartsData: React.FC = () => {
-    const {uuid} = useParams<{uuid: string}>();
+    const { uuid } = useParams<{ uuid: string }>();
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -52,7 +53,7 @@ const ChartsData: React.FC = () => {
         events: state.events.events
     }));
 
-    const currentEvent = events.find((event)=>event.uuid === uuid);
+    const currentEvent = events.find((event) => event.uuid === uuid);
 
     // console.log(eventAttendee);
 
@@ -63,6 +64,15 @@ const ChartsData: React.FC = () => {
     }, [uuid, token]);
 
     const [checkedIn, setCheckedIn] = useState<number>(0);
+    const [, setCheckedInAttendees] = useState<attendeeType[]>([]);
+    const [uniqueAttendees, setUniqueAttendees] = useState<string[]>([]);
+    const [uniqueDesignations, setUniqueDesignations] = useState<string[]>([]);
+    const [uniqueIndustry, setUniqueIndustry] = useState<string[]>([]);
+    // const [companyCounts, setCompanyCounts] = useState<number[]>([]);
+    // let companyCounts: number[] = [];
+    const [companyCounts, setCompanyCounts] = useState<number[]>([]);
+    const [designationCounts, setDesignationCounts] = useState<number[]>([]);
+    const [industryCounts, setIndustryCounts] = useState<number[]>([]);
     const [nonCheckedIn, setNonCheckedIn] = useState<number>(0);
     const [dateDifference, setDateDifference] = useState<number>(0);
 
@@ -103,16 +113,12 @@ const ChartsData: React.FC = () => {
 
     let start_time: string = currentEvent?.start_time + ":" + currentEvent?.start_minute_time + " " + currentEvent?.start_time_type;
     let end_time: string = currentEvent?.end_time + ":" + currentEvent?.end_minute_time + " " + currentEvent?.end_time_type;
-    console.log(start_time);
-    console.log(end_time);
 
     // let hoursArray: string[] = generateHours(start_time, end_time);
     let hoursArray: string[] = generateHours(start_time, end_time);
     const checkInTimes = eventAttendee.map((attendee: attendeeType) => {
         return attendee.check_in_time;
     });
-
-    console.log(hoursArray, checkInTimes);
 
     const extractHour = (timeStr: string): number => {
         const date = new Date(timeStr); // Parse the datetime string
@@ -166,25 +172,119 @@ const ChartsData: React.FC = () => {
     };
 
     const sortedCheckInCounts = countCheckInsByPeriod(checkInTimes, hoursArray);
-    const allCounts = sortedCheckInCounts.map((sorted)=>{
+    const allCounts = sortedCheckInCounts.map((sorted) => {
         return sorted.count;
     })
 
-    console.log("ChecksIn", sortedCheckInCounts);
+    // useEffect(() => {
+    //     // Calculate checkedIn and nonCheckedIn counts in one go
+    //     const checkedInCount = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1).length;
+    //     const attendees = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1);
+    //     const checkIn = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1);
+    //     const uniques = [...new Set(checkIn.map((user: attendeeType) => user.company_name))];
+
+    //     const companyCountsTemp: number[] = [];
+
+    //     uniques.forEach((company: string) => {
+    //         let counter = 0;
+
+    //         checkIn.forEach((user: attendeeType) => {
+    //             if (user.company_name === company) {
+    //                 counter++;
+    //             }
+    //         });
+
+    //         companyCountsTemp.push(counter);
+    //     });
+
+    //     // Update state only once after calculations
+    //     setCompanyCounts(companyCountsTemp);
+
+    //     const nonCheckedInCount = eventAttendee.length - checkedInCount;
+
+    //     // Update other states
+    //     setCheckedIn(checkedInCount);
+    //     setCheckedInAttendees(attendees);
+    //     setUniqueAttendees(uniques);
+    //     setNonCheckedIn(nonCheckedInCount);
+
+    // }, [eventAttendee, currentEvent, dateDifference]);
 
     useEffect(() => {
         // Calculate checkedIn and nonCheckedIn counts in one go
         const checkedInCount = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1).length;
+        const attendees = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1);
+        const checkIn = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1);
+
+        // Calculate unique company names
+        const uniquesCompanies = [...new Set(checkIn.map((user: attendeeType) => user.company_name))];
+
+        const companyCountsTemp: number[] = [];
+        uniquesCompanies.forEach((company: string) => {
+            let counter = 0;
+            checkIn.forEach((user: attendeeType) => {
+                if (user.company_name === company) {
+                    counter++;
+                }
+            });
+            companyCountsTemp.push(counter);
+        });
+
+        // Calculate unique designations
+        const uniquesDesignations = [...new Set(checkIn.map((user: attendeeType) => user.job_title))];
+
+        const designationCountsTemp: number[] = [];
+        uniquesDesignations.forEach((designation: string) => {
+            let counter = 0;
+            checkIn.forEach((user: attendeeType) => {
+                if (user.job_title === designation) {
+                    counter++;
+                }
+            });
+            designationCountsTemp.push(counter);
+        });
+
+        // Calculate unique industries
+        const uniqueIndustry = [...new Set(checkIn.map((user: attendeeType) => {
+            const industry = user.industry.toLowerCase() === "others" || user.industry === "" ? "Others" : user.industry;
+            return industry;
+        }))];
+
+        const uniqueIndustryTemp: number[] = [];
+        uniqueIndustry.forEach((industry: string) => {
+            let counter = 0;
+            checkIn.forEach((user: attendeeType) => {
+                // Normalize the industry here as well
+                if ((user.industry.toLowerCase() === "others" || user.industry === "") && industry === "Others") {
+                    counter++;
+                } else if (user.industry === industry) {
+                    counter++;
+                }
+            });
+            uniqueIndustryTemp.push(counter);
+        });
+
+
+        // Update state only once after calculations
+        setCompanyCounts(companyCountsTemp);
+        setUniqueAttendees(uniquesCompanies); // Assuming you want to display unique companies
+
+        setUniqueDesignations(uniquesDesignations);
+        setDesignationCounts(designationCountsTemp); // Assuming you have a state for designations
+
+        setUniqueIndustry(uniqueIndustry)
+        setIndustryCounts(uniqueIndustryTemp);
+
+
         const nonCheckedInCount = eventAttendee.length - checkedInCount;
 
-        // Update state only once after calculation
+        // Update other states
         setCheckedIn(checkedInCount);
+        setCheckedInAttendees(attendees);
         setNonCheckedIn(nonCheckedInCount);
 
-        // Log current event start and end dates
-        // console.log("Current Event time is: ", currentEvent?.start_time, currentEvent?.start_time_type, currentEvent?.end_time, currentEvent?.end_time_type);
-
     }, [eventAttendee, currentEvent, dateDifference]);
+
 
     useEffect(() => {
 
@@ -193,7 +293,6 @@ const ChartsData: React.FC = () => {
             setDateDifference(difference);
         }
 
-        // console.log("The Date Difference is: ", dateDifference);
     }, [currentEvent, dateDifference]);
 
     if (loading) {
@@ -209,13 +308,47 @@ const ChartsData: React.FC = () => {
                 </Link>
             </div>
 
-            <div className='flex justify-between gap-40 bg-white p-10 rounded shadow-sm items-baseline'>
-                <div className='w-1/3'>
-                    <DonutChart checkedInUsers={checkedIn} nonCheckedInUsers={nonCheckedIn} />
-                </div>
+            {/* Total Attendees */}
+            <div className=' bg-white p-10 rounded shadow-sm '>
+                <h2 className='text-xl font-bold'>Total Attendees</h2>
+                <div className='flex justify-between gap-40 items-baseline'>
+                    <div className='w-1/3'>
+                        <DonutChart checkedInUsers={checkedIn} nonCheckedInUsers={nonCheckedIn} />
+                    </div>
 
-                <div className='w-2/3'>
-                    <BarChart hours={hoursArray} checkedInUsers={checkedIn} allCounts={allCounts}/>
+                    <div className='w-2/3'>
+                        <BarChart hours={hoursArray} checkedInUsers={checkedIn} allCounts={allCounts} />
+                    </div>
+                </div>
+            </div>
+
+            {/* CheckedIn Attendees of Companies */}
+            <div className=' bg-white p-10 rounded shadow-sm '>
+                <h2 className='text-xl font-bold'>Total Attendees of Company</h2>
+                <div className='flex justify-between gap-40 items-baseline'>
+                    <div className='w-full'>
+                        <BarChart hours={uniqueAttendees} checkedInUsers={uniqueAttendees.length} allCounts={companyCounts} className='h-[500px]'/>
+                    </div>
+                </div>
+            </div>
+
+            {/* CheckedIn Attendees of Designations */}
+            <div className=' bg-white p-10 rounded shadow-sm '>
+                <h2 className='text-xl font-bold'>Total Attendees by Designations</h2>
+                <div className='flex justify-between gap-40 items-baseline'>
+                    <div className='w-full'>
+                        <BarChart hours={uniqueDesignations} checkedInUsers={uniqueDesignations.length} allCounts={designationCounts} className='h-[500px]'/>
+                    </div>
+                </div>
+            </div>
+
+            {/* CheckedIn Attendees of Industries */}
+            <div className=' bg-white p-10 rounded shadow-sm '>
+                <h2 className='text-xl font-bold'>Total Attendees by Industries</h2>
+                <div className='flex justify-between gap-40 items-baseline'>
+                    <div className='w-full'>
+                        <BarChart hours={uniqueIndustry} checkedInUsers={uniqueIndustry.length} allCounts={industryCounts} className='h-[500px]'/>
+                    </div>
                 </div>
             </div>
         </div>

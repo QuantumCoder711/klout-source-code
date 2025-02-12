@@ -9,10 +9,11 @@ interface BarChartProps {
     hours: string[];
     checkedInUsers: number;
     allCounts: number[];
+    className?: string;
 }
 
 const BarChart: React.FC<BarChartProps> = (props) => {
-
+    console.log(props.allCounts);
     const data = {
         labels: props.hours,
         datasets: [{
@@ -58,7 +59,7 @@ const BarChart: React.FC<BarChartProps> = (props) => {
 
 
     return (
-        <div className='w-full h-80'>
+        <div className={`w-full h-80 ${props.className}`}>
             <Bar data={data} options={options}></Bar>
         </div>
     )
