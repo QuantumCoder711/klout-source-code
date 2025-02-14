@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../redux/store';
 import HeadingH2 from '../../component/HeadingH2';
@@ -10,6 +10,9 @@ import DonutChart from './components/DonutChart';
 import { allEventAttendee } from '../event/eventSlice';
 import Loader from '../../component/Loader';
 import BarChart from './components/BarChart';
+import CustomBarChart from './components/CustomBarChart';
+import html2canvas from 'html2canvas-pro';
+import { jsPDF } from 'jspdf';
 
 type attendeeType = {
     uuid: string;
@@ -42,6 +45,7 @@ type attendeeType = {
 
 const ChartsData: React.FC = () => {
     const { uuid } = useParams<{ uuid: string }>();
+    const chartsWrapperRef = useRef<HTMLDivElement | null>(null);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -68,8 +72,6 @@ const ChartsData: React.FC = () => {
     const [uniqueAttendees, setUniqueAttendees] = useState<string[]>([]);
     const [uniqueDesignations, setUniqueDesignations] = useState<string[]>([]);
     const [uniqueIndustry, setUniqueIndustry] = useState<string[]>([]);
-    // const [companyCounts, setCompanyCounts] = useState<number[]>([]);
-    // let companyCounts: number[] = [];
     const [companyCounts, setCompanyCounts] = useState<number[]>([]);
     const [designationCounts, setDesignationCounts] = useState<number[]>([]);
     const [industryCounts, setIndustryCounts] = useState<number[]>([]);
@@ -176,40 +178,6 @@ const ChartsData: React.FC = () => {
         return sorted.count;
     })
 
-    // useEffect(() => {
-    //     // Calculate checkedIn and nonCheckedIn counts in one go
-    //     const checkedInCount = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1).length;
-    //     const attendees = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1);
-    //     const checkIn = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1);
-    //     const uniques = [...new Set(checkIn.map((user: attendeeType) => user.company_name))];
-
-    //     const companyCountsTemp: number[] = [];
-
-    //     uniques.forEach((company: string) => {
-    //         let counter = 0;
-
-    //         checkIn.forEach((user: attendeeType) => {
-    //             if (user.company_name === company) {
-    //                 counter++;
-    //             }
-    //         });
-
-    //         companyCountsTemp.push(counter);
-    //     });
-
-    //     // Update state only once after calculations
-    //     setCompanyCounts(companyCountsTemp);
-
-    //     const nonCheckedInCount = eventAttendee.length - checkedInCount;
-
-    //     // Update other states
-    //     setCheckedIn(checkedInCount);
-    //     setCheckedInAttendees(attendees);
-    //     setUniqueAttendees(uniques);
-    //     setNonCheckedIn(nonCheckedInCount);
-
-    // }, [eventAttendee, currentEvent, dateDifference]);
-
     useEffect(() => {
         // Calculate checkedIn and nonCheckedIn counts in one go
         const checkedInCount = eventAttendee.filter((attendee: attendeeType) => attendee.check_in === 1).length;
@@ -272,7 +240,7 @@ const ChartsData: React.FC = () => {
         setUniqueDesignations(uniquesDesignations);
         setDesignationCounts(designationCountsTemp); // Assuming you have a state for designations
 
-        setUniqueIndustry(uniqueIndustry)
+        setUniqueIndustry(uniqueIndustry);
         setIndustryCounts(uniqueIndustryTemp);
 
 
@@ -295,6 +263,50 @@ const ChartsData: React.FC = () => {
 
     }, [currentEvent, dateDifference]);
 
+    const handleExport = () => {
+        if (chartsWrapperRef.current) {
+            const element = chartsWrapperRef.current;
+
+            // Use a scale factor to capture high-quality images without too large a file
+            html2canvas(element, { scale: 1 }).then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+
+                // Create a new jsPDF instance
+                const pdf = new jsPDF('p', 'mm', 'a4');
+
+                // A4 page size dimensions
+                const imgWidth = 210; // A4 width in mm
+                const imgHeight = (canvas.height * imgWidth) / canvas.width; // Scale the height based on aspect ratio
+
+                // Define page height for A4
+                const pageHeight = 295; // A4 page height in mm
+                let yPosition = 0;
+
+                // Add the first image to the PDF
+                pdf.addImage(imgData, 'PNG', 0, yPosition, imgWidth, imgHeight);
+
+                // Check if the image height exceeds the page height
+                if (imgHeight > pageHeight) {
+                    let remainingHeight = imgHeight - pageHeight;
+                    let offset = pageHeight;
+
+                    // If the image is larger than the page, split it into multiple pages
+                    while (remainingHeight > 0) {
+                        // Add the next portion of the image
+                        pdf.addPage(); // New page for the next part
+                        pdf.addImage(imgData, 'PNG', 0, -offset, imgWidth, imgHeight);
+                        offset += pageHeight;
+                        remainingHeight -= pageHeight;
+                    }
+                }
+
+                // Save the final PDF after all content has been added
+                pdf.save('charts.pdf');
+            });
+        }
+    };
+
+
     if (loading) {
         return <Loader />
     }
@@ -308,46 +320,54 @@ const ChartsData: React.FC = () => {
                 </Link>
             </div>
 
-            {/* Total Attendees */}
-            <div className=' bg-white p-10 rounded shadow-sm '>
-                <h2 className='text-xl font-bold'>Total Attendees</h2>
-                <div className='flex justify-between gap-40 items-baseline'>
-                    <div className='w-1/3'>
-                        <DonutChart checkedInUsers={checkedIn} nonCheckedInUsers={nonCheckedIn} />
-                    </div>
-
-                    <div className='w-2/3'>
-                        <BarChart hours={hoursArray} checkedInUsers={checkedIn} allCounts={allCounts} />
-                    </div>
-                </div>
+            <div className='flex justify-end'>
+                <button className='btn btn-sm btn-primary rounded-b-none' onClick={handleExport}>
+                    Export Charts
+                </button>
             </div>
 
-            {/* CheckedIn Attendees of Companies */}
-            <div className=' bg-white p-10 rounded shadow-sm '>
-                <h2 className='text-xl font-bold'>Total Attendees of Company</h2>
-                <div className='flex justify-between gap-40 items-baseline'>
-                    <div className='w-full'>
-                        <BarChart hours={uniqueAttendees} checkedInUsers={uniqueAttendees.length} allCounts={companyCounts} className='h-[500px]'/>
+            <div className='charts-wrapper' ref={chartsWrapperRef}>
+                {/* Total Attendees */}
+                <div className='bg-white p-10 rounded shadow-sm'>
+                    <h2 className='text-xl font-bold'>Total Attendees</h2>
+                    <div className='flex justify-between gap-40 items-baseline'>
+                        <div className='w-1/3'>
+                            <DonutChart checkedInUsers={checkedIn} nonCheckedInUsers={nonCheckedIn} />
+                        </div>
+
+                        <div className='w-2/3'>
+                            <BarChart hours={hoursArray} checkedInUsers={checkedIn} allCounts={allCounts} />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* CheckedIn Attendees of Designations */}
-            <div className=' bg-white p-10 rounded shadow-sm '>
-                <h2 className='text-xl font-bold'>Total Attendees by Designations</h2>
-                <div className='flex justify-between gap-40 items-baseline'>
-                    <div className='w-full'>
-                        <BarChart hours={uniqueDesignations} checkedInUsers={uniqueDesignations.length} allCounts={designationCounts} className='h-[500px]'/>
+                {/* CheckedIn Attendees of Companies */}
+                <div className='bg-white p-10 rounded shadow-sm'>
+                    <h2 className='text-xl font-bold'>Total Attendees by Companies</h2>
+                    <div className='flex justify-between gap-40 items-baseline'>
+                        <div className='w-full mt-5'>
+                            <CustomBarChart labels={uniqueAttendees} color='blue' allCounts={companyCounts} />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* CheckedIn Attendees of Industries */}
-            <div className=' bg-white p-10 rounded shadow-sm '>
-                <h2 className='text-xl font-bold'>Total Attendees by Industries</h2>
-                <div className='flex justify-between gap-40 items-baseline'>
-                    <div className='w-full'>
-                        <BarChart hours={uniqueIndustry} checkedInUsers={uniqueIndustry.length} allCounts={industryCounts} className='h-[500px]'/>
+                {/* CheckedIn Attendees of Designations */}
+                <div className='bg-white p-10 rounded shadow-sm'>
+                    <h2 className='text-xl font-bold'>Total Attendees by Designations</h2>
+                    <div className='flex justify-between gap-40 items-baseline'>
+                        <div className='w-full mt-5'>
+                            <CustomBarChart labels={uniqueDesignations} color='orange' allCounts={designationCounts} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* CheckedIn Attendees of Industries */}
+                <div className='bg-white p-10 rounded shadow-sm'>
+                    <h2 className='text-xl font-bold'>Total Attendees by Industry</h2>
+                    <div className='flex justify-between gap-40 items-baseline'>
+                        <div className='w-full mt-5'>
+                            <CustomBarChart labels={uniqueIndustry} color='green' allCounts={industryCounts} />
+                        </div>
                     </div>
                 </div>
             </div>

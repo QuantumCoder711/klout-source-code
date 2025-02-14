@@ -13,26 +13,29 @@ interface BarChartProps {
 }
 
 const BarChart: React.FC<BarChartProps> = (props) => {
-    console.log(props.allCounts);
+
+    // Helper function to generate random colors
+    const getRandomColor = () => {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        const alpha = (Math.random() * (0.8 - 0.4) + 0.4).toFixed(2); // Random opacity between 0.4 and 0.8
+        return `rgba(${r},${g},${b},${alpha})`; // rgba format to include alpha
+    };
+
+    // Create random colors for each bar
+    const randomColors = props.allCounts.map(() => getRandomColor());
+
     const data = {
         labels: props.hours,
         datasets: [{
             label: "Check-Ins",
             data: props.allCounts,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: "rgba(75, 192, 192)",
-            borderWidth: 1,
-            // barThickness: ,
+            backgroundColor: randomColors, // Apply random colors here
             maxBarThickness: 60,
             minBarLength: 0,
         }],
     };
-
-    // const options = {
-    //     responsive: true,
-    //     maintainAspectRatio: false,
-    // };
-
 
     const options: ChartOptions<'bar'> = {
         responsive: true,
@@ -56,13 +59,11 @@ const BarChart: React.FC<BarChartProps> = (props) => {
         },
     };
 
-
-
     return (
         <div className={`w-full h-80 ${props.className}`}>
             <Bar data={data} options={options}></Bar>
         </div>
-    )
-}
+    );
+};
 
 export default BarChart;
