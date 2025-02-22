@@ -49,6 +49,8 @@ const ChartsData: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
 
+    const [exportLoading, setExportLoading] = useState<boolean>(false);
+
     const { token } = useSelector((state: RootState) => state.auth);
 
     const { eventAttendee, loading, events } = useSelector((state: RootState) => ({
@@ -111,7 +113,6 @@ const ChartsData: React.FC = () => {
 
         return timeArray;
     }
-
 
     let start_time: string = currentEvent?.start_time + ":" + currentEvent?.start_minute_time + " " + currentEvent?.start_time_type;
     let end_time: string = currentEvent?.end_time + ":" + currentEvent?.end_minute_time + " " + currentEvent?.end_time_type;
@@ -264,32 +265,33 @@ const ChartsData: React.FC = () => {
     }, [currentEvent, dateDifference]);
 
     const handleExport = () => {
+        setExportLoading(true);
         if (chartsWrapperRef.current) {
             const element = chartsWrapperRef.current;
-
+    
             // Use a scale factor to capture high-quality images without too large a file
             html2canvas(element, { scale: 1 }).then((canvas) => {
                 const imgData = canvas.toDataURL('image/png');
-
+    
                 // Create a new jsPDF instance
                 const pdf = new jsPDF('p', 'mm', 'a4');
-
+    
                 // A4 page size dimensions
                 const imgWidth = 210; // A4 width in mm
                 const imgHeight = (canvas.height * imgWidth) / canvas.width; // Scale the height based on aspect ratio
-
+    
                 // Define page height for A4
                 const pageHeight = 295; // A4 page height in mm
                 let yPosition = 0;
-
+    
                 // Add the first image to the PDF
                 pdf.addImage(imgData, 'PNG', 0, yPosition, imgWidth, imgHeight);
-
+    
                 // Check if the image height exceeds the page height
                 if (imgHeight > pageHeight) {
                     let remainingHeight = imgHeight - pageHeight;
                     let offset = pageHeight;
-
+    
                     // If the image is larger than the page, split it into multiple pages
                     while (remainingHeight > 0) {
                         // Add the next portion of the image
@@ -299,22 +301,26 @@ const ChartsData: React.FC = () => {
                         remainingHeight -= pageHeight;
                     }
                 }
-
+    
                 // Save the final PDF after all content has been added
-                pdf.save('charts.pdf');
+                pdf.save(`${currentEvent?.title} Chart.pdf`);
+                setExportLoading(false); // Only set this after the export completes
+            }).catch(() => {
+                setExportLoading(false); // In case of an error, still stop loading
             });
+        } else {
+            setExportLoading(false); // In case the chartsWrapperRef is not set
         }
     };
 
-
-    if (loading) {
+    if (loading || exportLoading) {
         return <Loader />
     }
 
     return (
         <div>
             <div className="flex justify-between items-center w-full mb-6">
-                <HeadingH2 title='Charts Data' />
+                <HeadingH2 title={currentEvent?.title} />
                 <Link to="/all-charts" onClick={() => dispatch(heading("All Charts"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go Back
                 </Link>

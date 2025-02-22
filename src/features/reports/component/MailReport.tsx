@@ -99,7 +99,7 @@ const MailReport: React.FC = () => {
     const [selectedTemplate, setSelectedTemplate] = useState('event_downloadapp');
     const [allData, setAllData] = useState([]);
     const { user, loading } = useSelector((state: RootState) => state.auth);
-    // const { currentEventUUID } = useSelector((state: RootState) => (state.events));
+    const { events } = useSelector((state: RootState) => (state.events));
     const [totalMessage, setTotalMessage] = useState(0);
     const [totalDelivered, setTotalDelivered] = useState(0);
     const [, setTotalRead] = useState(0);
@@ -134,6 +134,8 @@ const MailReport: React.FC = () => {
             })
     }, [selectedTemplate]);
 
+    const currentEvent = events.find((event) => event.uuid === uuid);
+
     if (loading) {
         return <Loader />
     }
@@ -142,7 +144,7 @@ const MailReport: React.FC = () => {
         <div>
             {/* Heading  */}
             <div className="flex justify-between items-center w-full mb-6">
-                <HeadingH2 title='Mail Reports' />
+                <HeadingH2 title={currentEvent?.title} />
 
                 {/* Custom Dropdown Menu */}
                 <div className="flex justify-center rounded-md w-fit">
