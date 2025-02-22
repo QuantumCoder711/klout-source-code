@@ -21,12 +21,12 @@ type Signup = {
   confirm_password: string;
   company: string;
   company_name: string;
-  designation: string;
-  designation_name: string;
-  pincode: string;
+  // designation: string;
+  // designation_name: string;
+  // pincode: string;
   tnc: string;
   notifications: string;
-  address: string;
+  // address: string;
   mobile_otp: string;
   email_otp: string;
   step: number;
@@ -53,9 +53,7 @@ const Signup: React.FC = () => {
   const [companyID, setCompanyID] = useState<string | number>(''); // Track selected company
 
   const [designations, setDesignations] = useState<ApiType[] | undefined>();
-  const [selectedDesignation, setSelectedDesignation] = useState<string | number>(''); // Track selected company
-  const [designationID, setDesignationID] = useState<string | number>(''); // Track selected company
-
+  
   const textToType = "Step into the Future of Event Management with Klout Club - Your Event, Your Way!";
   const typingSpeed = 100;
   const deletingSpeed = 50;
@@ -80,15 +78,6 @@ const Signup: React.FC = () => {
     }
   }
 
-  const findDesignationID = () => {
-    if (designations) {
-      const designation = designations.find(designation => designation.name === selectedDesignation)
-      if (designation)
-        setDesignationID(designation.id);
-    }
-  }
-
-
   useEffect(() => {
     // Only show error modal if the form has been submitted and there's a loginError
     if (submitted && loginError) {
@@ -105,10 +94,9 @@ const Signup: React.FC = () => {
   useEffect(() => {
     console.log(selectedCompany);
     console.log(companyID);
-    findDesignationID();
     findCompanyID();
     console.log(companyID);
-  }, [selectedCompany, companyID, selectedDesignation, designationID]);
+  }, [selectedCompany, companyID]);
 
   if (token) {
     return <Navigate to="/" />;
@@ -127,10 +115,6 @@ const Signup: React.FC = () => {
 
       if (companyID) {
         formData.append("company", companyID as string);
-      }
-
-      if (designationID) {
-        formData.append("designation", designationID as string);
       }
 
       // formData.append("mobile_otp", );
@@ -368,64 +352,6 @@ const Signup: React.FC = () => {
                   />
                   {errors.company_name && <p className="text-red-500 text-sm">{errors.company_name.message}</p>}
                 </div>}
-              </div>
-
-              {/* Designation */}
-              <div className='flex gap-3 w-full'>
-                {/* Designation Field */}
-                <div className='w-full'>
-                  <label className='block text-sm font-medium text-gray-700'>Designation</label>
-                  <select
-                    {...register("designation_name", {
-                      required: "Designation is required", onChange: (e) => {
-                        // console.log(selectedDesignation);
-                        setSelectedDesignation(e.target.value);
-                      }
-                    })} className="mt-1 block relative w-full  p-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500">
-                    <option value="">Select Designation</option>
-                    {designations?.map((designation) => (
-                      <option key={designation.id} value={designation.name}>
-                        {designation.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Custom Designation */}
-                {designationID === 252 && <div className='w-full'>
-                  <label className="block text-sm font-medium text-gray-700">Designation</label>
-                  <input
-                    type="text"
-                    {...register('designation_name', { required: 'Designation is required' })}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                  />
-                  {errors.designation_name && <p className="text-red-500 text-sm">{errors.designation_name.message}</p>}
-                </div>}
-              </div>
-
-              {/* Address & Pincode */}
-              <div className='flex flex-col gap-3'>
-                {/* Address */}
-                <div className='w-full'>
-                  <label className="block text-sm font-medium text-gray-700">Address</label>
-                  <input
-                    type="text"
-                    {...register('address', { required: 'Address is required' })}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                  />
-                  {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
-                </div>
-
-                {/* Pincode */}
-                <div className='w-full'>
-                  <label className="block text-sm font-medium text-gray-700">Pincode</label>
-                  <input
-                    type="number"
-                    {...register('pincode', { required: 'Pincode is required' })}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-black outline-none focus:border-klt_primary-500"
-                  />
-                  {errors.pincode && <p className="text-red-500 text-sm">{errors.pincode.message}</p>}
-                </div>
               </div>
 
               {/* Company's Conditions */}
