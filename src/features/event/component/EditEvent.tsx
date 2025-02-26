@@ -38,6 +38,8 @@ type formInputType = {
     video_url: string;
     _method: string;
     printer_count: number | null;
+    event_otp: string;
+    view_agenda_by: number;
 };
 
 interface EditEventProps {
@@ -66,9 +68,16 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
     const [cities, setCities] = useState<any[]>([]);
     const [printers, setPrinters] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState('');
+    const [randomOTP, setRandomOTP] = useState<string>("");
     const [image, setImage] = useState();
     const selectedCountryCode = watch('country');
     const dummyImage = imageBaseUrl + '/' + currentEvent?.image;
+
+    const [viewAgendaBy, setViewAgendaBy] = useState(0); // 0 for unchecked, 1 for checked
+
+    const handleToggleChange = (e: any) => {
+        setViewAgendaBy(e.target.checked ? 1 : 0); // Update state based on checkbox value
+    };
 
     useEffect(() => {
         if (currentEvent) {
@@ -133,9 +142,11 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
         })
     }, [setValue, currentEvent, printers]);
 
-    // useEffect(() => {
-
-    // }, [currentEvent, setValue]);
+    const generateRandomOTP = () => {
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        setRandomOTP(String(otp));
+        setValue("event_otp", String(otp));
+    }
 
     const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedCountry = e.target.value;
@@ -156,9 +167,6 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
         return match ? match[1] : null; // Return the video ID or null if not found
     };
 
-    if (loading) {
-        return <Loader />
-    }
 
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
         // Step 1: Show confirmation dialog to ask if the user wants to update
@@ -248,13 +256,15 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
         }
     };
 
-
-
-
-
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
     const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
     const amPm = ['AM', 'PM'];
+
+
+    if (loading) {
+        return <Loader />
+    }
+
 
     return (
 
@@ -483,12 +493,65 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                 </div>
 
                 <div className='flex flex-col gap-3 my-4'>
-                    {/* Printer Count */}
-                    <label htmlFor="printer_count" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className="font-semibold text-green-700 flex justify-between items-center">No. Of Printers &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="printer_count" defaultValue={printers} className="grow" {...register('printer_count')} />
-                    </label>
-                    {errors.printer_count && <p className="text-red-600">{errors.printer_count.message}</p>}
+                    {/* Printer Count and View Agenda By in one row */}
+                    <div className='flex gap-3'>
+                        {/* Printer Count */}
+                        <div className='flex flex-col gap-3 w-fit'>
+                            <label htmlFor="printer_count" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                <span className="font-semibold text-green-700 min-w-fit flex justify-between items-center">No. Of Printers &nbsp; <TiArrowRight className='mt-1' /> </span>
+                                <input id="printer_count" type="text" className="grow w-fit" {...register('printer_count', { required: false, onChange: (e) => setPrinters(e.target.value) })} />
+                            </label>
+                            {errors.printer_count && <p className="text-red-600">{errors.printer_count.message}</p>}
+                        </div>
+
+                        <div className='flex flex-col gap-3 w-fit'>
+                            <label htmlFor='view_agenda_by' className="input cursor-pointer input-bordered bg-white text-black w-fit flex items-center gap-2">
+                                <span className="font-semibold text-green-700 flex justify-between items-center">
+                                    View Agenda By &nbsp;
+                                    <TiArrowRight className='mt-1' />
+                                </span>
+                                <span className='text-sm text-gray-600'>All</span>
+                                <input
+                                    type="checkbox"
+                                    checked={viewAgendaBy === 1} // Control the checkbox based on state
+                                    onChange={handleToggleChange} // Handle the change event
+                                    id="view_agenda_by"
+                                    className="toggle toggle-md toggle-success"
+                                />
+                                <span className='text-sm text-gray-600'>Checked In</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Event OTP - Full Width */}
+                    <div className='flex flex-col gap-3 w-full'>
+                        <label htmlFor="event_otp" className="relative input input-bordered bg-white text-black flex w-full items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center min-w-fit">Event OTP <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <input
+                                id="event_otp"
+                                type="text"
+                                className="grow w-full"
+                                defaultValue={currentEvent?.event_otp}
+                                value={randomOTP}  // Use state for OTP value
+                                {...register('event_otp', { required: "Event OTP is Required" })}
+                                maxLength={6}  // Limit the input to 6 characters
+                                onChange={(e) => {
+                                    // Ensure only numbers and limit to 6 digits
+                                    const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                                    setRandomOTP(value); // Update state with 6-digit OTP
+                                }}
+                            />
+                            <button
+                                className='bg-orange-500 rounded-r-lg px-4 h-full text-white right-0 absolute'
+                                onClick={generateRandomOTP}
+                                type='button'
+                            >
+                                Generate
+                            </button>
+                        </label>
+                        {errors.event_otp && <p className="text-red-600">{errors.event_otp.message}</p>}
+                    </div>
+
                 </div>
 
                 <div className="col-span-3 flex justify-center mt-4">

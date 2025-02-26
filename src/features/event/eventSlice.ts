@@ -48,7 +48,9 @@ type eventType = {
     total_checkedin: number,
     total_checkedin_speaker: number,
     total_checkedin_sponsor: number,
-    total_pending_delegate: number
+    total_pending_delegate: number,
+    event_otp: string;
+    view_agenda_by: number;
 }
 
 // type AgendaType = {

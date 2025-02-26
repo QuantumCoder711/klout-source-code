@@ -40,6 +40,8 @@ type formInputType = {
     status: number,
     google_map_link: string;
     printer_count: number;
+    event_otp: string;
+    view_agenda_by: number;
 };
 
 const AddEvent: React.FC = () => {
@@ -54,6 +56,7 @@ const AddEvent: React.FC = () => {
     const [, setPrinters] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState('');
     const [, setImage] = useState<File | null>(null);
+    const [randomOTP, setRandomOTP] = useState<string>("");
     const [eventBannerImage, setEventBannerImage] = useState<File | null>(null);
     const selectedCountryCode = watch('country');
     // const dummyImage = "https://via.placeholder.com/150";
@@ -72,6 +75,12 @@ const AddEvent: React.FC = () => {
     const [, setEventVenueName] = useState<string>("");
     const [, setEventCity] = useState<string>("");
 
+    const [viewAgendaBy, setViewAgendaBy] = useState(0); // 0 for unchecked, 1 for checked
+
+    const handleToggleChange = (e: any) => {
+        setViewAgendaBy(e.target.checked ? 1 : 0); // Update state based on checkbox value
+    };
+
 
     // Handle image upload
     const handleImageUpload = (e: any) => {
@@ -83,6 +92,12 @@ const AddEvent: React.FC = () => {
             setSelectedImage(imageUrl);
         }
     };
+
+    const generateRandomOTP = () => {
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        setRandomOTP(String(otp));
+        setValue("event_otp", String(otp));
+    }
 
     const handleCustomTemplate = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files ? e.target.files[0] : null;
@@ -97,6 +112,7 @@ const AddEvent: React.FC = () => {
 
     useEffect(() => {
         // Load countries on component mount
+        generateRandomOTP();
         const countryList = Country.getAllCountries();
         setCountries(countryList);
     }, []);
@@ -238,6 +254,8 @@ const AddEvent: React.FC = () => {
             data.event_date = data.event_start_date; // Map event date
             data.feedback = 1; // Set default feedback
             data.status = 1; // Set default status
+            data.view_agenda_by = viewAgendaBy;
+            data.event_otp = randomOTP;
 
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
@@ -256,7 +274,10 @@ const AddEvent: React.FC = () => {
             // formData.append("printer_count", printers);
 
             try {
-                console.log("The form data is: ", formData);
+                Object.entries(data).forEach(([key, value]) => {
+                    console.log(key, value);
+                });
+
                 // Dispatch the addNewEvent action
                 await dispatch(addNewEvent({ eventData: formData, token })).unwrap(); // unwrap if using createAsyncThunk
 
@@ -489,20 +510,73 @@ const AddEvent: React.FC = () => {
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Google Map Link */}
                     <label htmlFor="google_map_link" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Google Map Link &nbsp; <TiArrowRight className='mt-1' /> </span>
+                        <span className="font-semibold text-green-700 flex justify-between items-center">Google Map Link &nbsp; <TiArrowRight className='mt-1' /> </span>
                         <input id="google_map_link" type="url" className="grow" {...register('google_map_link', { required: false, pattern: { value: /^https?:\/\//, message: 'Link must start with http or https' } })} />
                     </label>
                     {errors.google_map_link && <p className="text-red-600">{errors.google_map_link.message}</p>}
                 </div>
 
                 <div className='flex flex-col gap-3 my-4'>
-                    {/* Printer Count */}
-                    <label htmlFor="printer_count" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">No. Of Printers &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="printer_count" type="text" className="grow" {...register('printer_count', { required: false, onChange: (e) => setPrinters(e.target.value) })} />
-                    </label>
-                    {errors.printer_count && <p className="text-red-600">{errors.printer_count.message}</p>}
+                    {/* Printer Count and View Agenda By in one row */}
+                    <div className='flex gap-3'>
+                        {/* Printer Count */}
+                        <div className='flex flex-col gap-3 w-fit'>
+                            <label htmlFor="printer_count" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                <span className="font-semibold text-green-700 min-w-fit flex justify-between items-center">No. Of Printers &nbsp; <TiArrowRight className='mt-1' /> </span>
+                                <input id="printer_count" type="text" className="grow w-fit" {...register('printer_count', { required: false, onChange: (e) => setPrinters(e.target.value) })} />
+                            </label>
+                            {errors.printer_count && <p className="text-red-600">{errors.printer_count.message}</p>}
+                        </div>
+
+                        <div className='flex flex-col gap-3 w-fit'>
+                            <label htmlFor='view_agenda_by' className="input cursor-pointer input-bordered bg-white text-black w-fit flex items-center gap-2">
+                                <span className="font-semibold text-green-700 flex justify-between items-center">
+                                    View Agenda By &nbsp;
+                                    <TiArrowRight className='mt-1' />
+                                </span>
+                                <span className='text-sm text-gray-600'>All</span>
+                                <input
+                                    type="checkbox"
+                                    checked={viewAgendaBy === 1} // Control the checkbox based on state
+                                    onChange={handleToggleChange} // Handle the change event
+                                    id="view_agenda_by"
+                                    className="toggle toggle-md toggle-success"
+                                />
+                                <span className='text-sm text-gray-600'>Checked In</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Event OTP - Full Width */}
+                    <div className='flex flex-col gap-3 w-full'>
+                        <label htmlFor="event_otp" className="relative input input-bordered bg-white text-black flex w-full items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center min-w-fit">Event OTP <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <input
+                                id="event_otp"
+                                type="text"
+                                className="grow w-full"
+                                value={randomOTP}  // Use state for OTP value
+                                {...register('event_otp', { required: "Event OTP is Required" })}
+                                maxLength={6}  // Limit the input to 6 characters
+                                onChange={(e) => {
+                                    // Ensure only numbers and limit to 6 digits
+                                    const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 6);
+                                    setRandomOTP(value); // Update state with 6-digit OTP
+                                }}
+                            />
+                            <button
+                                className='bg-orange-500 rounded-r-lg px-4 h-full text-white right-0 absolute'
+                                onClick={generateRandomOTP}
+                                type='button'
+                            >
+                                Generate
+                            </button>
+                        </label>
+                        {errors.event_otp && <p className="text-red-600">{errors.event_otp.message}</p>}
+                    </div>
+
                 </div>
+
 
                 {!eventCreate && <div className='flex flex-row-reverse items-center gap-3'>
                     {/* Image Upload */}
