@@ -520,7 +520,7 @@ const AddEvent: React.FC = () => {
                     {/* Printer Count and View Agenda By in one row */}
                     <div className='flex gap-3'>
                         {/* Printer Count */}
-                        <div className='flex flex-col gap-3 w-fit'>
+                        <div className='flex flex-col gap-3 w-full'>
                             <label htmlFor="printer_count" className="input input-bordered bg-white text-black flex items-center gap-2">
                                 <span className="font-semibold text-green-700 min-w-fit flex justify-between items-center">No. Of Printers &nbsp; <TiArrowRight className='mt-1' /> </span>
                                 <input id="printer_count" type="text" className="grow w-fit" {...register('printer_count', { required: false, onChange: (e) => setPrinters(e.target.value) })} />
@@ -528,8 +528,8 @@ const AddEvent: React.FC = () => {
                             {errors.printer_count && <p className="text-red-600">{errors.printer_count.message}</p>}
                         </div>
 
-                        <div className='flex flex-col gap-3 w-fit'>
-                            <label htmlFor='view_agenda_by' className="input cursor-pointer input-bordered bg-white text-black w-fit flex items-center gap-2">
+                        <div className='flex flex-col gap-3 w-full'>
+                            <label htmlFor='view_agenda_by' className="input cursor-pointer input-bordered bg-white text-black flex items-center gap-2">
                                 <span className="font-semibold text-green-700 flex justify-between items-center">
                                     View Agenda By &nbsp;
                                     <TiArrowRight className='mt-1' />

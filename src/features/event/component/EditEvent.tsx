@@ -73,10 +73,11 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
     const selectedCountryCode = watch('country');
     const dummyImage = imageBaseUrl + '/' + currentEvent?.image;
 
-    const [viewAgendaBy, setViewAgendaBy] = useState(0); // 0 for unchecked, 1 for checked
+    const [viewAgendaBy, setViewAgendaBy] = useState(0);
 
     const handleToggleChange = (e: any) => {
-        setViewAgendaBy(e.target.checked ? 1 : 0); // Update state based on checkbox value
+        console.log(e.target.checked);
+        setViewAgendaBy(e.target.checked ? 1 : 0);
     };
 
     useEffect(() => {
@@ -86,8 +87,6 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
             setValue("printer_count", printer);
         }
     }, [currentEvent]);
-
-    console.log(currentEvent);
 
     const handleImageUpload = (e: any) => {
         const file = e.target.files?.[0];
@@ -107,24 +106,30 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                 "Content-Type": "application/json"
             }
         }).then(res => {
+
             const countryList = Country.getAllCountries();
             setCountries(countryList);
 
             const data = res.data.data;
 
+            const agendaby = data.view_agenda_by;
+            const otp = data.event_otp;
+
+            setValue("view_agenda_by", agendaby);
+            setValue("event_otp", otp);
+
+            setRandomOTP(otp);
+
+            console.log(agendaby, otp);
+
+            setViewAgendaBy(agendaby);
+
             const printersCount = data.printer_count === null ? 0 : data.printer_count;
             setPrinters(printersCount);
 
-            console.log("The printer count is: ", printers);
-
-            console.log("Data fetched from API is: ", res.data.data);
             const initialCountry = data.country;
             const initialState = data.state;
             const initialCity = data.city;
-
-            console.log(initialCountry);
-            console.log(initialState);
-            console.log(initialCity);
 
             setValue('country', initialCountry);
             setValue('state', initialState);
@@ -140,7 +145,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                 }
             }
         })
-    }, [setValue, currentEvent, printers]);
+    }, [setValue, currentEvent, printers, ]);
 
     const generateRandomOTP = () => {
         const otp = Math.floor(Math.random() * 900000) + 100000;
@@ -186,6 +191,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
             data.feedback = 1;
             data.status = 1;
             data._method = 'PUT';
+            data.view_agenda_by = viewAgendaBy;
 
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
@@ -200,8 +206,6 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                     formData.append(key, value as string);
                 }
             });
-
-            console.log(formData);
 
             // Append the image only if it exists
             if (image) {
@@ -496,7 +500,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                     {/* Printer Count and View Agenda By in one row */}
                     <div className='flex gap-3'>
                         {/* Printer Count */}
-                        <div className='flex flex-col gap-3 w-fit'>
+                        <div className='flex flex-col gap-3 w-full'>
                             <label htmlFor="printer_count" className="input input-bordered bg-white text-black flex items-center gap-2">
                                 <span className="font-semibold text-green-700 min-w-fit flex justify-between items-center">No. Of Printers &nbsp; <TiArrowRight className='mt-1' /> </span>
                                 <input id="printer_count" type="text" className="grow w-fit" {...register('printer_count', { required: false, onChange: (e) => setPrinters(e.target.value) })} />
@@ -504,8 +508,8 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                             {errors.printer_count && <p className="text-red-600">{errors.printer_count.message}</p>}
                         </div>
 
-                        <div className='flex flex-col gap-3 w-fit'>
-                            <label htmlFor='view_agenda_by' className="input cursor-pointer input-bordered bg-white text-black w-fit flex items-center gap-2">
+                        <div className='flex flex-col gap-3 w-full'>
+                            <label htmlFor='view_agenda_by' className="input cursor-pointer input-bordered bg-white text-black flex items-center gap-2">
                                 <span className="font-semibold text-green-700 flex justify-between items-center">
                                     View Agenda By &nbsp;
                                     <TiArrowRight className='mt-1' />
@@ -513,7 +517,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                                 <span className='text-sm text-gray-600'>All</span>
                                 <input
                                     type="checkbox"
-                                    checked={viewAgendaBy === 1} // Control the checkbox based on state
+                                    checked={viewAgendaBy ? true : false} // Control the checkbox based on state
                                     onChange={handleToggleChange} // Handle the change event
                                     id="view_agenda_by"
                                     className="toggle toggle-md toggle-success"
@@ -531,7 +535,6 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                                 id="event_otp"
                                 type="text"
                                 className="grow w-full"
-                                defaultValue={currentEvent?.event_otp}
                                 value={randomOTP}  // Use state for OTP value
                                 {...register('event_otp', { required: "Event OTP is Required" })}
                                 maxLength={6}  // Limit the input to 6 characters

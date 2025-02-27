@@ -29,7 +29,9 @@ type eventType = {
     end_time_type: string,
     event_venue_name: string,
     event_venue_address_1: string,
-    google_map_link: string
+    google_map_link: string,
+    event_otp: string;
+    view_agenda_by: number;
 }
 
 const ViewEvent: React.FC<ViewEventProps> = ({ uuid }) => {
@@ -120,6 +122,18 @@ const ViewEvent: React.FC<ViewEventProps> = ({ uuid }) => {
                 <h3 className="text-gray-900 text-xl font-semibold">Date</h3>
                 <p className="text-gray-700 mb-2">
                     {currentEvent.event_start_date + ' - ' + currentEvent.event_end_date}
+                </p>
+
+                {/* Event OTP */}
+                <h3 className="text-gray-900 text-xl font-semibold">Event OTP</h3>
+                <p className="text-gray-700 mb-2">
+                    {currentEvent.event_otp}
+                </p>
+
+                {/* View Agenda By */}
+                <h3 className="text-gray-900 text-xl font-semibold">View Agenda By</h3>
+                <p className="text-gray-700 mb-2">
+                    {currentEvent.view_agenda_by === 0 ? "All" : "Checked In"}
                 </p>
 
                 <h3 className="text-gray-900 text-xl font-semibold">Time</h3>

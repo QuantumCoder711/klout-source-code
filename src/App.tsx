@@ -51,7 +51,22 @@ import Transcriber from "./features/ai-transcriber/Transcriber";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
+
 const App: React.FC = () => {
+
+  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+
+  //   if (token) {
+  //     setIsLoggedIn(true);
+  //   } else {
+  //     setIsLoggedIn(false)
+  //   }
+
+  // }, []);
+
   return (
     <Router>
       <Routes>
