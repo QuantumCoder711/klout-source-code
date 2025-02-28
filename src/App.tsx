@@ -48,6 +48,8 @@ import EditRequestedAttendee from "./features/attendee/component/EditRequestedAt
 import InviteResgistations from "./features/attendee/component/InviteResigtrations";
 import AITranscribers from "./features/ai-transcriber/AITranscribers";
 import Transcriber from "./features/ai-transcriber/Transcriber";
+import EventsHome from "./features/homepage/events-home";
+import AddEvent from "./features/homepage/add-event";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -74,6 +76,8 @@ const App: React.FC = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/home" element={<EventsHome />} />
+        <Route path="/add-first-event" element={<AddEvent />} />
 
         {/* All other routes wrapped in Layout */}
         <Route

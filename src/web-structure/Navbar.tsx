@@ -125,11 +125,11 @@ const Navbar: React.FC = () => {
   };
 
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/home" />;
   }
 
-  const handleLogout = () => {
-    dispatch(logout());
+  const handleLogout = async() => {
+    await dispatch(logout());
   }
 
   const handlePageTitle = (e: React.MouseEvent<HTMLElement>) => {

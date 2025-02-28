@@ -17,6 +17,12 @@ export default {
           700: '#259976',
           800: '#188f6b',
           900: '#07845e'
+        },
+        brand: {
+          primary: "#0071E3",
+          foreground: "#E4E9ED",
+          lightBlue: "#D6DEE4",
+          text: "#fff"
         }
       }
     },
