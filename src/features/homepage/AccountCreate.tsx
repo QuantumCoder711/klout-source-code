@@ -216,7 +216,7 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails 
                 setLoading(false)
                 setFormErrors(errors);
             }
-            if(res.data.status === 400) {
+            if (res.data.status === 400) {
                 const errors = [];
                 if (res.data.error.email) {
                     errors.push(res.data.error.email[0]);
@@ -460,7 +460,11 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails 
                                 onChange={handleChange}
                                 className='size-4'
                             />
-                            <span>I agree to company T&C and Privacy Policy</span>
+                            <span>I agree to company 
+                                <a href="https://www.klout.club/terms-and-condition" className='mx-1 text-brand-primary' target='_blank'>Terms & Conditions</a>
+                                and 
+                                <a href="https://www.klout.club/privacypolicy.html" className='mx-1 text-brand-primary' target='_blank'>Privacy Policy</a>
+                            </span>
                         </div>
 
                         <div className='flex gap-2 items-center'>

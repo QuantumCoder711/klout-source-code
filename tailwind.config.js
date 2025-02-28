@@ -24,7 +24,12 @@ export default {
           lightBlue: "#D6DEE4",
           text: "#fff"
         }
-      }
+      },
+
+        fontFamily: {
+          sfpro: ['SF Pro', 'sans-serif'],
+          signpainter: ['Sign Painter', 'sans-serif']
+        }
     },
   },
   plugins: [require('daisyui')],
