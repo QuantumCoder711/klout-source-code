@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
     }, [location]);
 
     return (
-        <header className={`fixed p-5 left-0 top-0 z-50 w-full ${isDarkBackground ? 'text-black bg-white/10 backdrop-blur-sm' : 'text-white'}`}>
+        <header className={`fixed p-5 left-0 top-0 z-50 w-full ${isDarkBackground ? 'text-black bg-white/10 backdrop-blur-sm' : 'text-white'} bg-white/10 md:bg-transparent backdrop-blur-md md:backdrop-blur-0`}>
             <nav className={`flex justify-between items-center ${isDarkBackground ? 'bg-transparent' : 'bg-transparent'}`}>
                 <Link to={"/home"}>
                     <img src={!isDarkBackground ? Logo : DarkLogo} alt="Klout Club" className='w-32' />
@@ -58,7 +58,7 @@ const Navbar: React.FC = () => {
 
             {/* Mobile Menu */}
             <ul className={`${active ? "right-0" : "-right-full"
-                } fixed top-0 h-screen max-w-60 p-3 w-full bg-white/20 backdrop-blur-2xl md:hidden flex flex-col gap-4 transition-all duration-300 ease-in-out`}>
+                } fixed top-0 h-screen max-w-60 p-3 w-full bg-white !text-black backdrop-blur-2xl md:hidden flex flex-col gap-4 transition-all duration-300 ease-in-out`}>
                 <X onClick={() => setActive(false)} className='absolute right-3 cursor-pointer' />
                 <div className='mt-10 space-y-5'>
                     {navLinks.map((link) => (

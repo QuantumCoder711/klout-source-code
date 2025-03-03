@@ -30,23 +30,23 @@ const Events: React.FC = () => {
 
   return (
     <main
-      className={`!overflow-x-hidden relative bg-zinc-800 h-screen text-brand-text p-3 flex flex-col lg:p-5 bg-cover bg-center`}
+      className={`!overflow-x-hidden relative bg-zinc-800 h-screen text-brand-text p-5 flex flex-col bg-cover bg-center`}
       style={{ background: `url(${EventsBg})` }}
     >
       <Navbar />
-      <div className='max-w-screen-lg w-full flex mt-10 sm:mt-0 flex-col-reverse sm:flex-row justify-between gap-5 items-center mx-auto sm:h-full'>
+      <div className='max-w-screen-lg w-full flex mt-20 flex-col sm:flex-row justify-between gap-5 items-center mx-auto sm:h-full'>
         <div className=''>
-          <span className='text-base md:text-xl'>Welcome To</span>
-          <h1 className='text-3xl sm:text-4xl md:text-5xl font-bold'>Klout Club <br />
+          <span className='text-base md:text-xl !m-0'>Welcome To</span>
+          <h1 className='text-3xl sm:text-4xl xl:text-5xl font-bold'>Klout Club <br />
             <span className='curly'>Smarter</span> Event <br />
             <span className='curly'>Smoother</span> Experience!
           </h1>
-          <p className='max-w-[500px] text-sm md:text-base'>Effortlessly create, manage, and elevate your events
+          <p className='max-w-[500px] text-sm md:text-base mt-3'>Effortlessly create, manage, and elevate your events
             All in one place. From hassle-free check-ins to
             AI-powered insights, Make Your event management smarter!</p>
 
-          <div className='mt-16 sm:mt-24'>
-            <h2 className='text-3xl sm:text-4xl md:text-5xl font-bold capitalize'><span className='curly'>Ready</span> to host a smarter event<span className='curly'>?</span></h2>
+          <div className='mt-14 md:mt-20'>
+            <h2 className='text-3xl sm:text-4xl xl:text-5xl font-bold capitalize'><span className='curly'>Ready</span> to host a smarter event<span className='curly'>?</span></h2>
             <Link to="/add-first-event" className='py-2 px-5 inline-block font-semibold mt-6 bg-white text-black rounded-full '>Create Your First Event</Link>
           </div>
         </div>

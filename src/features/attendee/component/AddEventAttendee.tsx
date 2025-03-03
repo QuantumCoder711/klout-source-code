@@ -148,6 +148,13 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({ uuid }) => {
           if (res.data.status === 200) {
             swal("Success", res.data.message, "success").then(() => window.history.back());
           }
+          if (res.data.status === 422) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: res.data.message,
+            });
+          }
         });
     } catch (error) {
       alert('An error occurred while submitting the form.');

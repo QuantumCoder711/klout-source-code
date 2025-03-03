@@ -111,7 +111,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: width 0.2s ease;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+.custom-input[type="date"]::-webkit-calendar-picker-indicator {
   background: transparent;
   bottom: 0;
   color: transparent;
@@ -125,7 +125,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 100%;
 }
 
-input[type="time"]::-webkit-calendar-picker-indicator {
+.custom-input[type="time"]::-webkit-calendar-picker-indicator {
   background: transparent;
   bottom: 0;
   color: transparent;

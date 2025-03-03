@@ -57,7 +57,7 @@ const AllAttendee: React.FC = () => {
   const handleExportData = () => {
     setExportLoading(true);
 
-    const data = attendees.map((attendee) => ({
+    const data = currentAttendees.map((attendee) => ({
       "Event Name": attendee.title,
       'First Name': attendee.first_name,
       'Last Name': attendee.last_name,

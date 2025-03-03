@@ -464,14 +464,14 @@ const AddEvent: React.FC = () => {
 
                                     {/* Date Picker */}
                                     <div className='relative bg-brand-lightBlue rounded-l-[10px] px-3 py-1 w-full'>
-                                        <input type='date' onChange={handleStartDateChange} className='w-full h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
+                                        <input type='date' onChange={handleStartDateChange} className='w-full custom-input h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
                                         <span className='w-full h-full flex pl-2 items-center absolute left-0 z-10 top-0 rounded-l-[10px]'>{selectedStartDate}</span>
                                     </div>
 
                                     {/* Time Picker */}
                                     <div className='w-32 bg-brand-lightBlue rounded-r-[10px] px-3 py-1 h-full'>
                                         <div className='h-full relative bg-brand-lightBlue rounded-l-[10px] py-2 w-full'>
-                                            <input type="time" name="" id="" onChange={handleStartTimeChange} className='w-full h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
+                                            <input type="time" name="" id="" onChange={handleStartTimeChange} className='w-full custom-input h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
                                             <span className='w-full h-full flex items-center absolute left-0 z-10 top-0 rounded-l-[10px]'>{`${selectedStartTime.formattedHour}:${selectedStartTime.formattedMinutes}:${selectedStartTime.ampm}`}</span>
                                         </div>
                                     </div>
@@ -488,14 +488,14 @@ const AddEvent: React.FC = () => {
 
                                     {/* Date Picker */}
                                     <div className='relative bg-brand-lightBlue rounded-l-[10px] px-3 py-1 w-full'>
-                                        <input type='date' onChange={handleEndDateChange} className='w-full h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
+                                        <input type='date'  onChange={handleEndDateChange} className='w-full custom-input h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
                                         <span className='w-full h-full flex pl-2 items-center absolute left-0 z-10 top-0 rounded-l-[10px]'>{selectedEndDate}</span>
                                     </div>
 
                                     {/* Time Picker */}
                                     <div className='w-32 bg-brand-lightBlue rounded-r-[10px] px-3 py-1 h-full'>
                                         <div className='h-full relative bg-brand-lightBlue rounded-l-[10px] py-2 w-full'>
-                                            <input type="time" name="" id="" onChange={handleEndTimeChange} className='w-full h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
+                                            <input type="time" name="" id="" onChange={handleEndTimeChange} className='w-full custom-input h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
                                             <span className='w-full h-full flex items-center absolute left-0 z-10 top-0 rounded-l-[10px]'>{`${selectedEndTime.formattedHour}:${selectedEndTime.formattedMinutes}:${selectedEndTime.ampm}`}</span>
                                         </div>
                                     </div>

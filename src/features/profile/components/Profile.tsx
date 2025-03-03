@@ -69,24 +69,39 @@ const Profile: React.FC = () => {
     const [, setCustomDesignationName] = useState<string>(user?.designation_name || "");
     const [selectedCompany, setSelectedCompany] = useState<string>();
     const [selectedDesignation, setSelectedDesignation] = useState<string>();
+    const [selectedCompanyId, setSelectedCompanyId] = useState<string>();
+    const [selectedDesignationId, setSelectedDesignationId] = useState<string>();
 
     useEffect(() => {
         axios.get(`${apiBaseUrl}/api/job-titles`).then(res => setJobTitles(res.data.data || []));
         axios.get(`${apiBaseUrl}/api/companies`).then(res => setCompanies(res.data.data || []));
         setSelectedCompany(user?.company);
+        setSelectedCompanyId(user?.company);
+        setSelectedDesignationId(user?.designation);
         setSelectedDesignation(user?.designation);
     }, []);
 
     const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedCompany(e.target.value);
+        const cId: any = companies.filter((company: any) => company.name === e.target.value);
+
+        setSelectedCompanyId(cId[0].id);
+
         if (e.target.value !== "Others") {
+            setSelectedCompanyId("439");
             setCustomCompanyName(''); // Reset custom name if a valid company is selected
         }
     };
 
     const handleDesignationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedDesignation(e.target.value);
+
+        const jId: any = jobTitle.filter((job: any) => job.name === e.target.value);
+
+        setSelectedDesignationId(jId[0].id);
+        
         if (e.target.value !== "Others") {
+            setSelectedDesignationId("252");
             setCustomDesignationName(''); // Reset custom name if a valid designation is selected
         }
     };
@@ -129,16 +144,28 @@ const Profile: React.FC = () => {
             formData.append("image", selectedUserImage);
         }
 
-        const cId: jobTitleType[] | undefined = companies.filter((company: jobTitleType) => company.name === selectedCompany);
-        if (cId) {
-            formData.append("company", String(cId[0].id));
-        }
+        const ci = Number(selectedCompanyId);
+        const di = Number(selectedDesignationId);
 
-        const dId: jobTitleType[] | undefined = jobTitle.filter((job: jobTitleType) => job.name === selectedDesignation);
-        if (dId) {
-            formData.append("designation", String(dId[0].id));
-            console.log("The designation id: ", dId[0].id);
-        }
+        formData.append("company", String(ci));
+        formData.append("designation", String(di));
+
+        // const cId: jobTitleType[] | undefined = companies.filter((company: jobTitleType) => company.name === selectedCompany);
+        // if (cId) {
+        //     formData.append("company", String(cId[0].id));
+        // }
+
+        // const dId: jobTitleType[] | undefined = jobTitle.filter((job: jobTitleType) => job.name === selectedDesignation);
+        // if (dId) {
+        //     formData.append("designation", String(dId[0].id));
+        //     console.log("The designation id: ", dId[0].id);
+        // }
+
+        formData.forEach((key, value) => {
+            console.log(value, key);
+        });
+
+        // return;
 
         axios
             .post(`${apiBaseUrl}/api/updateprofile`, formData, {
