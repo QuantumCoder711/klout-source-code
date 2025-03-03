@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import EventsBg from "/eventsBg.png";
 import Navbar from './Navbar';
 import { FaVolumeMute, FaVolumeUp } from 'react-icons/fa'; // Importing icons for mute/unmute
+import Footer from './Footer';
 
 const Events: React.FC = () => {
   // State to control mute
@@ -85,8 +86,8 @@ const Events: React.FC = () => {
             </div>
           )}
         </div>
-
       </div>
+      <Footer />
     </main>
   );
 }
