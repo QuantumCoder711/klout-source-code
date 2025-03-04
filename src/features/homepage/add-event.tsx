@@ -16,6 +16,11 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import WhiteLogo from "/white_logo.png";
+import { Heart } from 'lucide-react';
+import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import { Link } from "react-router-dom";
 
 interface Form {
     title: string;
@@ -79,13 +84,16 @@ const AddEvent: React.FC = () => {
     const [color, setColor] = useState<string>("#FFFFFF");
     const [textSize, setTextSize] = useState<number>(20);
     const { token } = useSelector((state: RootState) => state.auth);
-    const [userLoginDetails, ] = useState({
+    const [userLoginDetails,] = useState({
         email: "",
         password: ""
     });
     const formRef = useRef<HTMLDivElement | null>(null);
     const modalRef = useRef<HTMLDialogElement | null>(null);
 
+
+    const year = new Date().getFullYear();
+    const nextYear = (new Date().getFullYear() + 1) % 100;
 
     const openModal = () => {
         const modal = modalRef.current;
@@ -369,8 +377,9 @@ const AddEvent: React.FC = () => {
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
             <div className='!text-black w-full z-30 fixed top-0 left-0'>
-            <Navbar />
+                <Navbar />
             </div>
+
             {/* All Fields Wrapper */}
             <div ref={formRef} className='justify-center w-full items-center md:items-start flex flex-col-reverse md:flex-row gap-5 p-5 absolute top-20'>
                 <div className='space-y-5 max-w-screen-sm w-full'>
@@ -488,7 +497,7 @@ const AddEvent: React.FC = () => {
 
                                     {/* Date Picker */}
                                     <div className='relative bg-brand-lightBlue rounded-l-[10px] px-3 py-1 w-full'>
-                                        <input type='date'  onChange={handleEndDateChange} className='w-full custom-input h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
+                                        <input type='date' onChange={handleEndDateChange} className='w-full custom-input h-full absolute z-20 top-0 left-0 rounded-l-[10px] opacity-0' />
                                         <span className='w-full h-full flex pl-2 items-center absolute left-0 z-10 top-0 rounded-l-[10px]'>{selectedEndDate}</span>
                                     </div>
 
@@ -622,6 +631,38 @@ const AddEvent: React.FC = () => {
                             Add Event
                         </button>
                     </div>
+
+                    <footer className='w-full mt-10 flex absolute left-0 p-5 justify-between flex-col gap-4 md:flex-row items-center'>
+                    <Link to={"/home"}>
+                        <img src={WhiteLogo} alt="Klout Club" width={96} height={96} className="filter invert" />
+                    </Link>
+
+                    <div className='text-xs lg:text-sm font-light'>
+                        <p className='flex gap-1 items-center flex-wrap'>Copyright &copy; {year}-{nextYear} All rights reserved | The Klout Club is made with <Heart size={18} /></p>
+                        <div className='flex gap-2 mt-2 items-center justify-center'>
+                            <a href="https://www.klout.club/privacypolicy.html" target='_blank' className='underline underline-offset-1'>Privacy Policy</a>
+                            <span>|</span>
+                            <a href="https://www.klout.club/terms-and-condition" target='_blank' className='underline underline-offset-1'>Terms and Conditions</a>
+                            <span>|</span>
+                            <a href="https://www.klout.club/cancellation-policy" target='_blank' className='underline underline-offset-1'>Refund Policy</a>
+                        </div>
+                    </div>
+
+                    <div className='flex gap-4'>
+                        <a target='_blank' href="https://www.facebook.com/thekloutclub">
+                            <FaFacebookF />
+                        </a>
+                        <a target='_blank' href="https://www.facebook.com/thekloutclub">
+                            <FaXTwitter />
+                        </a>
+                        <a target='_blank' href="https://www.linkedin.com/company/klout-club/">
+                            <FaLinkedinIn />
+                        </a>
+                        <a target='_blank' href="https://www.instagram.com/klout_club/">
+                            <FaInstagram />
+                        </a>
+                    </div>
+                </footer>
                 </div>
 
                 {/* Sticky Box */}
@@ -666,6 +707,8 @@ const AddEvent: React.FC = () => {
                 </div>
             </div>
 
+
+
             {/* {showRegistrationPopup && (
                 <AccountCreate
                     setShowRegistrationPopup={setShowRegistrationPopup}
@@ -680,7 +723,7 @@ const AddEvent: React.FC = () => {
 
                 <dialog ref={modalRef} className="modal">
                     <div className="modal-box bg-brand-lightBlue w-fit m-5 max-w-screen-sm p-5">
-                        <AccountCreate closeModal={closeModal} eventDetails={formData}/>
+                        <AccountCreate closeModal={closeModal} eventDetails={formData} />
                     </div>
                     <form method="dialog" className="modal-backdrop" onSubmit={closeModal}>
                         <button type="submit">Close</button>
