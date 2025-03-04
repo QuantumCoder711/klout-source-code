@@ -3,7 +3,7 @@ import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
 import { allEventAttendee } from '../../event/eventSlice';
-import { FaEdit, FaFileExcel, FaEye, FaUserFriends, FaUserClock, FaPoll } from 'react-icons/fa';
+import { FaEdit, FaFileExcel, FaEye, FaUserFriends, FaUserClock, FaPoll, FaUserCheck } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import HeadingH2 from '../../../component/HeadingH2';
@@ -87,6 +87,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
     // const [selectedAction, setSelectedAction] = useState('');
 
     const { token } = useSelector((state: RootState) => state.auth);
+    const { user } = useSelector((state: RootState) => state.auth);
     const { currentEventUUID, eventAttendee, loading, allEvents } = useSelector((state: RootState) => ({
         currentEventUUID: state.events.currentEventUUID,
         eventAttendee: state.events.eventAttendee as attendeeType[],
@@ -479,6 +480,38 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                 })
             }
         })
+    }
+
+    const handleManualCheckIn = async (attendee_uuid: string) => {
+        Swal.fire({
+            title: "Are You Sure ?",
+            text: "Are you sure want to mark this user as checked in ?",
+            icon: "info",
+            showCancelButton: true,
+        }).then(res => {
+            if (res.isConfirmed) {
+                axios.post(`${apiBaseUrl}/api/manual-check-in`, {
+                    user_id: user?.id,
+                    attendee_uuid,
+                    event_id: currentEvent?.id
+                }).then(res => {
+                    if (res.data.status === 200) {
+                        Swal.fire({
+                            title: "Success",
+                            icon: "success",
+                            text: "Attendee is marked check in now"
+                        }).then(()=>window.location.reload());
+                    }
+                    else {
+                        Swal.fire({
+                            title: "Error",
+                            icon: "error",
+                            text: "Failed to mark check in"
+                        });
+                    }
+                })
+            }
+        });
     }
 
     if (loading || deletingAttendee) {
@@ -945,6 +978,9 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                                                 <Link to={`/events/edit-attendee/${attendee.uuid}/${currentEvent?.id}`} onClick={() => { dispatch(heading("Edit Attendee")) }} className="text-blue-500 hover:text-blue-700">
                                                     <FaEdit />
                                                 </Link>
+                                                <button onClick={() => handleManualCheckIn(attendee.uuid)}>
+                                                    <FaUserCheck className='text-green-600 hover:text-green-700' />
+                                                </button>
                                                 <button onClick={() => handleDelete(attendee.id)} className="text-red-500 hover:text-red-700">
                                                     <MdDelete />
                                                 </button>
