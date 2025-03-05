@@ -6,6 +6,7 @@ import EventsBg from "/eventsBg.png";
 import Navbar from './Navbar';
 import { FaVolumeMute, FaVolumeUp } from 'react-icons/fa'; // Importing icons for mute/unmute
 import Footer from './Footer';
+import { Helmet } from 'react-helmet-async';
 
 const Events: React.FC = () => {
   // State to control mute
@@ -34,6 +35,11 @@ const Events: React.FC = () => {
       className={`!overflow-x-hidden relative bg-zinc-800 h-screen text-brand-text p-5 flex flex-col bg-cover bg-center`}
       style={{ background: `url(${EventsBg})` }}
     >
+      <Helmet>
+        {/* <title>Home - My Website</title> */}
+        <meta name="title" content="Klout Club | AI-Powered Event Management for Seamless Experiences" />
+        <meta name="description" content="Host smarter events with Klout Club. Experience seamless QR check-ins, real-time updates, and AI-driven insights. Power your event with smarter technology!" />
+      </Helmet>
       <Navbar />
       <div className='max-w-screen-lg w-full flex mt-20 flex-col sm:flex-row justify-between gap-5 items-center mx-auto sm:h-full'>
         <div className=''>
@@ -58,7 +64,7 @@ const Events: React.FC = () => {
           onMouseEnter={handleMouseEnter}  // Show icons when hovered
           onMouseLeave={handleMouseLeave}  // Hide icons when mouse leaves
           className='h-[500px] !overflow-hidden cursor-pointer min-w-[246px] !bg-cover bg-center relative rounded-[42px] !bg-no-repeat'>
-          
+
           <video
             className='absolute top-0 inset-1 left-0 w-full h-full z-10 object-cover py-7 mx-2 !pr-4'
             src={Video}

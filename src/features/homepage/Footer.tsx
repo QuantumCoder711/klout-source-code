@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
                 <a target='_blank' href="https://www.facebook.com/thekloutclub">
                     <FaFacebookF />
                 </a>
-                <a target='_blank' href="https://www.facebook.com/thekloutclub">
+                <a target='_blank' href="https://x.com/TheKloutClub">
                     <FaXTwitter />
                 </a>
                 <a target='_blank' href="https://www.linkedin.com/company/klout-club/">

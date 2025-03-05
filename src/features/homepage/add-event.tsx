@@ -21,6 +21,7 @@ import { Heart } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { Link } from "react-router-dom";
+import { Helmet } from 'react-helmet-async';
 
 interface Form {
     title: string;
@@ -376,6 +377,11 @@ const AddEvent: React.FC = () => {
 
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
+            <Helmet>
+                {/* <title>Home - My Website</title> */}
+                <meta name="title" content="Add Your Event | Effortless Event Setup With Klout Club" />
+                <meta name="description" content="Easily add and customize your event with Klout Club. Set up event details, venue, and location - all in one place. Get started today!" />
+            </Helmet>
             <div className='!text-black w-full z-30 fixed top-0 left-0'>
                 <Navbar />
             </div>
@@ -633,36 +639,36 @@ const AddEvent: React.FC = () => {
                     </div>
 
                     <footer className='w-full mt-10 flex absolute left-0 p-5 justify-between flex-col gap-4 md:flex-row items-center'>
-                    <Link to={"/home"}>
-                        <img src={WhiteLogo} alt="Klout Club" width={96} height={96} className="filter invert" />
-                    </Link>
+                        <Link to={"/home"}>
+                            <img src={WhiteLogo} alt="Klout Club" width={96} height={96} className="filter invert" />
+                        </Link>
 
-                    <div className='text-xs lg:text-sm font-light'>
-                        <p className='flex gap-1 items-center flex-wrap'>Copyright &copy; {year}-{nextYear} All rights reserved | The Klout Club is made with <Heart size={18} /></p>
-                        <div className='flex gap-2 mt-2 items-center justify-center'>
-                            <a href="https://www.klout.club/privacypolicy.html" target='_blank' className='underline underline-offset-1'>Privacy Policy</a>
-                            <span>|</span>
-                            <a href="https://www.klout.club/terms-and-condition" target='_blank' className='underline underline-offset-1'>Terms and Conditions</a>
-                            <span>|</span>
-                            <a href="https://www.klout.club/cancellation-policy" target='_blank' className='underline underline-offset-1'>Refund Policy</a>
+                        <div className='text-xs lg:text-sm font-light'>
+                            <p className='flex gap-1 items-center flex-wrap'>Copyright &copy; {year}-{nextYear} All rights reserved | The Klout Club is made with <Heart size={18} /></p>
+                            <div className='flex gap-2 mt-2 items-center justify-center'>
+                                <a href="https://www.klout.club/privacypolicy.html" target='_blank' className='underline underline-offset-1'>Privacy Policy</a>
+                                <span>|</span>
+                                <a href="https://www.klout.club/terms-and-condition" target='_blank' className='underline underline-offset-1'>Terms and Conditions</a>
+                                <span>|</span>
+                                <a href="https://www.klout.club/cancellation-policy" target='_blank' className='underline underline-offset-1'>Refund Policy</a>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className='flex gap-4'>
-                        <a target='_blank' href="https://www.facebook.com/thekloutclub">
-                            <FaFacebookF />
-                        </a>
-                        <a target='_blank' href="https://www.facebook.com/thekloutclub">
-                            <FaXTwitter />
-                        </a>
-                        <a target='_blank' href="https://www.linkedin.com/company/klout-club/">
-                            <FaLinkedinIn />
-                        </a>
-                        <a target='_blank' href="https://www.instagram.com/klout_club/">
-                            <FaInstagram />
-                        </a>
-                    </div>
-                </footer>
+                        <div className='flex gap-4'>
+                            <a target='_blank' href="https://www.facebook.com/thekloutclub">
+                                <FaFacebookF />
+                            </a>
+                            <a target='_blank' href="https://www.facebook.com/thekloutclub">
+                                <FaXTwitter />
+                            </a>
+                            <a target='_blank' href="https://www.linkedin.com/company/klout-club/">
+                                <FaLinkedinIn />
+                            </a>
+                            <a target='_blank' href="https://www.instagram.com/klout_club/">
+                                <FaInstagram />
+                            </a>
+                        </div>
+                    </footer>
                 </div>
 
                 {/* Sticky Box */}
@@ -670,6 +676,7 @@ const AddEvent: React.FC = () => {
                     <div className='space-y-5'>
                         <div className='max-w-72 w-full flex flex-col gap-2'>
                             <div ref={imageRef} className='w-72 h-72 grid relative place-content-center rounded-lg bg-brand-lightBlue'>
+                                {creatingBanner && <span className='inline-block absolute backdrop-blur text-center w-full bg-white/10 p-3 rounded-b-full text-white'>{selectedStartDate}</span>}
                                 {selectedImage ? <img src={selectedImage} className='object-cover object-center h-72 w-72 rounded-lg' /> :
                                     <Image className='size-20 text-brand-primary/20' />}
                                 <div className='w-full h-full grid place-content-center top-0 left-0 absolute rounded-lg p-2'>
