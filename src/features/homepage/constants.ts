@@ -25,3 +25,10 @@ export const navLinks = [
 export const domain: string = import.meta.env.VITE_API_BASE_URL;
 
 export const token: string | null = localStorage.getItem("token");
+
+export const apiKey: string = import.meta.env.VITE_API_KEY;
+
+export const options = {
+    types: ['establishment'], // Adjust types based on your needs
+    componentRestrictions: { country: 'in' }, // Optional: Restrict by country code
+};

@@ -9,7 +9,7 @@ import Template5 from "/templates/template_5.jpg";
 import React from 'react';
 import AccountCreate from './AccountCreate';
 import axios from 'axios';
-import { domain } from './constants';
+import { apiKey, domain, options } from './constants';
 import { Country, State, City, ICountry, IState, ICity } from 'country-state-city';
 import { formatDate, formatTime } from './utils';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { Link } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
+import GoogleMapComponent from './GoogleMapComponent';
 
 interface Form {
     title: string;
@@ -43,17 +44,45 @@ interface Form {
     state: string;
     city: string;
     pincode: string;
+    google_map_link: string;
     status: number;
     feedback: number;
-    google_map_link: string;
     event_otp: string;
     view_agenda_by: number;
 }
 
+interface FormUI {
+    title: string;
+    image: File | string | null; // This can be either a File from the file input or a string for selected template URLs
+    description: string;
+    event_start_date: string;
+    event_end_date: string;
+    event_date: string;
+    start_time: string; // New field for formatted start time (e.g., '16:05')
+    start_minute_time: string; // New field for start time minute part (e.g., '05')
+    start_time_type: string; // New field for AM/PM designation (e.g., 'PM')
+    end_time: string; // New field for formatted end time (e.g., '17:05')
+    end_minute_time: string; // New field for end time minute part (e.g., '05')
+    end_time_type: string; // New field for AM/PM designation (e.g., 'PM')
+    status: number;
+    feedback: number;
+    event_otp: string;
+    view_agenda_by: number;
+}
+
+const addGoogleMapsScript = () => {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+};
+
+addGoogleMapsScript();
 
 const AddEvent: React.FC = () => {
     // State to hold form data
-    const [formData, setFormData] = useState<Form>({
+    const [formData, setFormData] = useState<FormUI>({
         title: '',
         image: null,
         description: '',
@@ -66,16 +95,8 @@ const AddEvent: React.FC = () => {
         end_time: '', // New field
         end_minute_time: '', // New field
         end_time_type: '', // New field
-        event_venue_name: '',
-        event_venue_address_1: '',
-        event_venue_address_2: '',
-        country: '',
-        state: '',
-        city: '',
-        pincode: '',
         feedback: 1,
         status: 1,
-        google_map_link: '',
         event_otp: "000000",
         view_agenda_by: 0,
     });
@@ -91,7 +112,6 @@ const AddEvent: React.FC = () => {
     });
     const formRef = useRef<HTMLDivElement | null>(null);
     const modalRef = useRef<HTMLDialogElement | null>(null);
-
 
     const year = new Date().getFullYear();
     const nextYear = (new Date().getFullYear() + 1) % 100;
@@ -124,12 +144,23 @@ const AddEvent: React.FC = () => {
 
     // const [selectedEndTime, setSelectedEndTime] = useState<string>("");
 
-    const [countries, setCountries] = useState<ICountry[] | undefined>(undefined);
-    const [states, setStates] = useState<IState[] | undefined>(undefined);
-    const [cities, setCities] = useState<ICity[] | undefined>(undefined);
+    const [, setCountries] = useState<ICountry[] | undefined>(undefined);
+    const [, setStates] = useState<IState[] | undefined>(undefined);
+    const [, setCities] = useState<ICity[] | undefined>(undefined);
     const [creatingBanner, setCreatingBanner] = useState<boolean>(false);
     const [, setShowRegistrationPopup] = useState<boolean>(false);
     const [isPopupComplete,] = useState<boolean>(false);
+
+
+    // Google Maps Location
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const [locationInfo, setLocationInfo] = useState<any>(null);
+    const [location, setLocation] = useState<string>("");
+    const [center, setCenter] = useState<{ lat: number; lng: number }>({
+        lat: -3.745,  // Default latitude (you can change it to a default location)
+        lng: -38.523, // Default longitude
+    });
+
 
     // const [createAccount, setCreateAccount] = useState<boolean>(false);
     const templates = [Template1, Template2, Template3, Template4, Template5];
@@ -265,13 +296,12 @@ const AddEvent: React.FC = () => {
         }
 
         // Update the data directly before making the request
-        const updatedFormData = {
-            ...formData,
-            event_venue_address_2: formData.event_venue_address_1,
-            event_date: formData.event_start_date,
-        };
+        // const updatedFormData = {
+        //     ...formData,
+        //     event_venue_address_2: formData.event_venue_address_1,
+        //     event_date: formData.event_start_date,
+        // };
 
-        console.log("The updated form data is: ", updatedFormData);
 
         // Validate form data
         let validationErrors: any = {};
@@ -288,12 +318,7 @@ const AddEvent: React.FC = () => {
         if (!formData.end_time) validationErrors.end_time = 'End Time is required.'; // Updated field name
         if (!formData.end_minute_time) validationErrors.end_minute_time = 'End Minute is required.'; // Updated field name
         if (!formData.end_time_type) validationErrors.end_time_type = 'End Time Type is required.'; // Updated field name
-        if (!formData.event_venue_name) validationErrors.event_venue_name = 'Venue Name is required.';
-        if (!formData.event_venue_address_1) validationErrors.event_venue_address_1 = 'Venue Address is required.';
-        if (!formData.country) validationErrors.country = 'Country is required.';
-        if (!formData.state) validationErrors.state = 'State is required.';
-        if (!formData.city) validationErrors.city = 'City is required.';
-        if (!formData.pincode) validationErrors.pincode = 'Pincode is required.';
+        if (!locationInfo) validationErrors.locationInfo = 'Location is required.'; // Updated field name
 
         // If validation fails, set the errors state
         // If validation fails, set the errors state and scroll to top
@@ -307,6 +332,46 @@ const AddEvent: React.FC = () => {
 
             return;
         }
+
+        let city;
+        let state;
+        let country;
+        let pincode;
+
+        locationInfo.address_components.forEach((component: any) => {
+            const types = component.types;
+            if (types.includes('locality')) {
+                city = component.long_name;
+            }
+            if (types.includes('administrative_area_level_1')) {
+                state = component.long_name;
+            }
+            if (types.includes('country')) {
+                country = component.long_name;
+            }
+            if (types.includes('postal_code')) {
+                pincode = component.long_name;
+            }
+        });
+
+        const updatedFormData = {
+            ...formData,
+            event_date: formData.event_start_date,
+            event_venue_name: locationInfo.name,
+            event_venue_address_1: locationInfo.formatted_address,
+            event_venue_address_2: locationInfo.vicinity,
+            state,
+            city,
+            country,
+            pincode,
+            google_map_link: locationInfo.url
+        };
+
+        // console.log("The updated form data is: ", updatedFormData);
+
+
+        // return;
+
 
         if (!token) {
             openModal();
@@ -339,16 +404,8 @@ const AddEvent: React.FC = () => {
                     end_time: '', // New field
                     end_minute_time: '', // New field
                     end_time_type: '', // New field
-                    event_venue_name: '',
-                    event_venue_address_1: '',
-                    event_venue_address_2: '',
-                    country: '',
-                    state: '',
-                    city: '',
-                    pincode: '',
                     feedback: 1,
                     status: 1,
-                    google_map_link: '',
                     event_otp: "000000",
                     view_agenda_by: 0,
                 });
@@ -373,6 +430,38 @@ const AddEvent: React.FC = () => {
             }
         }
     };
+
+    useEffect(() => {
+        console.log("The data is: ", locationInfo);
+    }, [locationInfo]);
+
+
+    useEffect(() => {
+        if (inputRef.current && window.google) {
+            console.log(inputRef.current.value)
+            const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, options);
+
+            // Add listener for when a place is selected
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (place && place.name) {
+                    setLocationInfo(place);
+                    setLocation(place.name);  // Store the place name in the state
+
+                    const longitude = place.geometry?.location?.lng();
+                    const latitude = place.geometry?.location?.lat();
+
+                    if (longitude && latitude) {
+                        setCenter({
+                            lat: latitude,
+                            lng: longitude
+                        })
+                    }
+                }
+            }
+            )
+        }
+    }, [inputRef.current]); // Only run when the inputRef is set
 
 
     return (
@@ -435,40 +524,6 @@ const AddEvent: React.FC = () => {
                         {errors.description && <span className='text-rose-600 text-xs'>{errors.description}</span>}
                     </div>
 
-                    {/* Start Date & End Date */}
-                    {/* <div className='flex gap-3'>
-            <div className='flex flex-col w-full'>
-              <span className='text-xl'>Start Date</span>
-              <div className='relative w-full'>
-                <input
-                  type="date"
-                  name="event_start_date"
-                  value={formData.event_start_date}
-                  onChange={handleChange}
-                  id="startDate"
-                  className={`bg-white px-3 w-full py-2 focus:outline-none rounded-lg ${errors.event_start_date ? 'border-rose-600' : ''}`}
-                />
-              </div>
-              {errors.event_start_date && <span className='text-rose-600 text-xs'>{errors.event_start_date}</span>}
-            </div>
-
-            <div className='flex flex-col w-full'>
-              <span className='text-xl'>End Date</span>
-              <div className='relative w-full'>
-                <input
-                  type="date"
-                  name="event_end_date"
-                  value={formData.event_end_date}
-                  onChange={handleChange}
-                  id="endDate"
-                  className={`bg-white w-full px-3 py-1 focus:outline-none rounded-lg ${errors.event_end_date ? 'border-rose-600' : ''}`}
-                />
-              </div>
-              {errors.event_end_date && <span className='text-rose-600 text-xs'>{errors.event_end_date}</span>}
-            </div>
-          </div> */}
-
-
                     {/* Start & End */}
                     <div className='flex gap-3 max-[964px]:flex-col w-full'>
                         {/* Start Time */}
@@ -520,113 +575,24 @@ const AddEvent: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Venue Name */}
-                    <div className='flex flex-col'>
-                        <span className='text-xl'>Venue Name</span>
-                        <input
-                            type="text"
-                            name='event_venue_name'
-                            value={formData.event_venue_name}
-                            onChange={handleChange}
-                            className={`rounded-lg bg-white px-3 py-1 focus:outline-none ${errors.event_venue_name ? 'border-rose-600' : ''}`}
-                        />
-                        {errors.event_venue_name && <span className='text-rose-600 text-xs'>{errors.event_venue_name}</span>}
-                    </div>
-
-                    {/* Venue Address */}
-                    <div className='flex flex-col'>
-                        <span className='text-xl'>Venue Address</span>
-                        <input
-                            type="text"
-                            name='event_venue_address_1'
-                            value={formData.event_venue_address_1}
-                            onChange={handleChange}
-                            className={`rounded-lg bg-white px-3 py-1 focus:outline-none ${errors.event_venue_address_1 ? 'border-rose-600' : ''}`}
-                        />
-                        {errors.event_venue_address_1 && <span className='text-rose-600 text-xs'>{errors.event_venue_address_1}</span>}
-                    </div>
-
-
-                    <div className="flex flex-col">
-                        {/* Country */}
-                        <span className='text-xl'>Location</span>
-                        <div className='flex gap-5 max-[460px]:flex-col w-full'>
-                            <select
-                                name="country"
-                                value={formData.country}
-                                onChange={handleChange}
-                                id="country"
-                                className={`bg-white  md:max-w-[192px]  w-full px-3 py-1 focus:outline-none rounded-lg ${errors?.country ? 'border-rose-600' : ''}`}
-                            >
-                                <option value="">Select Country</option>
-                                {countries?.map((country: ICountry) => (
-                                    <option key={country.isoCode} value={country.isoCode}>
-                                        {country.name}
-                                    </option>
-                                ))}
-                            </select>
-
-                            {/* State */}
-                            <select
-                                name="state"
-                                value={formData.state}
-                                onChange={handleChange}
-                                id="state"
-                                className={`bg-white px-3 py-1  md:max-w-[192px]  w-full focus:outline-none rounded-lg ${errors?.state ? 'border-rose-600' : ''}`}
-                                disabled={!formData.country}
-                            >
-                                <option value="">Select State</option>
-                                {states?.map((state: IState) => (
-                                    <option key={state.isoCode} value={state.isoCode}>
-                                        {state.name}
-                                    </option>
-                                ))}
-                            </select>
-
-                            {/* City */}
-                            <select
-                                name="city"
-                                value={formData.city}
-                                onChange={handleChange}
-                                id="city"
-                                className={`bg-white px-3 py-1  md:max-w-[192px] w-full focus:outline-none rounded-lg ${errors?.city ? 'border-rose-600' : ''}`}
-                                disabled={!formData.state}
-                            >
-                                <option value="">Select City</option>
-                                {cities?.map((city: ICity) => (
-                                    <option key={city.name} value={city.name}>
-                                        {city.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Pincode */}
-                    <div className='flex gap-3'>
-                        <div className='flex flex-col w-full'>
-                            <span className='text-xl'>Pincode</span>
+                    {/* Location */}
+                    <div className='flex flex-col gap-5'>
+                        <div>
+                            <label htmlFor="location" className='text-xl'>Location</label>
                             <input
+                                ref={inputRef}
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)} // Update the location state while typing
                                 type="text"
-                                name='pincode'
-                                value={formData.pincode}
-                                onChange={handleChange}
-                                className={`rounded-lg bg-white px-3 py-1 focus:outline-none ${errors.pincode ? 'border-rose-600' : ''}`}
+                                placeholder="Search for a location"
+                                className='rounded-lg bg-white px-3 py-1 focus:outline-none w-full'
                             />
-                            {errors.pincode && <span className='text-rose-600 text-xs'>{errors.pincode}</span>}
-                        </div>
-                    </div>
+                            {errors.locationInfo && <span className='text-rose-600 text-xs mt-1'>{errors.locationInfo}</span>}
 
-                    {/* Google Map Link */}
-                    <div className='flex flex-col'>
-                        <span className='text-xl'>Google Map Link</span>
-                        <input
-                            type="text"
-                            name='google_map_link'
-                            value={formData.google_map_link}
-                            onChange={handleChange}
-                            className='rounded-lg bg-white px-3 py-1 focus:outline-none'
-                        />
+                        </div>
+                        <div className='rounded-lg overflow-hidden'>
+                            <GoogleMapComponent center={center} zoom={12} />
+                        </div>
                     </div>
 
                     <div className='flex items-center justify-center'>
@@ -713,17 +679,6 @@ const AddEvent: React.FC = () => {
                     </div>}
                 </div>
             </div>
-
-
-
-            {/* {showRegistrationPopup && (
-                <AccountCreate
-                    setShowRegistrationPopup={setShowRegistrationPopup}
-                    setUserLoginDetails={setUserLoginDetails}
-                    setIsPopupComplete={setIsPopupComplete} // Pass the callback to update state
-                />
-            )} */}
-
 
             <div>
                 {/* <button className="btn" onClick={openModal}>Open Modal</button> */}
