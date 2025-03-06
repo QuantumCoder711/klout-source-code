@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
 
     useEffect(() => {
         // Set the text color based on the current path's background color
-        if (location.pathname === '/add-first-event') {
+        if (location.pathname === '/add-first-event' || location.pathname.includes("/explore-events")) {
             setIsDarkBackground(true);
         } else {
             setIsDarkBackground(false);

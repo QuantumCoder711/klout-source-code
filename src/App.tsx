@@ -50,6 +50,8 @@ import AITranscribers from "./features/ai-transcriber/AITranscribers";
 import Transcriber from "./features/ai-transcriber/Transcriber";
 import EventsHome from "./features/homepage/events-home";
 import AddEvent from "./features/homepage/add-event";
+import AllEvents from "./features/homepage/explore-view-event";
+import ExploreViewEvent from "./features/homepage/explore-view-event";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -78,6 +80,7 @@ const App: React.FC = () => {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/home" element={<EventsHome />} />
         <Route path="/add-first-event" element={<AddEvent />} />
+        <Route path="/explore-events/:uuid" element={<ExploreViewEvent />} />
 
         {/* All other routes wrapped in Layout */}
         <Route

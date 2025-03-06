@@ -22,7 +22,8 @@ export default {
           primary: "#0071E3",
           foreground: "#E4E9ED",
           lightBlue: "#D6DEE4",
-          text: "#fff"
+          text: "#fff",
+          gray: "#727272"
         }
       },
 
