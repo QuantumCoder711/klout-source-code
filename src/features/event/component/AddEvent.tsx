@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import html2canvas from 'html2canvas-pro';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { Country, State, City } from 'country-state-city';
 import { TiArrowRight } from "react-icons/ti";
 import '../component/style/addEvent.css';
 import { addNewEvent, fetchEvents } from '../eventSlice';
@@ -10,13 +9,42 @@ import { RootState, useAppDispatch } from '../../../redux/store';
 import dummyImage from "/dummyImage.jpg";
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import Loader from '../../../component/Loader';
 import Bg1 from "/background.jpg";
 import Bg2 from "/bg2.jpeg";
 import Bg3 from "/bg3.jpg";
 import Bg4 from "/bg4.jpg";
+import GoogleMapComponent from '../../homepage/GoogleMapComponent';
+import { options } from '../../homepage/constants';
 
-type formInputType = {
+// type formInputType = {
+//     title: string,
+//     description: string,
+//     event_start_date: string,
+//     event_end_date: string,
+//     start_time: string,
+//     start_minute_time: string,
+//     start_time_type: string,
+//     end_time: string,
+//     end_minute_time: string,
+//     end_time_type: string,
+//     event_venue_name: string,
+//     event_venue_address_1: string,
+//     event_venue_address_2: string,
+//     event_date: string,
+//     country: string,
+//     state: string,
+//     city: string,
+//     pincode: string,
+//     image: File | null,
+//     feedback: number,
+//     status: number,
+//     google_map_link: string;
+//     printer_count: number;
+//     event_otp: string;
+//     view_agenda_by: number;
+// };
+
+type FormType = {
     title: string,
     description: string,
     event_start_date: string,
@@ -27,19 +55,12 @@ type formInputType = {
     end_time: string,
     end_minute_time: string,
     end_time_type: string,
-    event_venue_name: string,
-    event_venue_address_1: string,
-    event_venue_address_2: string,
     event_date: string,
-    country: string,
-    state: string,
-    city: string,
-    pincode: string,
     image: File | null,
     feedback: number,
     status: number,
-    google_map_link: string;
     printer_count: number;
+    locationInfo: string;
     event_otp: string;
     view_agenda_by: number;
 };
@@ -49,16 +70,12 @@ const AddEvent: React.FC = () => {
     const { token, user } = useSelector((state: RootState) => state.auth);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<formInputType>();
-    const [countries, setCountries] = useState<any[]>([]);
-    const [states, setStates] = useState<any[]>([]);
-    const [cities, setCities] = useState<any[]>([]);
+    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<FormType>();
     const [, setPrinters] = useState<number>(0);
     const [selectedImage, setSelectedImage] = useState('');
     const [, setImage] = useState<File | null>(null);
     const [randomOTP, setRandomOTP] = useState<string>("");
     const [eventBannerImage, setEventBannerImage] = useState<File | null>(null);
-    const selectedCountryCode = watch('country');
     // const dummyImage = "https://via.placeholder.com/150";
 
     const eventDetailsRef = useRef<HTMLDivElement>(null);
@@ -72,10 +89,21 @@ const AddEvent: React.FC = () => {
     const [textSize, setTextSize] = useState<number>(48);
     const [eventStartDate, setEventStartDate] = useState<string>("");
     const [eventEndDate, setEventEndDate] = useState<string>("");
-    const [, setEventVenueName] = useState<string>("");
-    const [, setEventCity] = useState<string>("");
 
     const [viewAgendaBy, setViewAgendaBy] = useState(0); // 0 for unchecked, 1 for checked
+
+
+
+
+    // Google Maps Location
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const [locationInfo, setLocationInfo] = useState<any>(null);
+    const [location, setLocation] = useState<string>("");
+    const [center, setCenter] = useState<{ lat: number; lng: number }>({
+        lat: -3.745,  // Default latitude (you can change it to a default location)
+        lng: -38.523, // Default longitude
+    });
+
 
     const handleToggleChange = (e: any) => {
         setViewAgendaBy(e.target.checked ? 1 : 0); // Update state based on checkbox value
@@ -111,30 +139,8 @@ const AddEvent: React.FC = () => {
     };
 
     useEffect(() => {
-        // Load countries on component mount
         generateRandomOTP();
-        const countryList = Country.getAllCountries();
-        setCountries(countryList);
     }, []);
-
-    if (!countries) {
-        return <Loader />
-    }
-
-    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedCountry = e.target.value;
-        setValue('country', selectedCountry);
-        // Reset states and cities
-        setStates(State.getStatesOfCountry(selectedCountry));
-        setCities([]); // Clear cities when country changes
-    };
-
-    const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedState = e.target.value;
-        setValue('state', selectedState);
-        // Set cities based on selected state and country
-        setCities(City.getCitiesOfState(selectedCountryCode, selectedState));
-    };
 
     const handleStartDateChange = (e: any) => {
         const dateString = e.target.value;  // e.g., "12/4/2024"
@@ -191,8 +197,8 @@ const AddEvent: React.FC = () => {
     };
 
     // onSubmit function to handle form submission
-    const onSubmit: SubmitHandler<formInputType> = async (data) => {
-
+    const onSubmit: SubmitHandler<FormType> = async (data) => {
+        console.log("working")
         const startDate = formatDate(eventStartDate);
         const endDate = formatDate(eventEndDate);
 
@@ -250,16 +256,48 @@ const AddEvent: React.FC = () => {
             }
 
             // Prepare data for form submission
-            data.event_venue_address_2 = data.event_venue_address_1; // Duplicate address
-            data.event_date = data.event_start_date; // Map event date
-            data.feedback = 1; // Set default feedback
-            data.status = 1; // Set default status
-            data.view_agenda_by = viewAgendaBy;
-            data.event_otp = randomOTP;
+
+            let city;
+            let state;
+            let country;
+            let pincode;
+
+            locationInfo.address_components.forEach((component: any) => {
+                const types = component.types;
+                if (types.includes('locality')) {
+                    city = component.long_name;
+                }
+                if (types.includes('administrative_area_level_1')) {
+                    state = component.long_name;
+                }
+                if (types.includes('country')) {
+                    country = component.long_name;
+                }
+                if (types.includes('postal_code')) {
+                    pincode = component.long_name;
+                }
+            });
+
+            const updatedFormData = {
+                ...data,
+                event_date: data.event_start_date,
+                event_venue_name: locationInfo.name,
+                event_venue_address_1: locationInfo.formatted_address,
+                event_venue_address_2: locationInfo.vicinity,
+                view_agenda_by: viewAgendaBy,
+                state,
+                city,
+                country,
+                pincode,
+                google_map_link: locationInfo.url
+            };
+
+            console.log("The updated from data is: ", updatedFormData)
 
             const formData = new FormData();
-            Object.entries(data).forEach(([key, value]) => {
-                formData.append(key, value as string);
+            Object.entries(updatedFormData).forEach(([key, value]) => {
+                if (key !== "locationInfo")
+                    formData.append(key, value as string);
             });
 
             // Append image if available
@@ -271,12 +309,11 @@ const AddEvent: React.FC = () => {
                 formData.append("image", eventBannerImage);
             }
 
-            // formData.append("printer_count", printers);
+            formData.append("feedback", String(1));
+            formData.append("status", String(1));
+
 
             try {
-                Object.entries(data).forEach(([key, value]) => {
-                    console.log(key, value);
-                });
 
                 // Dispatch the addNewEvent action
                 await dispatch(addNewEvent({ eventData: formData, token })).unwrap(); // unwrap if using createAsyncThunk
@@ -309,6 +346,36 @@ const AddEvent: React.FC = () => {
             }
         }
     };
+
+
+    useEffect(() => {
+        if (inputRef.current && window.google) {
+            console.log(inputRef.current.value)
+            const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, options);
+
+            // Add listener for when a place is selected
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (place && place.vicinity) {
+                    setLocationInfo(place);
+                    setLocation(place.vicinity);  // Store the place name in the state
+
+                    const longitude = place.geometry?.location?.lng();
+                    const latitude = place.geometry?.location?.lat();
+
+                    if (longitude && latitude) {
+                        setCenter({
+                            lat: latitude,
+                            lng: longitude
+                        })
+                    }
+                }
+            }
+            )
+        }
+    }, [inputRef.current]); // Only run when the inputRef is set
+
+
 
     const hours = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
     const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
@@ -430,90 +497,22 @@ const AddEvent: React.FC = () => {
                 </div>
 
                 <div className='flex flex-col gap-3 my-4'>
-                    {/* Venue Name */}
-                    <label htmlFor="event_venue_name" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Name <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="event_venue_name" type="text" className="grow" {...register('event_venue_name', { required: 'Venue name is required' })} onChange={(e) => setEventVenueName(e.target.value)} />
-                    </label>
-                    {errors.event_venue_name && <p className="text-red-600">{errors.event_venue_name.message}</p>}
-                </div>
-
-                <div className='flex flex-col gap-3 my-4'>
-                    {/* Venue Address */}
-                    <label htmlFor="event_venue_address_1" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className=" font-semibold text-green-700 flex justify-between items-center">Venue Address <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="event_venue_address_1" type="text" className="grow" {...register('event_venue_address_1', { required: 'Address is required' })} />
-                    </label>
-                    {errors.event_venue_address_1 && <p className="text-red-600">{errors.event_venue_address_1.message}</p>}
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-2 gap-3 my-4">
-                    <div className='flex flex-col gap-3'>
-                        {/* Country */}
-                        <label htmlFor="country" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Country <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="country" className="grow bg-white" {...register('country', { required: 'Country is required' })} onChange={handleCountryChange}>
-                                <option value="">Select Country</option>
-                                {countries.map((country) => (
-                                    <option key={country.isoCode} value={country.isoCode}>
-                                        {country.name}
-                                    </option>
-                                ))}
-                            </select>
+                    <div className='flex flex-col gap-3 w-full'>
+                        <label htmlFor="locationInfo" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 min-w-fit flex justify-between items-center">Location <span className='text-red-500 ml-1'>*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <input id="locationInfo" type="text" className="grow w-fit"
+                                {...register('locationInfo', { required: "Location is Required" })}
+                                ref={inputRef}
+                                value={location}
+                                onChange={(e) => { setLocation(e.target.value); setValue("locationInfo", location) }} // Update the location state while typing
+                            />
                         </label>
-                        {errors.country && <p className="text-red-600">{errors.country.message}</p>}
+                        {errors.locationInfo && <p className="text-red-600">{errors.locationInfo.message}</p>}
+
+                        <div className='rounded-lg overflow-hidden'>
+                            <GoogleMapComponent center={center} zoom={12} />
+                        </div>
                     </div>
-
-                    <div className='flex flex-col gap-3'>
-                        {/* State */}
-                        <label htmlFor="state" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">State <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="state" className="grow bg-white" {...register('state', { required: 'State is required' })} onChange={handleStateChange}>
-                                <option value="">Select State</option>
-                                {states.map((state) => (
-                                    <option key={state.isoCode} value={state.isoCode}>
-                                        {state.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        {errors.state && <p className="text-red-600">{errors.state.message}</p>}
-                    </div>
-
-                    <div className='flex flex-col gap-3'>
-                        {/* City */}
-                        <label htmlFor="city" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">City <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="city" className="grow bg-white" {...register('city', { required: 'City is required' })} onChange={(e) => setEventCity(e.target.value)}>
-                                <option value="">Select City</option>
-                                {cities.map((city) => (
-                                    <option key={city.isoCode} value={city.name}>
-                                        {city.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        {errors.city && <p className="text-red-600">{errors.city.message}</p>}
-                    </div>
-
-                    <div className='flex flex-col gap-3'>
-                        {/* Pincode */}
-                        <label htmlFor="pincode" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className=" font-semibold text-green-700 flex justify-between items-center">Pincode <span className="text-red-600 ml-1">*</span> &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="pincode" type="text" className="grow" {...register('pincode', { required: 'Pincode is required', minLength: { value: 6, message: 'Pincode must be at least 5 characters' } })} />
-                        </label>
-                        {errors.pincode && <p className="text-red-600">{errors.pincode.message}</p>}
-                    </div>
-                </div>
-
-
-                <div className='flex flex-col gap-3 my-4'>
-                    {/* Google Map Link */}
-                    <label htmlFor="google_map_link" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className="font-semibold text-green-700 flex justify-between items-center">Google Map Link &nbsp; <TiArrowRight className='mt-1' /> </span>
-                        <input id="google_map_link" type="url" className="grow" {...register('google_map_link', { required: false, pattern: { value: /^https?:\/\//, message: 'Link must start with http or https' } })} />
-                    </label>
-                    {errors.google_map_link && <p className="text-red-600">{errors.google_map_link.message}</p>}
                 </div>
 
                 <div className='flex flex-col gap-3 my-4'>

@@ -10,7 +10,6 @@ import React from 'react';
 import AccountCreate from './AccountCreate';
 import axios from 'axios';
 import { apiKey, domain, options } from './constants';
-import { Country, State, City, ICountry, IState, ICity } from 'country-state-city';
 import { formatDate, formatTime } from './utils';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
@@ -24,32 +23,32 @@ import { Link } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
 import GoogleMapComponent from './GoogleMapComponent';
 
-interface Form {
-    title: string;
-    image: File | string | null; // This can be either a File from the file input or a string for selected template URLs
-    description: string;
-    event_start_date: string;
-    event_end_date: string;
-    event_date: string;
-    start_time: string; // New field for formatted start time (e.g., '16:05')
-    start_minute_time: string; // New field for start time minute part (e.g., '05')
-    start_time_type: string; // New field for AM/PM designation (e.g., 'PM')
-    end_time: string; // New field for formatted end time (e.g., '17:05')
-    end_minute_time: string; // New field for end time minute part (e.g., '05')
-    end_time_type: string; // New field for AM/PM designation (e.g., 'PM')
-    event_venue_name: string;
-    event_venue_address_1: string;
-    event_venue_address_2: string;
-    country: string;
-    state: string;
-    city: string;
-    pincode: string;
-    google_map_link: string;
-    status: number;
-    feedback: number;
-    event_otp: string;
-    view_agenda_by: number;
-}
+// interface Form {
+//     title: string;
+//     image: File | string | null; // This can be either a File from the file input or a string for selected template URLs
+//     description: string;
+//     event_start_date: string;
+//     event_end_date: string;
+//     event_date: string;
+//     start_time: string; // New field for formatted start time (e.g., '16:05')
+//     start_minute_time: string; // New field for start time minute part (e.g., '05')
+//     start_time_type: string; // New field for AM/PM designation (e.g., 'PM')
+//     end_time: string; // New field for formatted end time (e.g., '17:05')
+//     end_minute_time: string; // New field for end time minute part (e.g., '05')
+//     end_time_type: string; // New field for AM/PM designation (e.g., 'PM')
+//     event_venue_name: string;
+//     event_venue_address_1: string;
+//     event_venue_address_2: string;
+//     country: string;
+//     state: string;
+//     city: string;
+//     pincode: string;
+//     google_map_link: string;
+//     status: number;
+//     feedback: number;
+//     event_otp: string;
+//     view_agenda_by: number;
+// }
 
 interface FormUI {
     title: string;
@@ -142,11 +141,6 @@ const AddEvent: React.FC = () => {
         ampm: "AM"
     });
 
-    // const [selectedEndTime, setSelectedEndTime] = useState<string>("");
-
-    const [, setCountries] = useState<ICountry[] | undefined>(undefined);
-    const [, setStates] = useState<IState[] | undefined>(undefined);
-    const [, setCities] = useState<ICity[] | undefined>(undefined);
     const [creatingBanner, setCreatingBanner] = useState<boolean>(false);
     const [, setShowRegistrationPopup] = useState<boolean>(false);
     const [isPopupComplete,] = useState<boolean>(false);
@@ -215,14 +209,6 @@ const AddEvent: React.FC = () => {
     // State for validation errors
     const [errors, setErrors] = useState<any>({});
 
-    useEffect(() => {
-        // Load countries on component mount
-        const countryList = Country.getAllCountries();
-        if (countryList) {
-            setCountries(countryList);
-        }
-    }, []);
-
     // Handle input change
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -237,16 +223,6 @@ const AddEvent: React.FC = () => {
             ...prevData,
             [name]: value,
         }));
-
-        // If country or state changes, reset dependent fields
-        if (name === 'country') {
-            const stateList = State.getStatesOfCountry(value);
-            setStates(stateList); // Filter states based on country
-            setCities([]); // Reset cities on country change
-        } else if (name === 'state') {
-            const cityList = City.getCitiesOfState(formData.country, value);
-            setCities(cityList); // Filter cities based on state
-        }
     };
 
 
@@ -430,10 +406,6 @@ const AddEvent: React.FC = () => {
             }
         }
     };
-
-    useEffect(() => {
-        console.log("The data is: ", locationInfo);
-    }, [locationInfo]);
 
 
     useEffect(() => {

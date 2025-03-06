@@ -24,8 +24,8 @@ const GoogleMapComponent: React.FC<GoogleMapComponentProps> = ({ center, zoom })
     map.fitBounds(bounds);
   }, [center]);
 
-  const onUnmount = React.useCallback(function callback(map: any) {
-    map = null;
+  const onUnmount = React.useCallback(function callback() {
+    // map = null;
   }, []);
 
   return isLoaded ? (
