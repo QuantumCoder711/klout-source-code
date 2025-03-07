@@ -33,3 +33,22 @@ export const formatTime = (time: string) => {
 
     return generatedTime;
 };
+
+export function convertDateFormat(inputDate: string) {
+    // Parse the input date string into a Date object
+    const date = new Date(inputDate);
+
+    // Array of month names
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    // Get day, month, and year
+    const day = date.getDate();
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    // Get the weekday
+    const weekday = date.toLocaleString('en-us', { weekday: 'long' });
+
+    // Return the formatted date string
+    return `${weekday}, ${day} ${month}, ${year}`;
+}

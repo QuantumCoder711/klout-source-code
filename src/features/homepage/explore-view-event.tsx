@@ -1,12 +1,164 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { BiRightArrow } from 'react-icons/bi';
 import { IoMdArrowBack, IoMdArrowForward } from 'react-icons/io';
 import { IoLocationSharp } from 'react-icons/io5';
 import Speaker from "./speaker.png"
 import Invite from "./invite.svg";
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { convertDateFormat, formatTime } from './utils';
+import axios from 'axios';
+import GoogleMapComponent from './GoogleMapComponent';
+
+type attendeeType = {
+    uuid: string;
+    title: string;
+    first_name: string;
+    job_title: string;
+    company_name: string;
+    email_id: string;
+    alternate_email: string;
+    phone_number: string;
+    alternate_mobile_number: string;
+    status: string;
+    last_name: string;
+    check_in: number;
+    check_in_time: string;
+    check_in_second: number;
+    check_in_second_time: string;
+    check_in_third: number;
+    check_in_third_time: string;
+    check_in_forth: number;
+    check_in_forth_time: string;
+    check_in_fifth: number;
+    check_in_fifth_time: string;
+    event_name: string;
+    not_invited: boolean;
+    image: string;
+    id: number;
+};
+
+// Define the AgendaType interface
+type AgendaType = {
+    id: number;
+    uuid: string;
+    event_id: number;
+    title: string;
+    description: string;
+    event_date: string;
+    start_time: string;
+    start_time_type: string;
+    end_time: string;
+    end_time_type: string;
+    image_path: string;
+    created_at: string;
+    updated_at: string;
+    start_minute_time: string;
+    end_minute_time: string;
+    position: number;
+    speakers: attendeeType[];
+};
 
 const ExploreViewEvent: React.FC = () => {
+
+    const { uuid } = useParams<{ uuid: string }>();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+    const allEvents = useSelector((state: RootState) => state.events.events);
+    const user = useSelector((state: RootState) => state.auth.user);
+    const currentEvent = allEvents.find(event => event.uuid === uuid);
+    const startTime = currentEvent?.event_date || "";
+    const [agendaData, setAgendaData] = useState<AgendaType[]>([]);
+    const [center, setCenter] = useState<{ lat: number; lng: number }>({
+        lat: -3.745,  // Default latitude (you can change it to a default location)
+        lng: -38.523, // Default longitude
+    });
+
+    useEffect(() => {
+        if (currentEvent) {
+            axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
+                .then((res) => {
+                    if (res.data) {
+                        console.log(currentEvent);
+
+                        console.log("The data is: ", res.data);
+
+                        // Sort the data in descending order to show the highest position at the top
+                        const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
+
+                        setAgendaData(sortedData);
+
+                        // Extract coordinates from Google Maps link
+                        const extractCoordinates = (url: string) => {
+                            const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
+                            const match = url.match(regex);
+                            if (match) {
+                                const encodedUrl = decodeURIComponent(match[1]);
+                                const coordsRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
+                                const coordsMatch = encodedUrl.match(coordsRegex);
+                                if (coordsMatch) {
+                                    const lat = parseFloat(coordsMatch[1]);
+                                    const lng = parseFloat(coordsMatch[2]);
+                                    console.log(lat, lng);
+                                    return { lat, lng };
+                                }
+                            }
+                            return null;
+                        };
+
+                        if (currentEvent) {
+                            const coords = extractCoordinates(currentEvent?.google_map_link);
+                            if (coords) {
+                                setCenter(coords);
+                            }
+                        }
+                    }
+                })
+        }
+    }, [currentEvent]);
+
+    const allSpeakers = agendaData.flatMap((agenda) =>
+        agenda.speakers.map((speaker) => ({
+            first_name: speaker.first_name,
+            last_name: speaker.last_name,
+            company_name: speaker.company_name,
+            job_title: speaker.job_title,
+            image: speaker.image
+        }))
+    );
+
+    useEffect(() => {
+        // Extract coordinates from Google Maps link
+        const extractCoordinates = (url: string) => {
+            const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
+            const match = url.match(regex);
+            if (match) {
+                const encodedUrl = decodeURIComponent(match[1]);
+                const coordsRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
+                const coordsMatch = encodedUrl.match(coordsRegex);
+                if (coordsMatch) {
+                    const lat = parseFloat(coordsMatch[1]);
+                    const lng = parseFloat(coordsMatch[2]);
+                    console.log(lat, lng);
+                    return { lat, lng };
+                }
+            }
+            return null;
+        };
+
+        if (currentEvent) {
+            const coords = extractCoordinates(currentEvent?.google_map_link);
+            if (coords) {
+                setCenter(coords);
+            }
+        }
+    }, [currentEvent]);
+
+    console.log(agendaData);
+
+
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
             <div className='!text-black w-full z-30 fixed top-0 left-0'>
@@ -16,9 +168,9 @@ const ExploreViewEvent: React.FC = () => {
             <div className='max-w-screen-lg flex gap-7 mx-auto mt-20 space-y-4'>
                 {/* Left Div */}
                 <div className='space-y-4'>
-                    <span className='text-gray-700 text-sm'>By Insightner</span>
+                    <span className='text-gray-700 text-sm'>By {user?.company_name}</span>
 
-                    <h1 className='text-2xl font-semibold !mt-0'>Telecom Powerhouse Summit 2025</h1>
+                    <h1 className='text-2xl font-semibold !mt-0'>{currentEvent?.title}</h1>
 
                     {/* Row for Start Date */}
                     <div className='flex gap-2'>
@@ -27,21 +179,23 @@ const ExploreViewEvent: React.FC = () => {
                             <p className='text-2xl leading-none font-semibold text-brand-gray'>30</p>
                         </div>
                         <div>
-                            <h4 className='font-semibold'>Wednesday, 30 Feb, 2025</h4>
-                            <p className='text-sm text-brand-gray'>08:00 AM - 05:00 PM</p>
+                            <h4 className='font-semibold'>{convertDateFormat(startTime)}</h4>
+                            <p className='text-sm text-brand-gray'>{currentEvent?.start_time}:{currentEvent?.start_minute_time}  {currentEvent?.start_time_type} - {currentEvent?.end_time}:{currentEvent?.end_minute_time} {currentEvent?.end_time_type}</p>
                         </div>
                     </div>
 
                     {/* Row for Location */}
                     <div className='flex gap-2'>
-                        <div className='rounded-md grid place-content-center size-10 bg-white'>
-                            <IoLocationSharp size={30} className='text-brand-gray' />
-                        </div>
+                        <a href={currentEvent?.google_map_link} className='flex gap-2'>
+                            <div className='rounded-md grid place-content-center size-10 bg-white'>
+                                <IoLocationSharp size={30} className='text-brand-gray' />
+                            </div>
 
-                        <div>
-                            <h4 className='font-semibold flex items-center'>Hotel holiday Inn, Aerocity <IoMdArrowForward size={20} className='-rotate-45' /></h4>
-                            <p className='text-sm text-brand-gray'>New Delhi, 110077</p>
-                        </div>
+                            <div>
+                                <h4 className='font-semibold flex items-center'>{currentEvent?.event_venue_name} <IoMdArrowForward size={20} className='-rotate-45' /></h4>
+                                <p className='text-sm text-brand-gray'>{currentEvent?.city}, {currentEvent?.pincode}</p>
+                            </div>
+                        </a>
                     </div>
 
                     {/* Row for Registration */}
@@ -74,13 +228,7 @@ const ExploreViewEvent: React.FC = () => {
                         <h3 className='font-semibold text-lg'>Event Details</h3>
                         <hr className='border-t-2 border-white my-[10px]' />
 
-                        <p className='text-brand-gray'>Lorem ipsum dolor sit amet consectetur. Eu tristique tincidunt convallis facilisi nulla. Id a diam posuere nec. Ac enim venenatis facilisi risus iaculis aliquam senectus. Iaculis lacus tortor donec fusce. Neque sagittis ut ac leo at nisi consectetur quis. Quis turpis in iaculis in vulputate sagittis sagittis adipiscing varius.
-
-                            Quisque feugiat aliquet nibh egestas mauris. Amet arcu nam nunc magna feugiat ipsum nisl fermentum proin. Quam risus consequat hac odio diam. Eros condimentum morbi risus dictum pharetra. Tincidunt suspendisse at eu diam at ut nec facilisi. Varius sollicitudin nisi nunc faucibus venenatis volutpat. Sagittis cras vitae eget id in malesuada. Leo facilisi feugiat pharetra euismod vel. Eros feugiat risus orci eget iaculis feugiat nunc. Massa velit nunc at urna nisl. Elit penatibus mauris scelerisque in pulvinar. Justo accumsan cras habitant sapien semper malesuada. Mi turpis pellentesque velit elit lobortis eu cras.
-
-                            Et eget interdum elit tellus tincidunt nibh. Aliquam etiam vitae vehicula magna proin mauris lorem volutpat porta. Nisl enim libero diam faucibus. At massa urna risus tellus lacus in mi. Dictum ut egestas risus vestibulum enim. Accumsan tincidunt ut nec dignissim felis vulputate venenatis. Pharetra nunc aenean vitae sit elit quis elementum. Nec et tortor vitae nam amet consectetur pharetra. Orci viverra lacus lectus ipsum viverra quis sit vel vel. Viverra vel lacus ac nulla neque in. Id ac vestibulum aenean purus ullamcorper arcu malesuada nunc ultricies. Vivamus eu tempor ut arcu cursus.
-
-                            Sit aliquet accumsan pulvinar fermentum. Tincidunt odio non est commodo euismod. Interdum auctor blandit tincidunt velit elementum commodo. Egestas ut commodo in ipsum sed. Vel fringilla lacus elit in in et at augue. Sed porttitor congue pharetra urna mattis. In eu nulla natoque sed faucibus. Pellentesque aliquam elementum in fusce. Sed dui lectus habitant ac nunc massa eros. Mauris in amet consectetur non cras iaculis amet malesuada aliquet. Facilisis dictum turpis nulla lobortis eu orci nisl elit. Dignissim sit habitant ac rhoncus massa gravida. Feugiat molestie justo sed facilisis turpis congue tincidunt neque bibendum.</p>
+                        <p className='text-brand-gray'>{currentEvent?.description}</p>
                     </div>
 
                     {/* Agenda Details */}
@@ -98,41 +246,30 @@ const ExploreViewEvent: React.FC = () => {
                             {/* All Rows Wrapper */}
                             <div>
                                 {/* Single Row */}
-                                <div className='!my-4'>
-                                    <h5 className='font-semibold'>12:00AM-07:00AM</h5>
-                                    <p className='font-light'>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                                {agendaData.map((agenda) => (
+                                    <div key={agenda.id} className='!my-4'>
+                                        <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
+                                        <p className='font-light'>{agenda.description}</p>
 
-                                    {/* All Images */}
-                                    <div className='flex gap-5'>
-                                        <div className='flex gap-3'>
-                                            <img src={Speaker} alt="user" className='size-14 rounded-full' />
-                                            <div className='space-y-1'>
-                                                <p className='font-semibold text-lg leading-none'>Nikhil Bishnoi</p>
-                                                <p className='text-sm leading-none'>Klout Club</p>
-                                                <p className='text-xs leading-none'>CEO</p>
-                                            </div>
-                                        </div>
-                                        <div className='flex gap-3'>
-                                            <img src={Speaker} alt="user" className='size-14 rounded-full' />
-                                            <div className='space-y-1'>
-                                                <p className='font-semibold text-lg leading-none'>Nikhil Bishnoi</p>
-                                                <p className='text-sm leading-none'>Klout Club</p>
-                                                <p className='text-xs leading-none'>CEO</p>
-                                            </div>
-                                        </div>
-                                        <div className='flex gap-3'>
-                                            <img src={Speaker} alt="user" className='size-14 rounded-full' />
-                                            <div className='space-y-1'>
-                                                <p className='font-semibold text-lg leading-none'>Nikhil Bishnoi</p>
-                                                <p className='text-sm leading-none'>Klout Club</p>
-                                                <p className='text-xs leading-none'>CEO</p>
+                                        {/* All Images */}
+                                        <div className='flex gap-5 my-3'>
+                                            <div className='grid grid-cols-2 gap-5'>
+                                                {agenda.speakers.map((speaker) => (
+                                                    <div key={speaker.id} className='flex gap-3 max-w-80 text-ellipsis overflow-hidden text-nowrap'>
+                                                        <img src={`${apiBaseUrl}/${speaker.image}`} alt="user" className='size-14 rounded-full' />
+                                                        <div className='space-y-1'>
+                                                            <p className='font-semibold text-lg leading-none'>{speaker.first_name} {speaker.last_name}</p>
+                                                            <p className='text-sm leading-none'>{speaker.company_name}</p>
+                                                            <p className='text-xs leading-none'>{speaker.job_title}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
-
 
                     </div>
 
@@ -143,32 +280,32 @@ const ExploreViewEvent: React.FC = () => {
 
 
                         {/* All Speakers */}
-                        <div className='flex flex-wrap justify-between'>
+                        <div className='grid grid-cols-4 gap-5 justify-between'>
 
                             {/* Single Speaker Deatils */}
-                            <div className='max-w-60 text-center border-2 border-red-500'>
-                                <img src={Speaker} alt="Speaker" className='rounded-full mx-auto size-24' />
-                                <p className='font-semibold'>Udit Tiwari</p>
-                                <p className=''>CEO</p>
-                                <p className='text-sm font-light'>Tatwa Technologies</p>
-                            </div>
-
+                            {allSpeakers.map((speaker, index) => (
+                                <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
+                                    <img src={apiBaseUrl + "/" + speaker.image} alt="Speaker" className='rounded-full mx-auto size-24' />
+                                    <p className='font-semibold overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.first_name + ' ' + speaker.last_name}</p>
+                                    <p className='overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.job_title}</p>
+                                    <p className='text-sm font-light overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.company_name}</p>
+                                </div>
+                            ))}
                         </div>
-
-
                     </div>
                 </div>
 
                 {/* Right Div */}
                 <div className='max-w-[300px]'>
-                    <img src="/background.jpg" alt="Background Image" className='rounded-lg w-full' />
+                    <img src={apiBaseUrl + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-full' />
 
                     <div className='mt-[5.8rem]'>
                         <h3 className='font-semibold text-lg'>Location</h3>
                         <hr className='border-t-2 border-white !my-[10px]' />
-                        <p className='text-brand-gray'><strong className='text-black'>Hotel holiday Inn, Aerocity</strong> <br />
-                            3rd - 5th floor, Huda City Centre Metro Station, Sector 29, Gurugram, Haryana 122002, India</p>
-                        <div className='bg-red-200 rounded-lg mt-[10px] w-[300px] h-[300px]'>
+                        <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
+                            {currentEvent?.event_venue_address_2}</p>
+                        <div className='rounded-lg mt-[10px] w-[300px] h-[300px]'>
+                            <GoogleMapComponent center={center} zoom={20} />
                         </div>
                     </div>
                 </div>
