@@ -125,7 +125,7 @@ const Navbar: React.FC = () => {
   };
 
   if (!token) {
-    return <Navigate to="/home" />;
+    return <Navigate to="/" />;
   }
 
   const handleLogout = async() => {

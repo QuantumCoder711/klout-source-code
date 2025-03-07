@@ -50,8 +50,8 @@ import AITranscribers from "./features/ai-transcriber/AITranscribers";
 import Transcriber from "./features/ai-transcriber/Transcriber";
 import EventsHome from "./features/homepage/events-home";
 import AddEvent from "./features/homepage/add-event";
-import AllEvents from "./features/homepage/explore-view-event";
 import ExploreViewEvent from "./features/homepage/explore-view-event";
+import ExploreAllEvents from "./features/homepage/ExploreAllEvents";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -78,15 +78,16 @@ const App: React.FC = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/home" element={<EventsHome />} />
+        <Route path="/" element={<EventsHome />} />
         <Route path="/add-first-event" element={<AddEvent />} />
         <Route path="/explore-events/:uuid" element={<ExploreViewEvent />} />
+        <Route path="/explore-events" element={<ExploreAllEvents />} />
 
         {/* All other routes wrapped in Layout */}
         <Route
           element={<Layout />}
         >
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/profile" element={<ProfilePage />} />

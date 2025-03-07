@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
-import { BiRightArrow } from 'react-icons/bi';
-import { IoMdArrowBack, IoMdArrowForward } from 'react-icons/io';
+import { IoMdArrowForward } from 'react-icons/io';
 import { IoLocationSharp } from 'react-icons/io5';
-import Speaker from "./speaker.png"
 import Invite from "./invite.svg";
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { convertDateFormat, formatTime } from './utils';
+import { convertDateFormat } from './utils';
 import axios from 'axios';
 import GoogleMapComponent from './GoogleMapComponent';
+import Loader from '../../component/Loader';
 
 type attendeeType = {
     uuid: string;
@@ -64,11 +63,10 @@ type AgendaType = {
 const ExploreViewEvent: React.FC = () => {
 
     const { uuid } = useParams<{ uuid: string }>();
+    const [isLoading, setIsLoading] = useState(false);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-    const allEvents = useSelector((state: RootState) => state.events.events);
     const user = useSelector((state: RootState) => state.auth.user);
-    const currentEvent = allEvents.find(event => event.uuid === uuid);
+    const [currentEvent, setCurrentEvent] = useState<any>(null);
     const startTime = currentEvent?.event_date || "";
     const [agendaData, setAgendaData] = useState<AgendaType[]>([]);
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
@@ -77,45 +75,79 @@ const ExploreViewEvent: React.FC = () => {
     });
 
     useEffect(() => {
-        if (currentEvent) {
-            axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
-                .then((res) => {
-                    if (res.data) {
-                        console.log(currentEvent);
-
-                        console.log("The data is: ", res.data);
-
-                        // Sort the data in descending order to show the highest position at the top
-                        const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
-
-                        setAgendaData(sortedData);
-
-                        // Extract coordinates from Google Maps link
-                        const extractCoordinates = (url: string) => {
-                            const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
-                            const match = url.match(regex);
-                            if (match) {
-                                const encodedUrl = decodeURIComponent(match[1]);
-                                const coordsRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
-                                const coordsMatch = encodedUrl.match(coordsRegex);
-                                if (coordsMatch) {
-                                    const lat = parseFloat(coordsMatch[1]);
-                                    const lng = parseFloat(coordsMatch[2]);
-                                    console.log(lat, lng);
-                                    return { lat, lng };
-                                }
-                            }
-                            return null;
-                        };
-
-                        if (currentEvent) {
-                            const coords = extractCoordinates(currentEvent?.google_map_link);
-                            if (coords) {
-                                setCenter(coords);
-                            }
-                        }
+        if (uuid) {
+            try {
+                setIsLoading(true);
+                axios.post(`${apiBaseUrl}/api/displayEvent/${uuid}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
                 })
+                    .then((res: any) => {
+                        setCurrentEvent(res.data.data);
+                    })
+                    .catch((err: any) => {
+                        console.log(err);
+                    })
+                    .finally(() => {
+                        setIsLoading(false);
+                    });
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    }, [uuid]);
+
+    useEffect(() => {
+        if (currentEvent) {
+            try {
+                setIsLoading(true);
+                axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
+                    .then((res) => {
+                        if (res.data) {
+                            // Sort the data in descending order to show the highest position at the top
+                            const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
+
+                            setAgendaData(sortedData);
+
+                            // Extract coordinates from Google Maps link
+                            const extractCoordinates = (url: string) => {
+                                const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
+                                const match = url.match(regex);
+                                if (match) {
+                                    const encodedUrl = decodeURIComponent(match[1]);
+                                    const coordsRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
+                                    const coordsMatch = encodedUrl.match(coordsRegex);
+                                    if (coordsMatch) {
+                                        const lat = parseFloat(coordsMatch[1]);
+                                        const lng = parseFloat(coordsMatch[2]);
+                                        console.log(lat, lng);
+                                        return { lat, lng };
+                                    }
+                                }
+                                return;
+                            };
+
+                            if (currentEvent) {
+                                const coords = extractCoordinates(currentEvent?.google_map_link);
+                                if (coords) {
+                                    setCenter(coords);
+                                }
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching agendas:", error);
+                    })
+                    .finally(() => {
+                        setIsLoading(false);
+                    });
+            } catch (error) {
+                console.error("Error in agenda fetch block:", error);
+                setIsLoading(false);
+            }
         }
     }, [currentEvent]);
 
@@ -158,6 +190,11 @@ const ExploreViewEvent: React.FC = () => {
 
     console.log(agendaData);
 
+    if (isLoading) {
+        return <div className='w-full h-screen flex justify-center items-center'>
+            <Loader />
+        </div>
+    }
 
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
@@ -233,15 +270,15 @@ const ExploreViewEvent: React.FC = () => {
 
                     {/* Agenda Details */}
                     <div className='mt-6'>
-                        <h3 className='font-semibold text-lg'>Event Details</h3>
+                        <h3 className='font-semibold text-lg'>Agenda Details</h3>
                         <hr className='border-t-2 border-white !my-[10px]' />
 
 
                         {/* Single Day Agenda Details */}
                         <div>
-                            <div className='p-2 bg-white rounded-lg font-semibold'>
+                            {/* <div className='p-2 bg-white rounded-lg font-semibold'>
                                 Day 1 (Friday, 17th Jan 2025)
-                            </div>
+                            </div> */}
 
                             {/* All Rows Wrapper */}
                             <div>

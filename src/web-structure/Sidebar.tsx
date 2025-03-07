@@ -56,7 +56,7 @@ const Sidebar: React.FC = () => {
       </div>
       <ul className="my-5 space-y-2 h-[80vh] overflow-y-scroll">
         <li>
-          <Link to="/" onClick={handlePageTitle} className="p-5 flex items-center gap-3 rounded font-semibold">
+          <Link to="/dashboard" onClick={handlePageTitle} className="p-5 flex items-center gap-3 rounded font-semibold">
             <MdDashboard className="size-6" />
             {collapse &&
               <span>

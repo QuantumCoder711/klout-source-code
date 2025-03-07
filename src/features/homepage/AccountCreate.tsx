@@ -262,7 +262,7 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails 
 
                 await dispatch(login(obj));
                 await dispatch(addNewEvent({ eventData: newEvent, token: res.data.access_token })).unwrap(); // unwrap if using createAsyncThunk
-                await navigate("/");
+                await navigate("/dashboard");
             }
 
             // console.log("The response is: ", res.data)

@@ -50,7 +50,7 @@ const Login: React.FC = () => {
     }, [loginError, submitted]); // Runs when loginError or submitted changes
 
     if (token) {
-        return <Navigate to="/" />;
+        return <Navigate to="/dashboard" />;
     }
 
     return (

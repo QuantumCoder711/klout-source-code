@@ -11,10 +11,10 @@ export const navLinks = [
     //     to: "/events",
     //     name: "events"
     // },
-    // {
-    //     to: "/download",
-    //     name: "download"
-    // },
+    {
+        to: "/explore-events",
+        name: "Explore Events"
+    },
     {
         to: "/login",
         name: "login"
