@@ -12,7 +12,7 @@ export const navLinks = [
     //     name: "events"
     // },
     {
-        to: "/explore-events",
+        to: "/explore-events/all",
         name: "Explore Events"
     },
     {

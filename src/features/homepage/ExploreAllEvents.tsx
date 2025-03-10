@@ -4,18 +4,19 @@ import Calender from "./calender.svg";
 import { IoLocationSharp } from 'react-icons/io5';
 import { convertDateFormat } from './utils';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Loader from '../../component/Loader';
 import { FaChevronDown } from "react-icons/fa6";
 import { Helmet } from 'react-helmet-async';
 
 const ExploreAllEvents: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
+  const {city} = useParams<{city: string}>();
+  const navigate = useNavigate();
   const [allEvents, setAllEvents] = useState<any[]>([]);
   const [pastEvents, setPastEvents] = useState<any[]>([]);
   const [selectedType, setSelectedType] = useState<string>("upcoming");
-  const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [selectedCity, setSelectedCity] = useState<string>(city?.toLowerCase() || "all");
   const [cities, setCities] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,9 +41,9 @@ const ExploreAllEvents: React.FC = () => {
           return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
         });
 
-        // Extract unique cities from events
+        // Extract unique cities from events and convert to lowercase
         const uniqueCities: any[] = Array.from(new Set(res.data.data.map((event: any) => {
-          return event.city;
+          return event.city.toLowerCase();
         })));
 
         setCities(uniqueCities);
@@ -62,13 +63,15 @@ const ExploreAllEvents: React.FC = () => {
   };
 
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCity(event.target.value);
+    const newCity = event.target.value;
+    setSelectedCity(newCity);
+    navigate(`/explore-events/${newCity}`);
   };
 
   const filterEventsByCity = (events: any[]) => {
     if (selectedCity === "all") return events;
     return events.filter(event => {
-      return event.city === selectedCity;
+      return event.city.toLowerCase() === selectedCity;
     });
   };
 
@@ -111,13 +114,13 @@ const ExploreAllEvents: React.FC = () => {
 
             <div className="relative">
               <select
-                className="px-4 py-2 pr-10 border border-gray-300 max-w-40 w-full rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary appearance-none"
+                className="px-4 py-2 pr-10 border capitalize border-gray-300 max-w-40 w-full rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary appearance-none"
                 value={selectedCity}
                 onChange={handleCityChange}
               >
                 <option value="all">All Cities</option>
                 {cities.map((city, index) => (
-                  <option key={index} value={city}>{city}</option>
+                  <option key={index} value={city} className='capitalize'>{city}</option>
                 ))}
               </select>
               <FaChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none" />
@@ -125,7 +128,7 @@ const ExploreAllEvents: React.FC = () => {
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
             {selectedType === "upcoming" ? filterEventsByCity(allEvents).map((event, index) => (
-              <Link to={`/explore-events/${event.slug}`} key={index}>
+              <Link to={`/explore-events/event/${event.slug}`} key={index}>
                 <div className='flex gap-3 max-h-24'>
                   <img src={apiBaseUrl + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
                   <div className='space-y-2 overflow-hidden'>
