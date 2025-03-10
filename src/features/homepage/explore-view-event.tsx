@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Navbar from './Navbar';
 import { IoMdArrowForward } from 'react-icons/io';
 import { IoLocationSharp } from 'react-icons/io5';
 import Invite from "./invite.svg";
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
 import { convertDateFormat } from './utils';
 import axios from 'axios';
 import GoogleMapComponent from './GoogleMapComponent';
 import Loader from '../../component/Loader';
+import { domain } from './constants';
 
 type attendeeType = {
     uuid: string;
@@ -39,6 +38,15 @@ type attendeeType = {
     id: number;
 };
 
+interface ApiType {
+    created_at: string;
+    id: number;
+    name: string;
+    parent_id: number;
+    updated_at: string;
+    uuid: string;
+}
+
 // Define the AgendaType interface
 type AgendaType = {
     id: number;
@@ -62,10 +70,9 @@ type AgendaType = {
 
 const ExploreViewEvent: React.FC = () => {
 
-    const { uuid } = useParams<{ uuid: string }>();
+    const { slug } = useParams<{ slug: string }>();
     const [isLoading, setIsLoading] = useState(false);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    const user = useSelector((state: RootState) => state.auth.user);
     const [currentEvent, setCurrentEvent] = useState<any>(null);
     const startTime = currentEvent?.event_date || "";
     const [agendaData, setAgendaData] = useState<AgendaType[]>([]);
@@ -73,18 +80,91 @@ const ExploreViewEvent: React.FC = () => {
         lat: -3.745,  // Default latitude (you can change it to a default location)
         lng: -38.523, // Default longitude
     });
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const modalRef = useRef<HTMLDialogElement>(null);
+
+    const [formErrors, setFormErrors] = useState({
+        first_name: '',
+        last_name: '',
+        phone_number: '',
+        email_id: '',
+        company_name: '',
+        custom_company_name: '',
+    });
+
+    const [userDetails, setUserDetails] = useState({
+        first_name: "",
+        last_name: "",
+        phone_number: "",
+        email_id: "",
+        company: 0,
+        company_name: "",
+        acceptence: "1",
+        industry: "Others",
+    });
+
+    const validateForm = () => {
+        let isValid = true;
+        const errors = {
+            first_name: '',
+            last_name: '',
+            phone_number: '',
+            email_id: '',
+            company_name: '',
+            custom_company_name: ''
+        };
+
+        if (!userDetails.first_name.trim()) {
+            errors.first_name = 'First name is required';
+            isValid = false;
+        }
+
+        if (!userDetails.last_name.trim()) {
+            errors.last_name = 'Last name is required';
+            isValid = false;
+        }
+
+        if (!userDetails.phone_number.trim()) {
+            errors.phone_number = 'Mobile number is required';
+            isValid = false;
+        } else if (!/^\d{10}$/.test(userDetails.phone_number)) {
+            errors.phone_number = 'Please enter a valid 10-digit mobile number';
+            isValid = false;
+        }
+
+        if (!userDetails.email_id.trim()) {
+            errors.email_id = 'Email is required';
+            isValid = false;
+        } else if (!/\S+@\S+\.\S+/.test(userDetails.email_id)) {
+            errors.email_id = 'Please enter a valid email address';
+            isValid = false;
+        }
+
+        if (!selectedCompany) {
+            errors.company_name = 'Please select a company';
+            isValid = false;
+        }
+
+        if (selectedCompany === 'Others' && !customCompanyName.trim()) {
+            errors.custom_company_name = 'Please specify company name';
+            isValid = false;
+        }
+
+        setFormErrors(errors);
+        return isValid;
+    };
+
+    const [companies, setCompanies] = useState<ApiType[] | undefined>();
+    const [selectedCompany, setSelectedCompany] = useState<string | number>('');
+    const [customCompanyName, setCustomCompanyName] = useState<string>(''); // New state for custom company name
 
     useEffect(() => {
-        if (uuid) {
+        if (slug) {
             try {
                 setIsLoading(true);
-                axios.post(`${apiBaseUrl}/api/displayEvent/${uuid}`, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                axios.get(`${apiBaseUrl}/api/all_events`)
                     .then((res: any) => {
-                        setCurrentEvent(res.data.data);
+                        setCurrentEvent(res.data.data.find((event: any) => event.slug === slug));
                     })
                     .catch((err: any) => {
                         console.log(err);
@@ -98,58 +178,72 @@ const ExploreViewEvent: React.FC = () => {
                 setIsLoading(false);
             }
         }
-    }, [uuid]);
+    }, [slug]);
 
     useEffect(() => {
         if (currentEvent) {
-            try {
-                setIsLoading(true);
-                axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
-                    .then((res) => {
-                        if (res.data) {
-                            // Sort the data in descending order to show the highest position at the top
-                            const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
+            axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
+                .then((res) => {
+                    if (res.data) {
+                        // Sort the data in descending order to show the highest position at the top
+                        const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
+                        setAgendaData(sortedData);
 
-                            setAgendaData(sortedData);
-
-                            // Extract coordinates from Google Maps link
-                            const extractCoordinates = (url: string) => {
-                                const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
-                                const match = url.match(regex);
-                                if (match) {
-                                    const encodedUrl = decodeURIComponent(match[1]);
-                                    const coordsRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
-                                    const coordsMatch = encodedUrl.match(coordsRegex);
-                                    if (coordsMatch) {
-                                        const lat = parseFloat(coordsMatch[1]);
-                                        const lng = parseFloat(coordsMatch[2]);
-                                        console.log(lat, lng);
-                                        return { lat, lng };
-                                    }
-                                }
-                                return;
-                            };
-
-                            if (currentEvent) {
-                                const coords = extractCoordinates(currentEvent?.google_map_link);
-                                if (coords) {
-                                    setCenter(coords);
+                        // Extract coordinates from Google Maps link
+                        const extractCoordinates = (url: string | undefined) => {
+                            if (!url) return;
+                            const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
+                            const match = url.match(regex);
+                            if (match) {
+                                const encodedUrl = decodeURIComponent(match[1]);
+                                const coordsRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
+                                const coordsMatch = encodedUrl.match(coordsRegex);
+                                if (coordsMatch) {
+                                    const lat = parseFloat(coordsMatch[1]);
+                                    const lng = parseFloat(coordsMatch[2]);
+                                    console.log(lat, lng);
+                                    return { lat, lng };
                                 }
                             }
+                            return;
+                        };
+
+                        const coords = extractCoordinates(currentEvent?.google_map_link);
+                        if (coords) {
+                            setCenter(coords);
                         }
-                    })
-                    .catch((error) => {
-                        console.error("Error fetching agendas:", error);
-                    })
-                    .finally(() => {
-                        setIsLoading(false);
-                    });
-            } catch (error) {
-                console.error("Error in agenda fetch block:", error);
-                setIsLoading(false);
-            }
+                    }
+                })
         }
     }, [currentEvent]);
+
+    // Handle Input Changes
+    const handleChange = (e: any) => {
+        const { name, value } = e.target;
+
+        if (name === "company_name") {
+            setSelectedCompany(value);
+        }
+
+        if (name === "custom_company_name") {
+            setCustomCompanyName(value);
+        }
+
+        setUserDetails((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+
+        // Clear error when user starts typing
+        setFormErrors(prev => ({
+            ...prev,
+            [name]: ''
+        }));
+    };
+
+    useEffect(() => {
+        axios.get(`${domain}/api/companies`).then(res => setCompanies(res.data.data));
+    }, []);
 
     const allSpeakers = agendaData.flatMap((agenda) =>
         agenda.speakers.map((speaker) => ({
@@ -163,7 +257,8 @@ const ExploreViewEvent: React.FC = () => {
 
     useEffect(() => {
         // Extract coordinates from Google Maps link
-        const extractCoordinates = (url: string) => {
+        const extractCoordinates = (url: string | undefined) => {
+            if (!url) return null;
             const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
             const match = url.match(regex);
             if (match) {
@@ -188,7 +283,80 @@ const ExploreViewEvent: React.FC = () => {
         }
     }, [currentEvent]);
 
-    console.log(agendaData);
+    const openModal = () => {
+        if (modalRef.current) {
+            modalRef.current.showModal();
+            setIsModalOpen(true);
+        }
+    };
+
+    const closeModal = () => {
+        if (modalRef.current) {
+            modalRef.current.close();
+            setIsModalOpen(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (validateForm()) {
+            try {
+                // Form is valid, proceed with submission
+                const companyId = companies?.find(company => company.name === selectedCompany);
+                const newObj = {
+                    ...userDetails,
+                    company: companyId?.id,
+                    company_name: selectedCompany === "Others" ? customCompanyName : selectedCompany,
+                    event_uuid: currentEvent?.uuid
+                };
+
+                const response = await axios.post(`${domain}/api/request_event_invitation`, {
+                    ...newObj
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if(response.data.status === 200) {
+                    swal({
+                        title: "Success", 
+                        text: response.data.message || "Registration Successfull",
+                        icon: "success",
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: response.data.message || "Something went wrong with registration",
+                        icon: "error",
+                    });
+                }
+                closeModal();
+            } catch (error) {
+                swal({
+                    title: "Error",
+                    text: "An error occurred during registration",
+                    icon: "error",
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && isModalOpen) {
+                closeModal();
+            }
+        };
+
+        document.addEventListener('keydown', handleEscapeKey);
+
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [isModalOpen]);
 
     if (isLoading) {
         return <div className='w-full h-screen flex justify-center items-center'>
@@ -202,10 +370,10 @@ const ExploreViewEvent: React.FC = () => {
                 <Navbar />
             </div>
 
-            <div className='max-w-screen-lg flex gap-7 mx-auto mt-20 space-y-4'>
+            <div className='max-w-screen-lg flex flex-col-reverse md:flex-row p-5 gap-7 justify-center !mx-auto mt-20 space-y-4'>
                 {/* Left Div */}
                 <div className='space-y-4'>
-                    <span className='text-gray-700 text-sm'>By {user?.company_name}</span>
+                    <span className='text-gray-700 text-sm'>By {currentEvent?.company_name}</span>
 
                     <h1 className='text-2xl font-semibold !mt-0'>{currentEvent?.title}</h1>
 
@@ -255,7 +423,121 @@ const ExploreViewEvent: React.FC = () => {
 
                             <div className='p-[10px]'>
                                 <p className='text-sm'>Welcome! Register below to request event access.</p>
-                                <button className='w-full mt-[10px] p-3 bg-brand-primary rounded-lg text-white'>Get an Invite</button>
+                                {/* <button className="btn" onClick={openModal}>open modal</button> */}
+                                <button className='w-full mt-[10px] p-3 bg-brand-primary rounded-lg text-white' onClick={openModal}>Get an Invite</button>
+                                <dialog ref={modalRef} className="modal">
+                                    <div className="modal-box bg-brand-lightBlue">
+                                        <div className=''>
+
+                                            <h1 className='text-2xl font-semibold text-center'>Registration For Event</h1>
+
+                                            <form onSubmit={handleSubmit} className='my-10 space-y-5 overflow-y-scroll max-h-96 hide-scrollbar overflow-hidden'>
+                                                {/* User Name */}
+                                                <div className='flex gap-5 flex-col sm:flex-row w-full'>
+                                                    {/* First Name */}
+                                                    <div className='flex flex-col w-full'>
+                                                        <span className='text-sm'>First Name</span>
+                                                        <input
+                                                            type="text"
+                                                            name='first_name'
+                                                            value={userDetails.first_name}
+                                                            onChange={handleChange}
+                                                            className={`rounded-lg bg-white px-3 py-1 w-full focus:outline-none ${formErrors.first_name ? 'border-red-500' : ''}`}
+                                                        />
+                                                        {formErrors.first_name && <span className="text-red-500 text-xs">{formErrors.first_name}</span>}
+                                                    </div>
+
+                                                    {/* Last Name */}
+                                                    <div className='flex flex-col w-full'>
+                                                        <span className='text-sm'>Last Name</span>
+                                                        <input
+                                                            type="text"
+                                                            name='last_name'
+                                                            value={userDetails.last_name}
+                                                            onChange={handleChange}
+                                                            className={`rounded-lg bg-white px-3 py-1 w-full focus:outline-none ${formErrors.last_name ? 'border-red-500' : ''}`}
+                                                        />
+                                                        {formErrors.last_name && <span className="text-red-500 text-xs">{formErrors.last_name}</span>}
+                                                    </div>
+                                                </div>
+
+                                                {/* Email */}
+                                                <div className='flex gap-5 flex-col sm:flex-row w-full'>
+                                                    <div className='flex flex-col w-full'>
+                                                        <span className='text-sm'>Email</span>
+                                                        <input
+                                                            type="email"
+                                                            name='email_id'
+                                                            value={userDetails.email_id}
+                                                            onChange={handleChange}
+                                                            className={`rounded-lg bg-white px-3 py-1 w-full focus:outline-none ${formErrors.email_id ? 'border-red-500' : ''}`}
+                                                        />
+                                                        {formErrors.email_id && <span className="text-red-500 text-xs">{formErrors.email_id}</span>}
+                                                    </div>
+
+                                                    {/* Phone No. */}
+                                                    <div className='flex flex-col w-full'>
+                                                        <span className='text-sm'>Phone No.</span>
+                                                        <input
+                                                            type="tel"
+                                                            name='phone_number'
+                                                            value={userDetails.phone_number}
+                                                            onChange={handleChange}
+                                                            className={`rounded-lg bg-white px-3 py-1 w-full focus:outline-none ${formErrors.phone_number ? 'border-red-500' : ''}`}
+                                                        />
+                                                        {formErrors.phone_number && <span className="text-red-500 text-xs">{formErrors.phone_number}</span>}
+                                                    </div>
+                                                </div>
+
+                                                {/* Company Name */}
+                                                <div className='flex gap-5 flex-col sm:flex-row w-full'>
+                                                    <div className='flex flex-col w-full'>
+                                                        <span className='text-sm'>Company Name</span>
+                                                        <select
+                                                            name="company_name"
+                                                            value={selectedCompany}
+                                                            onChange={handleChange}
+                                                            id="company_name"
+                                                            className={`bg-white px-3 py-1 w-full focus:outline-none rounded-lg ${formErrors.company_name ? 'border-red-500' : ''}`}
+                                                        >
+                                                            <option value="">Select Company</option>
+                                                            {companies?.map((company) => (
+                                                                <option key={company.id} value={company.name}>{company.name}</option>
+                                                            ))}
+                                                            <option value="Others">Others</option>
+                                                        </select>
+                                                        {formErrors.company_name && <span className="text-red-500 text-xs">{formErrors.company_name}</span>}
+                                                    </div>
+
+                                                    {/* Custom Company Name */}
+                                                    {selectedCompany === "Others" && (
+                                                        <div className='flex flex-col w-full'>
+                                                            <span className='text-sm'>Specify Company Name</span>
+                                                            <input
+                                                                type="text"
+                                                                name='custom_company_name'
+                                                                value={customCompanyName}
+                                                                onChange={handleChange}
+                                                                className={`rounded-lg bg-white px-3 py-1 w-full focus:outline-none ${formErrors.custom_company_name ? 'border-red-500' : ''}`}
+                                                            />
+                                                            {formErrors.custom_company_name && <span className="text-red-500 text-xs">{formErrors.custom_company_name}</span>}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <button
+                                                    type="submit"
+                                                    className='w-full py-1 bg-brand-primary text-white rounded-lg'
+                                                >
+                                                    Register
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <form method="dialog" className="modal-backdrop" onClick={closeModal}>
+                                        <button>close</button>
+                                    </form>
+                                </dialog>
                             </div>
                         </div>
                     </div>
@@ -333,15 +615,15 @@ const ExploreViewEvent: React.FC = () => {
                 </div>
 
                 {/* Right Div */}
-                <div className='max-w-[300px]'>
-                    <img src={apiBaseUrl + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-full' />
+                <div className='max-w-full mx-auto md:max-w-[300px]'>
+                    <img src={apiBaseUrl + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-60 mx-auto md:w-full' />
 
-                    <div className='mt-[5.8rem]'>
+                    <div className='mt-10 md:mt-[5.8rem]'>
                         <h3 className='font-semibold text-lg'>Location</h3>
                         <hr className='border-t-2 border-white !my-[10px]' />
                         <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
                             {currentEvent?.event_venue_address_2}</p>
-                        <div className='rounded-lg mt-[10px] w-[300px] h-[300px]'>
+                        <div className='rounded-lg mt-[10px] md:w-[300px] md:h-[300px]'>
                             <GoogleMapComponent center={center} zoom={20} />
                         </div>
                     </div>

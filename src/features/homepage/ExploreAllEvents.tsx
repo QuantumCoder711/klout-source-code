@@ -82,7 +82,7 @@ const ExploreAllEvents: React.FC = () => {
       </div>
 
       {/* All events div */}
-      <div className='max-w-screen-lg mx-auto mt-24'>
+      <div className='max-w-screen-lg mx-auto mt-24 p-5'>
         <div className='space-y-5'>
           <h1 className='text-2xl font-semibold leading-none'>All Events</h1>
           <p className='leading-none'>Explore popular events near you, browse by category, or check out some of the great community calendars.</p>
@@ -116,12 +116,11 @@ const ExploreAllEvents: React.FC = () => {
               <FaChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
-          <div className='grid grid-cols-2 gap-5'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
             {selectedType === "upcoming" ? filterEventsByCity(allEvents).map((event, index) => (
-              <Link to={`/explore-events/${event.uuid}`} key={index}>
+              <Link to={`/explore-events/${event.slug}`} key={index}>
                 <div className='flex gap-3 max-h-24'>
                   <img src={apiBaseUrl + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
-
                   <div className='space-y-2 overflow-hidden'>
                     <p className='text-sm text-brand-gray !leading-none truncate'>by {event?.company_name}</p>
                     <h1 className='text-xl font-semibold leading-none truncate'>{event.title}</h1>
@@ -139,7 +138,7 @@ const ExploreAllEvents: React.FC = () => {
                 </div>
               </Link>
             )) : filterEventsByCity(pastEvents).map((event, index) => (
-              <Link to={`/explore-events/${event.uuid}`} key={index}>
+              <Link to={`/explore-events/${event.slug}`} key={index}>
                 <div className='flex gap-3 max-h-24'>
                   <img src={apiBaseUrl + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
 

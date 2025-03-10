@@ -80,7 +80,7 @@ const App: React.FC = () => {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/" element={<EventsHome />} />
         <Route path="/add-first-event" element={<AddEvent />} />
-        <Route path="/explore-events/:uuid" element={<ExploreViewEvent />} />
+        <Route path="/explore-events/:slug" element={<ExploreViewEvent />} />
         <Route path="/explore-events" element={<ExploreAllEvents />} />
 
         {/* All other routes wrapped in Layout */}
