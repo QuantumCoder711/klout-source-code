@@ -36,6 +36,8 @@ const ExploreAllEvents: React.FC = () => {
           const eventDate = new Date(event.event_start_date);
           eventDate.setHours(0, 0, 0, 0);
           return eventDate < today;
+        }).sort((a: any, b: any) => {
+          return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
         });
 
         // Extract unique cities from events

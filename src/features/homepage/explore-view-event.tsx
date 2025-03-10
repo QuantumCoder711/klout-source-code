@@ -10,6 +10,49 @@ import GoogleMapComponent from './GoogleMapComponent';
 import Loader from '../../component/Loader';
 import { domain } from './constants';
 
+type EventType = {
+    id: number;
+    uuid: string;
+    user_id: number;
+    company_name: string;
+    title: string;
+    description: string;
+    event_date: string;
+    location: string;
+    start_time: string;
+    start_time_type: string;
+    end_time: string;
+    end_time_type: string;
+    image: string;
+    event_venue_name: string;
+    event_venue_address_1: string;
+    event_venue_address_2: string;
+    city: string;
+    state: string;
+    country: string;
+    pincode: string;
+    created_at: string;
+    updated_at: string;
+    status: number;
+    end_minute_time: string;
+    start_minute_time: string;
+    qr_code: string;
+    start_time_format: string;
+    feedback: number;
+    event_start_date: string;
+    event_end_date: string;
+    why_attend_info: string | null;
+    more_information: string | null;
+    t_and_conditions: string | null;
+    slug: string;
+    google_map_link: string;
+    total_attendee: number;
+    total_accepted: number;
+    total_not_accepted: number;
+    total_rejected: number;
+}
+
+
 type attendeeType = {
     uuid: string;
     title: string;
@@ -73,7 +116,7 @@ const ExploreViewEvent: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [isLoading, setIsLoading] = useState(false);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-    const [currentEvent, setCurrentEvent] = useState<any>(null);
+    const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
     const startTime = currentEvent?.event_date || "";
     const [agendaData, setAgendaData] = useState<AgendaType[]>([]);
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
@@ -201,7 +244,6 @@ const ExploreViewEvent: React.FC = () => {
                                 if (coordsMatch) {
                                     const lat = parseFloat(coordsMatch[1]);
                                     const lng = parseFloat(coordsMatch[2]);
-                                    console.log(lat, lng);
                                     return { lat, lng };
                                 }
                             }
@@ -268,7 +310,6 @@ const ExploreViewEvent: React.FC = () => {
                 if (coordsMatch) {
                     const lat = parseFloat(coordsMatch[1]);
                     const lng = parseFloat(coordsMatch[2]);
-                    console.log(lat, lng);
                     return { lat, lng };
                 }
             }
@@ -405,11 +446,16 @@ const ExploreViewEvent: React.FC = () => {
 
                     {/* Row for Registration */}
                     <div className='border border-white rounded-[10px]'>
-                        <p className='text-sm p-[10px]'>Registration</p>
+                        <p className='text-sm p-[10px]'>
+                            {new Date(currentEvent?.event_date || '') < new Date() ? 
+                                'Registration Closed' : 
+                                'Registration'
+                            }
+                        </p>
 
-                        <div className='bg-white'>
+                        <div className={`rounded-b-[10px] bg-white ${new Date(currentEvent?.event_date || '') < new Date() ? 'opacity-50' : ''}`}>
 
-                            <div className='flex gap-2 p-[10px] border-b'>
+                            <div className={`flex gap-2 p-[10px] border-b ${new Date(currentEvent?.event_date || '') < new Date() ? 'blur-[2px]' : ''}`}>
                                 <div className='rounded-md grid place-content-center size-10 bg-white'>
                                     {/* < size={30} className='text-brand-gray' /> */}
                                     <img src={Invite} alt="Invite" />
@@ -421,10 +467,16 @@ const ExploreViewEvent: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className='p-[10px]'>
+                            <div className={`p-[10px] ${new Date(currentEvent?.event_date || '') < new Date() ? 'blur-[2px]' : ''}`}>
                                 <p className='text-sm'>Welcome! Register below to request event access.</p>
                                 {/* <button className="btn" onClick={openModal}>open modal</button> */}
-                                <button className='w-full mt-[10px] p-3 bg-brand-primary rounded-lg text-white' onClick={openModal}>Get an Invite</button>
+                                <button 
+                                    className='w-full mt-[10px] p-3 bg-brand-primary rounded-lg text-white'
+                                    onClick={openModal}
+                                    disabled={new Date(currentEvent?.event_date || '') < new Date()}
+                                >
+                                    Get an Invite
+                                </button>
                                 <dialog ref={modalRef} className="modal">
                                     <div className="modal-box bg-brand-lightBlue">
                                         <div className=''>

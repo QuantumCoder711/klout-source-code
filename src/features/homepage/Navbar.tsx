@@ -8,7 +8,6 @@ import { navLinks } from './constants';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import dummyImage from "/dummyImage.jpg";
-import { TiArrowRight } from 'react-icons/ti';
 import { GoArrowUpRight } from 'react-icons/go';
 
 const Navbar: React.FC = () => {
