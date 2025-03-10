@@ -10,6 +10,7 @@ import HeadingH2 from '../../../component/HeadingH2';
 import { Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
 import Swal from 'sweetalert2';
+import { Helmet } from 'react-helmet-async';
 
 type LoginFormInputs = {
     email: string;
@@ -55,6 +56,12 @@ const Login: React.FC = () => {
 
     return (
         <div className="flex h-screen">
+
+            <Helmet>
+                <meta name="title" content="Log in to Klout Club | Manage & Host Business Events in India" />
+                <meta name="description" content="Access your Klout Club organizer dashboard to create, manage, and track corporate events in India. Log in now to streamline event check-ins, networking, and attendee insights." />
+            </Helmet>
+
             {/* Left side with image */}
             <div className="relative w-2/3 bg-cover flex justify-center items-center" style={{ backgroundImage: `url(${signinBanner})` }}>
                 {/* Overlay */}

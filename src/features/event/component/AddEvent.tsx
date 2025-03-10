@@ -15,6 +15,7 @@ import Bg3 from "/bg3.jpg";
 import Bg4 from "/bg4.jpg";
 import GoogleMapComponent from '../../homepage/GoogleMapComponent';
 import { options } from '../../homepage/constants';
+import { Helmet } from 'react-helmet-async';
 
 // type formInputType = {
 //     title: string,
@@ -384,6 +385,10 @@ const AddEvent: React.FC = () => {
     return (
 
         <div className='p-6 pt-3'>
+            <Helmet>
+                <meta name="title" content="Add Your Event | Effortless Event Setup With Klout Club" />
+                <meta name="description" content="Easily add and customize your event with Klout Club. Set up event details, venue, and location - all in one place. Get started today!" />
+            </Helmet>
             {/* <h2 className='text-black text-2xl font-semibold ps-5'>Add Details to create new event</h2> */}
             {/* <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
             <form onSubmit={handleSubmit(onSubmit)} className="gap-4">

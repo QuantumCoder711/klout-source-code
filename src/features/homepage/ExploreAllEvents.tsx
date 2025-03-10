@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Loader from '../../component/Loader';
 import { FaChevronDown } from "react-icons/fa6";
+import { Helmet } from 'react-helmet-async';
 
 const ExploreAllEvents: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -77,6 +78,10 @@ const ExploreAllEvents: React.FC = () => {
 
   return (
     <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
+      <Helmet>
+        <meta name="title" content="Discover & Attend Top Business Events in India | Klout Club" />
+        <meta name="description" content="Explore exclusive corporate events, business summits, networking meetups, and industry conferences in India with Klout Club. Find top business summits, connect with professionals, and enhance your event experience." />
+      </Helmet>
       <div className='!text-black w-full z-30 fixed top-0 left-0'>
         <Navbar />
       </div>

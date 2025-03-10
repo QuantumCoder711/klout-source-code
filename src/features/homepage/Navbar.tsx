@@ -8,6 +8,8 @@ import { navLinks } from './constants';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import dummyImage from "/dummyImage.jpg";
+import { TiArrowRight } from 'react-icons/ti';
+import { GoArrowUpRight } from 'react-icons/go';
 
 const Navbar: React.FC = () => {
     const [active, setActive] = useState<boolean>(false);
@@ -46,7 +48,12 @@ const Navbar: React.FC = () => {
                                         />
                                         {user.first_name + " " + user.last_name}
                                     </span>
-                                    : link.name}
+                                    : (
+                                        <span className='flex items-center gap-1'>
+                                            {link.name}
+                                            {link.to === "/explore-events" && <GoArrowUpRight className='mt-1' size={20} />}
+                                        </span>
+                                    )}
                             </li>
                         </Link>
                     ))}
@@ -63,7 +70,7 @@ const Navbar: React.FC = () => {
                 <div className='mt-10 space-y-5'>
                     {navLinks.map((link) => (
                         <Link onClick={() => setActive(false)} key={link.to} to={link.to} className='block'>
-                            {link.name === 'login' && user !== null ?
+                            {link.name === 'login' && user !== null ? (
                                 <span className='flex gap-2 items-center text-sm'>
                                     <img
                                         src={
@@ -73,7 +80,12 @@ const Navbar: React.FC = () => {
                                     />
                                     {user.first_name + " " + user.last_name}
                                 </span>
-                                : link.name}
+                            ) : (
+                                <span className='flex items-center gap-1'>
+                                    {link.name}
+                                    {link.to === "/explore-events" && <GoArrowUpRight className='mt-1' size={20} />}
+                                </span>
+                            )}
                         </Link>
                     ))}
                 </div>

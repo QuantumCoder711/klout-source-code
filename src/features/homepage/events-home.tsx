@@ -36,7 +36,6 @@ const Events: React.FC = () => {
       style={{ background: `url(${EventsBg})` }}
     >
       <Helmet>
-        {/* <title>Home - My Website</title> */}
         <meta name="title" content="Klout Club | AI-Powered Event Management for Seamless Experiences" />
         <meta name="description" content="Host smarter events with Klout Club. Experience seamless QR check-ins, real-time updates, and AI-driven insights. Power your event with smarter technology!" />
       </Helmet>

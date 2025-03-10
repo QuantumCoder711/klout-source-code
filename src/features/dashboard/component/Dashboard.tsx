@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { MdAdd } from "react-icons/md";
 import { heading } from '../../heading/headingSlice';
 import Loader from '../../../component/Loader';
+import { Helmet } from 'react-helmet-async';
 
 const Dashboard: React.FC = () => {
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
@@ -65,6 +66,10 @@ const Dashboard: React.FC = () => {
     <>
       {/* Heading */}
       <div className="flex justify-end items-end">
+        <Helmet>
+          <meta name="title" content="Klout Club Dashboard - Manage & Track Your Business Events" />
+          <meta name="description" content="Access your Klout Club event organizer dashboard to create, manage, and Analyze you events in India. Track attendee insights, Enable QR check-ins, AI Facial Photos and AI Session reports." />
+        </Helmet>
         <Link to='/events/add-event' onClick={handleHeading} className="btn btn-secondary text-white btn-sm"><MdAdd /> Create New Event</Link>
       </div>
 
