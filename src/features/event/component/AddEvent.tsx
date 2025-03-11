@@ -386,6 +386,7 @@ const AddEvent: React.FC = () => {
 
         <div className='p-6 pt-3'>
             <Helmet>
+                <title>Add Your Event | Effortless Event Setup With Klout Club</title>
                 <meta name="title" content="Add Your Event | Effortless Event Setup With Klout Club" />
                 <meta name="description" content="Easily add and customize your event with Klout Club. Set up event details, venue, and location - all in one place. Get started today!" />
             </Helmet>

@@ -8,17 +8,20 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import Loader from '../../component/Loader';
 import { FaChevronDown } from "react-icons/fa6";
 import { Helmet } from 'react-helmet-async';
-
+import Footer from './Footer';
 const ExploreAllEvents: React.FC = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const {city} = useParams<{city: string}>();
+  const { city } = useParams<{ city: string }>();
   const navigate = useNavigate();
   const [allEvents, setAllEvents] = useState<any[]>([]);
   const [pastEvents, setPastEvents] = useState<any[]>([]);
   const [selectedType, setSelectedType] = useState<string>("upcoming");
-  const [selectedCity, setSelectedCity] = useState<string>(city?.toLowerCase() || "all");
+  const [selectedCity, setSelectedCity] = useState<string>(city?.toLowerCase().replace(/ /g, '-') || "all");
   const [cities, setCities] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [upcomingCurrentPage, setUpcomingCurrentPage] = useState(1);
+  const [pastCurrentPage, setPastCurrentPage] = useState(1);
+  const eventsPerPage = 10;
 
   useEffect(() => {
     setIsLoading(true);
@@ -60,19 +63,52 @@ const ExploreAllEvents: React.FC = () => {
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
+    // Reset appropriate page counter based on selected type
+    if (event.target.value === "upcoming") {
+      setUpcomingCurrentPage(1);
+    } else {
+      setPastCurrentPage(1);
+    }
   };
 
   const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newCity = event.target.value;
     setSelectedCity(newCity);
-    navigate(`/explore-events/${newCity}`);
+    setUpcomingCurrentPage(1);
+    setPastCurrentPage(1);
+    navigate(`/explore-events/${newCity.replace(/ /g, '-')}`);
   };
 
   const filterEventsByCity = (events: any[]) => {
     if (selectedCity === "all") return events;
     return events.filter(event => {
-      return event.city.toLowerCase() === selectedCity;
+      return event.city.toLowerCase() === selectedCity.replace(/-/g, ' ');
     });
+  };
+
+  // Get current events for pagination
+  const getCurrentEvents = () => {
+    const filteredEvents = filterEventsByCity(selectedType === "upcoming" ? allEvents : pastEvents);
+    const currentPage = selectedType === "upcoming" ? upcomingCurrentPage : pastCurrentPage;
+    const indexOfLastEvent = currentPage * eventsPerPage;
+    const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+    return filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
+  };
+
+  const totalPages = Math.ceil(
+    filterEventsByCity(selectedType === "upcoming" ? allEvents : pastEvents).length / eventsPerPage
+  );
+
+  const handlePageChange = (pageNum: number) => {
+    if (selectedType === "upcoming") {
+      setUpcomingCurrentPage(pageNum);
+    } else {
+      setPastCurrentPage(pageNum);
+    }
+  };
+
+  const getCurrentPage = () => {
+    return selectedType === "upcoming" ? upcomingCurrentPage : pastCurrentPage;
   };
 
   if (isLoading) {
@@ -84,6 +120,7 @@ const ExploreAllEvents: React.FC = () => {
   return (
     <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
       <Helmet>
+        <title>Discover & Attend Top Business Events in India | Klout Club</title>
         <meta name="title" content="Discover & Attend Top Business Events in India | Klout Club" />
         <meta name="description" content="Explore exclusive corporate events, business summits, networking meetups, and industry conferences in India with Klout Club. Find top business summits, connect with professionals, and enhance your event experience." />
       </Helmet>
@@ -115,7 +152,7 @@ const ExploreAllEvents: React.FC = () => {
             <div className="relative">
               <select
                 className="px-4 py-2 pr-10 border capitalize border-gray-300 max-w-40 w-full rounded-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-primary appearance-none"
-                value={selectedCity}
+                value={selectedCity.replace(/-/g, ' ')}
                 onChange={handleCityChange}
               >
                 <option value="all">All Cities</option>
@@ -127,7 +164,7 @@ const ExploreAllEvents: React.FC = () => {
             </div>
           </div>
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
-            {selectedType === "upcoming" ? filterEventsByCity(allEvents).map((event, index) => (
+            {getCurrentEvents().map((event, index) => (
               <Link to={`/explore-events/event/${event.slug}`} key={index}>
                 <div className='flex gap-3 max-h-24'>
                   <img src={apiBaseUrl + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
@@ -147,30 +184,41 @@ const ExploreAllEvents: React.FC = () => {
                   </div>
                 </div>
               </Link>
-            )) : filterEventsByCity(pastEvents).map((event, index) => (
-              <Link to={`/explore-events/${event.slug}`} key={index}>
-                <div className='flex gap-3 max-h-24'>
-                  <img src={apiBaseUrl + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
-
-                  <div className='space-y-2 overflow-hidden'>
-                    <p className='text-sm text-brand-gray !leading-none truncate'>by {event?.company_name}</p>
-                    <h1 className='text-xl font-semibold leading-none truncate'>{event.title}</h1>
-                    <div className='flex gap-2 items-center'>
-                      <img src={Calender} alt="calendar" className='w-4 h-4 flex-shrink-0' />
-                      <p className='text-sm font-light text-brand-gray !leading-none truncate'>
-                        {convertDateFormat(event.event_start_date)} | {event.start_time}:{event.start_minute_time} {event.start_time_type} - {event.end_time}:{event.end_minute_time} {event.end_time_type}
-                      </p>
-                    </div>
-                    <div className='flex gap-2 items-center'>
-                      <IoLocationSharp className='w-4 h-4 text-brand-gray flex-shrink-0' />
-                      <p className='text-sm font-light text-brand-gray !leading-none truncate'>{event.event_venue_name}</p>
-                    </div>
-                  </div>
-                </div>
-              </Link>
             ))}
           </div>
+
+          {/* Pagination */}
+          <div className="flex justify-center gap-2 my-10">
+            <button
+              onClick={() => handlePageChange(getCurrentPage() - 1)}
+              disabled={getCurrentPage() === 1}
+              className={`px-4 py-2 rounded-md ${getCurrentPage() === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-brand-primary text-white hover:bg-brand-primary/90'}`}
+            >
+              Previous
+            </button>
+            <div className="flex items-center gap-2">
+              {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map(pageNum => (
+                <button
+                  key={pageNum}
+                  onClick={() => handlePageChange(pageNum)}
+                  className={`w-8 h-8 rounded text-sm ${getCurrentPage() === pageNum ? 'bg-brand-primary text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  {pageNum}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => handlePageChange(getCurrentPage() + 1)}
+              disabled={getCurrentPage() === totalPages}
+              className={`px-4 py-2 rounded-md ${getCurrentPage() === totalPages ? 'bg-gray-200 cursor-not-allowed' : 'bg-brand-primary text-white hover:bg-brand-primary/90'}`}
+            >
+              Next
+            </button>
+          </div>
         </div>
+      </div>
+      <div className='p-5'>
+        <Footer />
       </div>
     </div>
   );

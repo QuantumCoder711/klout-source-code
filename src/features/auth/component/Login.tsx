@@ -58,6 +58,7 @@ const Login: React.FC = () => {
         <div className="flex h-screen">
 
             <Helmet>
+                <title>Log in to Klout Club | Manage & Host Business Events in India</title>
                 <meta name="title" content="Log in to Klout Club | Manage & Host Business Events in India" />
                 <meta name="description" content="Access your Klout Club organizer dashboard to create, manage, and track corporate events in India. Log in now to streamline event check-ins, networking, and attendee insights." />
             </Helmet>

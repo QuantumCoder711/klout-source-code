@@ -13,7 +13,7 @@ const Footer: React.FC = () => {
     return (
         <footer className='w-full mt-10 flex justify-between flex-col gap-4 md:flex-row items-center'>
             <Link to={"/home"}>
-                <img src={WhiteLogo} alt="Klout Club" width={96} height={96} />
+                <img src={WhiteLogo} alt="Klout Club" width={96} height={96} className={`${window.location.pathname.includes("/explore-events") ? 'invert' : ''}`}/>
             </Link>
 
             <div className='text-xs lg:text-sm font-light'>

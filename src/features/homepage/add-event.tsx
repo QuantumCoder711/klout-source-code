@@ -439,6 +439,7 @@ const AddEvent: React.FC = () => {
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
             <Helmet>
+                <title>Add Your Event | Effortless Event Setup With Klout Club</title>
                 <meta name="title" content="Add Your Event | Effortless Event Setup With Klout Club" />
                 <meta name="description" content="Easily add and customize your event with Klout Club. Set up event details, venue, and location - all in one place. Get started today!" />
             </Helmet>

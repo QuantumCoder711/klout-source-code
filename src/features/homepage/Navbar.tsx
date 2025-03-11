@@ -29,9 +29,9 @@ const Navbar: React.FC = () => {
     return (
         <header className={`fixed p-5 left-0 top-0 z-50 w-full ${isDarkBackground ? 'text-black' : 'text-white'} ${location.pathname !== '/' ? 'bg-white/20' : ''} backdrop-blur-sm`}>
             <nav className={`flex justify-between items-center ${isDarkBackground ? 'bg-transparent' : 'bg-transparent'}`}>
-                <Link to={"/"}>
+                <a href="https://www.klout.club">
                     <img src={!isDarkBackground ? Logo : DarkLogo} alt="Klout Club" className='w-32' />
-                </Link>
+                </a>
 
                 <ul className='hidden md:flex gap-5 items-center'>
                     {navLinks.map((link) => (

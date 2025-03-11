@@ -67,6 +67,7 @@ const Dashboard: React.FC = () => {
       {/* Heading */}
       <div className="flex justify-end items-end">
         <Helmet>
+          <title>Klout Club Dashboard - Manage & Track Your Business Events</title>
           <meta name="title" content="Klout Club Dashboard - Manage & Track Your Business Events" />
           <meta name="description" content="Access your Klout Club event organizer dashboard to create, manage, and Analyze you events in India. Track attendee insights, Enable QR check-ins, AI Facial Photos and AI Session reports." />
         </Helmet>

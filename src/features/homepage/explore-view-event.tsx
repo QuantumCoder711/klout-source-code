@@ -9,6 +9,8 @@ import axios from 'axios';
 import GoogleMapComponent from './GoogleMapComponent';
 import Loader from '../../component/Loader';
 import { domain } from './constants';
+import { apiKey } from './constants';
+import Footer from './Footer';
 
 type EventType = {
     id: number;
@@ -223,6 +225,28 @@ const ExploreViewEvent: React.FC = () => {
         }
     }, [slug]);
 
+    // Extract coordinates from Google Maps link
+    const extractCoordinates = async (address: string | undefined) => {
+        if (!address) return;
+
+        try {
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
+            );
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                const { lat, lng } = data.results[0].geometry.location;
+                return { lat, lng };
+            }
+
+            return;
+        } catch (error) {
+            console.error('Error getting coordinates:', error);
+            return;
+        }
+    };
+
     useEffect(() => {
         if (currentEvent) {
             axios.get(`${apiBaseUrl}/api/all-agendas/${currentEvent.id}`)
@@ -232,32 +256,19 @@ const ExploreViewEvent: React.FC = () => {
                         const sortedData = res.data.data.sort((a: AgendaType, b: AgendaType) => a.position - b.position);
                         setAgendaData(sortedData);
 
-                        // Extract coordinates from Google Maps link
-                        const extractCoordinates = (url: string | undefined) => {
-                            if (!url) return;
-                            const regex = /https:\/\/maps\.app\.goo\.gl\/([a-zA-Z0-9]+)/;
-                            const match = url.match(regex);
-                            if (match) {
-                                const encodedUrl = decodeURIComponent(match[1]);
-                                const coordsRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
-                                const coordsMatch = encodedUrl.match(coordsRegex);
-                                if (coordsMatch) {
-                                    const lat = parseFloat(coordsMatch[1]);
-                                    const lng = parseFloat(coordsMatch[2]);
-                                    return { lat, lng };
-                                }
+                        extractCoordinates(currentEvent?.event_venue_address_1).then((coords) => {
+                            if (coords) {
+                                setCenter(coords);
                             }
-                            return;
-                        };
-
-                        const coords = extractCoordinates(currentEvent?.google_map_link);
-                        if (coords) {
-                            setCenter(coords);
-                        }
+                        })
                     }
                 })
         }
     }, [currentEvent]);
+
+    useEffect(() => {
+        console.log("The center is: ", center);
+    }, [center]);
 
     // Handle Input Changes
     const handleChange = (e: any) => {
@@ -359,9 +370,9 @@ const ExploreViewEvent: React.FC = () => {
                     }
                 });
 
-                if(response.data.status === 200) {
+                if (response.data.status === 200) {
                     swal({
-                        title: "Success", 
+                        title: "Success",
                         text: response.data.message || "Registration Successfull",
                         icon: "success",
                     });
@@ -447,8 +458,8 @@ const ExploreViewEvent: React.FC = () => {
                     {/* Row for Registration */}
                     <div className='border border-white rounded-[10px]'>
                         <p className='text-sm p-[10px]'>
-                            {new Date(currentEvent?.event_date || '') < new Date() ? 
-                                'Registration Closed' : 
+                            {new Date(currentEvent?.event_date || '') < new Date() ?
+                                'Registration Closed' :
                                 'Registration'
                             }
                         </p>
@@ -470,7 +481,7 @@ const ExploreViewEvent: React.FC = () => {
                             <div className={`p-[10px] ${new Date(currentEvent?.event_date || '') < new Date() ? 'blur-[2px]' : ''}`}>
                                 <p className='text-sm'>Welcome! Register below to request event access.</p>
                                 {/* <button className="btn" onClick={openModal}>open modal</button> */}
-                                <button 
+                                <button
                                     className='w-full mt-[10px] p-3 bg-brand-primary rounded-lg text-white'
                                     onClick={openModal}
                                     disabled={new Date(currentEvent?.event_date || '') < new Date()}
@@ -617,7 +628,7 @@ const ExploreViewEvent: React.FC = () => {
                             {/* All Rows Wrapper */}
                             <div>
                                 {/* Single Row */}
-                                {agendaData.map((agenda) => (
+                                {agendaData.length > 0 ? agendaData.map((agenda) => (
                                     <div key={agenda.id} className='!my-4'>
                                         <h5 className='font-semibold'>{agenda?.start_time}:{agenda?.start_minute_time}  {agenda?.start_time_type} - {agenda?.end_time}:{agenda?.end_minute_time} {agenda?.end_time_type}</h5>
                                         <p className='font-light'>{agenda.description}</p>
@@ -638,7 +649,7 @@ const ExploreViewEvent: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
-                                ))}
+                                )) : <p className='text-brand-gray mb-10'>No agenda available</p>}
                             </div>
                         </div>
 
@@ -654,14 +665,14 @@ const ExploreViewEvent: React.FC = () => {
                         <div className='grid grid-cols-4 gap-5 justify-between'>
 
                             {/* Single Speaker Deatils */}
-                            {allSpeakers.map((speaker, index) => (
+                            {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
                                 <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
                                     <img src={apiBaseUrl + "/" + speaker.image} alt="Speaker" className='rounded-full mx-auto size-24' />
                                     <p className='font-semibold overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.first_name + ' ' + speaker.last_name}</p>
                                     <p className='overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.job_title}</p>
                                     <p className='text-sm font-light overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.company_name}</p>
                                 </div>
-                            ))}
+                            )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
                         </div>
                     </div>
                 </div>
@@ -675,11 +686,15 @@ const ExploreViewEvent: React.FC = () => {
                         <hr className='border-t-2 border-white !my-[10px]' />
                         <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
                             {currentEvent?.event_venue_address_2}</p>
-                        <div className='rounded-lg mt-[10px] md:w-[300px] md:h-[300px]'>
-                            <GoogleMapComponent center={center} zoom={20} />
+                        <div className='rounded-lg w-full h-full mt-[10px] p-2 overflow-hidden md:w-[300px] md:h-[300px]'>
+                            <GoogleMapComponent center={center} zoom={18} />
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div className='p-5'>
+                <Footer />
             </div>
         </div>
     )
