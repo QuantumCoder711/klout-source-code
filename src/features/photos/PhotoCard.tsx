@@ -20,12 +20,14 @@ const PhotoCard: React.FC<PhotoCardProps> = (props) => {
     // console.log()
 
     const dispatch = useDispatch();
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 
     return (
         <div className="card bg-base-100 shadow-xl rounded-lg">
             <figure>
                 <img
-                    src={props.image}
+                    src={apiBaseUrl + "/" + props.image}
                     alt={"image"}
                     style={{ height: '200px', width: '100%', objectFit: 'cover' }}
                 />
@@ -37,7 +39,7 @@ const PhotoCard: React.FC<PhotoCardProps> = (props) => {
                 <div className="mt-2 flex items-center gap-2 rounded-bl-lg rounded-br-lg">
 
                     {/* Whatsapp Button */}
-                    <Link to={`/all-photos/photo/${props.uuid}`} onClick={()=>{dispatch(eventUUID(props.uuid)); dispatch(heading("Photo"))}} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-sky-500 text-white text-xl grid place-content-center'>
+                    <Link to={`/all-photos/photo/${props.uuid}`} onClick={() => { dispatch(eventUUID(props.uuid)); dispatch(heading("Photo")) }} className='active:scale-90 duration-300 w-full p-2 rounded-lg bg-sky-500 text-white text-xl grid place-content-center'>
                         <MdPhotoSizeSelectActual />
                     </Link>
 
