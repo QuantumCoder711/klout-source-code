@@ -39,6 +39,8 @@ type formInputType = {
     _method: string;
     printer_count: number | null;
     event_otp: string;
+    paid_event: number;
+    event_fee: string;
     view_agenda_by: number;
 };
 
@@ -62,6 +64,8 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [eventFee , setEventFee] = useState<string>("0");
+    const [paidEvent, setPaidEvent] = useState(currentEvent?.paid_event === 1 ? 1 : 0);
     const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<formInputType>();
     const [countries, setCountries] = useState<any[]>([]);
     const [states, setStates] = useState<any[]>([]);
@@ -145,7 +149,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                 }
             }
         })
-    }, [setValue, currentEvent, printers, ]);
+    }, [setValue, currentEvent, printers,]);
 
     const generateRandomOTP = () => {
         const otp = Math.floor(Math.random() * 900000) + 100000;
@@ -172,6 +176,11 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
         return match ? match[1] : null; // Return the video ID or null if not found
     };
 
+    
+    const handleToggleEventFeeChange = (e: any) => {
+        setPaidEvent(e.target.checked ? 1 : 0); // Update state based on checkbox value
+    };
+
 
     const onSubmit: SubmitHandler<formInputType> = async (data) => {
         // Step 1: Show confirmation dialog to ask if the user wants to update
@@ -191,6 +200,8 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
             data.feedback = 1;
             data.status = 1;
             data._method = 'PUT';
+            data.event_fee = eventFee;
+            data.paid_event = paidEvent;
             data.view_agenda_by = viewAgendaBy;
 
             const formData = new FormData();
@@ -231,7 +242,7 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Navigate to the home page if user clicks "Ok"
-                            navigate('/');
+                            navigate('/dashboard');
                         }
                     });
                 } else {
@@ -275,6 +286,36 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
         <div className='p-6 pt-3'>
             {/* <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-1 gap-4"> */}
             <form onSubmit={handleSubmit(onSubmit)} className="gap-4">
+                <div className='flex gap-3'>
+                    {/* Printer Count */}
+                    <div className='flex flex-col gap-3 w-full'>
+                        <label htmlFor='paid_event' className="input cursor-pointer input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Event Type &nbsp;
+                                <TiArrowRight className='mt-1' />
+                            </span>
+                            <span className='text-sm text-gray-600'>Free</span>
+                            <input
+                                type="checkbox"
+                                checked={paidEvent === 1} // Control the checkbox based on state
+                                onChange={handleToggleEventFeeChange} // Handle the change event
+                                id="paidEvent"
+                                className="toggle toggle-md toggle-success"
+                            />
+                            <span className='text-sm text-gray-600'>Paid</span>
+                        </label>
+                    </div>
+
+                    <div className='flex flex-col gap-3 w-full'>
+                        <label htmlFor="event_fee" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 min-w-fit flex justify-between items-center">Event Fee &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <input id="event_fee" type="text" className="grow w-fit" defaultValue={currentEvent?.event_fee} {...register('event_fee', { required: false, onChange: (e) => setEventFee(e.target.value) })} />
+                        </label>
+                        {errors.event_fee && <p className="text-red-600">{errors.event_fee.message}</p>}
+                    </div>
+
+
+                </div>
                 <div className='flex flex-col gap-3 my-4'>
                     {/* Title */}
                     <label htmlFor="title" className="input input-bordered bg-white text-black flex items-center gap-2">
@@ -283,7 +324,6 @@ const EditEvent: React.FC<EditEventProps> = ({ uuid }) => {
                     </label>
                     {errors.title && <p className="text-red-600">{errors.title.message}</p>}
                 </div>
-
 
                 <div className='flex items-center gap-3'>
                     {/* Image Upload */}

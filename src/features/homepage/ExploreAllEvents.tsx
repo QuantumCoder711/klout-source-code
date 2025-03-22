@@ -170,7 +170,7 @@ const ExploreAllEvents: React.FC = () => {
                   <img src={apiBaseUrl + "/" + event.image} alt="background" className='w-24 h-24 rounded-md object-center object-cover' />
                   <div className='space-y-2 overflow-hidden'>
                     <p className='text-sm text-brand-gray !leading-none truncate'>by {event?.company_name}</p>
-                    <h1 className='text-xl font-semibold leading-none truncate'>{event.title}</h1>
+                    <h1 className='text-xl font-semibold leading-none truncate'>{event.title} {event.paid_event === 1 && <span className='badge bg-brand-primary text-brand-text font-normal badge-sm'>Paid</span>}</h1>
                     <div className='flex gap-2 items-center'>
                       <img src={Calender} alt="calendar" className='w-4 h-4 flex-shrink-0' />
                       <p className='text-sm font-light text-brand-gray !leading-none truncate'>

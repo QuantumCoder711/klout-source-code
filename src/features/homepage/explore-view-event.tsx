@@ -11,6 +11,9 @@ import Loader from '../../component/Loader';
 import { domain } from './constants';
 import { apiKey } from './constants';
 import Footer from './Footer';
+import swal from 'sweetalert';
+import Swal from 'sweetalert2';
+
 
 type EventType = {
     id: number;
@@ -52,6 +55,8 @@ type EventType = {
     total_accepted: number;
     total_not_accepted: number;
     total_rejected: number;
+    paid_event: number,
+    event_fee: string
 }
 
 
@@ -126,6 +131,13 @@ const ExploreViewEvent: React.FC = () => {
         lng: -38.523, // Default longitude
     });
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFeesPaid, setIsFeesPaid] = useState<Boolean>(false);
+    const [paymentUrl, setPaymentUrl] = useState<string>('');
+    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const [count, setCount] = useState(0);
+    const [paymentCancelled, _] = useState(false);
+    const [paymentSuccess, __] = useState(false);
+
     const modalRef = useRef<HTMLDialogElement>(null);
 
     const [formErrors, setFormErrors] = useState({
@@ -260,15 +272,11 @@ const ExploreViewEvent: React.FC = () => {
                             if (coords) {
                                 setCenter(coords);
                             }
-                        })
+                        });
                     }
-                })
+                });
         }
     }, [currentEvent]);
-
-    useEffect(() => {
-        console.log("The center is: ", center);
-    }, [center]);
 
     // Handle Input Changes
     const handleChange = (e: any) => {
@@ -335,6 +343,38 @@ const ExploreViewEvent: React.FC = () => {
         }
     }, [currentEvent]);
 
+    // Reload page if payment is cancelled
+    useEffect(() => {
+        if (paymentCancelled) {
+            window.location.reload();
+        }
+    }, [paymentCancelled]);
+
+    // Show success message and refresh page when payment is successful
+    useEffect(() => {
+        if (paymentSuccess) {
+            setPaymentUrl('');
+            swal({
+                title: "Payment Successful",
+                text: "Your payment has been processed successfully!",
+                icon: "success",
+                buttons: {
+                    confirm: {
+                        text: "OK",
+                        value: true,
+                        visible: true,
+                        className: "",
+                        closeModal: true
+                    }
+                }
+            }).then((value) => {
+                if (value) {
+                    window.location.reload();
+                }
+            });
+        }
+    }, [paymentSuccess]);
+
     const openModal = () => {
         if (modalRef.current) {
             modalRef.current.showModal();
@@ -349,49 +389,217 @@ const ExploreViewEvent: React.FC = () => {
         }
     };
 
+    // const checkPaymentStatus = () => {
+    //     const iframe = iframeRef.current;
+    //     if (iframe && iframe.contentWindow) {
+    //         try {
+    //             const url = iframe.contentWindow.location.href;
+    //             if (url.includes('cancel') || url.includes('failure')) {
+    //                 setPaymentUrl('');
+    //                 setPaymentCancelled(true);
+    //             }
+    //         } catch (error) {
+    //             // Ignore cross-origin errors
+    //             // This is expected when the iframe is on a different domain
+    //         }
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     if (paymentUrl) {
+    //         const interval = setInterval(checkPaymentStatus, 1000); // Check every second
+    //         return () => clearInterval(interval);
+    //     }
+    // }, [paymentUrl]);
+
+    const handleIframeLoad = () => {
+        try {
+            if(count !== 0){
+                closeModal();
+                setIsFeesPaid(true);
+                Swal.fire({
+                    title: 'Payment Successful',
+                    text: 'Your payment has been processed successfully!',
+                    icon: 'success',
+                    backdrop: 'rgba(0,0,0,0.8)',
+                    allowOutsideClick: false,
+                    width: '100%',
+                    heightAuto: false,
+                    customClass: {
+                        popup: 'swal2-fullscreen'
+                    }
+                }).then(() => {
+                    window.location.reload();
+                });
+            }else{
+                setCount(1);
+            }
+        } catch (error) {
+            // Silently catch any errors to prevent them from showing
+            console.log('Iframe load handled silently');
+        }
+    };
+
+    // const handleIframeLoad = () => {
+    //     try {
+    //         const iframe = iframeRef.current;
+    //         if (iframe && iframe.contentWindow) {
+    //             const url = iframe.contentWindow.location.href;
+                
+    //             // Check for success URL pattern - only exact success URLs
+    //             if (url.includes('success') && !url.includes('cancel') && !url.includes('failure')) {
+    //                 closeModal();
+    //                 setIsFeesPaid(true);
+    //                 setPaymentSuccess(true);
+    //             }
+                
+    //             // Check for cancellation or failure
+    //             if (url.includes('cancel') || url.includes('failure')) {
+    //                 setPaymentUrl('');
+    //                 setPaymentCancelled(true);
+    //             }
+    //         }
+    //     } catch (error) {
+    //         // Don't automatically assume success on errors
+    //         // Only check for very specific success indicators
+    //         if (iframeRef.current?.src.includes('success') && 
+    //             !iframeRef.current?.src.includes('cancel') && 
+    //             !iframeRef.current?.src.includes('failure')) {
+                
+    //             closeModal();
+    //             setIsFeesPaid(true);
+    //             setPaymentSuccess(true);
+    //         }
+            
+    //         // Log the error for debugging
+    //         console.error("Payment iframe error:", error);
+    //     }
+    // };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
-            try {
-                // Form is valid, proceed with submission
-                const companyId = companies?.find(company => company.name === selectedCompany);
-                const newObj = {
-                    ...userDetails,
-                    company: companyId?.id,
-                    company_name: selectedCompany === "Others" ? customCompanyName : selectedCompany,
-                    event_uuid: currentEvent?.uuid
-                };
 
-                const response = await axios.post(`${domain}/api/request_event_invitation`, {
-                    ...newObj
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json',
+            if (currentEvent?.paid_event === 1) {
+                if (isFeesPaid) {
+                    try {
+                        // Form is valid, proceed with submission
+                        const companyId = companies?.find(company => company.name === selectedCompany);
+                        const newObj = {
+                            ...userDetails,
+                            company: companyId?.id,
+                            company_name: selectedCompany === "Others" ? customCompanyName : selectedCompany,
+                            event_uuid: currentEvent?.uuid
+                        };
+
+                        const response = await axios.post(`${domain}/api/request_event_invitation`, {
+                            ...newObj
+                        }, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+
+                        if (response.data.status === 200) {
+                            swal({
+                                title: "Success",
+                                text: response.data.message || "Registration Successful",
+                                icon: "success",
+                            });
+                        } else {
+                            swal({
+                                title: "Error",
+                                text: response.data.message || "Something went wrong with registration",
+                                icon: "error",
+                            });
+                        }
+                        closeModal();
+                    } catch (error) {
+                        swal({
+                            title: "Error",
+                            text: "An error occurred during registration",
+                            icon: "error",
+                        });
+                    } finally {
+                        setIsLoading(false);
                     }
-                });
-
-                if (response.data.status === 200) {
-                    swal({
-                        title: "Success",
-                        text: response.data.message || "Registration Successfull",
-                        icon: "success",
-                    });
                 } else {
+                    try {
+                        setIsLoading(true);
+                        const response = await axios.post('https://app.klout.club/api/v1/payment/purchase-event-plan', {
+                            firstName: userDetails.first_name,
+                            email: userDetails.email_id,
+                            mobileNumber: userDetails.phone_number,
+                            amount: `${currentEvent.event_fee}.00`
+                        }, {
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.data.status) {
+                            closeModal();
+                            setPaymentUrl(response.data.redirectUrl);
+                        } else {
+                            swal({
+                                title: "Error",
+                                text: "Failed to initiate payment",
+                                icon: "error",
+                            });
+                        }
+                    } catch (error) {
+                        swal({
+                            title: "Error",
+                            text: "An error occurred while processing payment",
+                            icon: "error",
+                        });
+                    } finally {
+                        setIsLoading(false);
+                    }
+                }
+            } else {
+                try {
+                    setIsLoading(true);
+                    // Form is valid, proceed with submission
+                    const companyId = companies?.find(company => company.name === selectedCompany);
+                    const newObj = {
+                        ...userDetails,
+                        company: companyId?.id,
+                        company_name: selectedCompany === "Others" ? customCompanyName : selectedCompany,
+                        event_uuid: currentEvent?.uuid
+                    };
+
+                    const response = await axios.post(`${domain}/api/request_event_invitation`, {
+                        ...newObj
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    if (response.data.status === 200) {
+                        swal({
+                            title: "Success",
+                            text: response.data.message || "Registration Successful",
+                            icon: "success",
+                        });
+                    } else {
+                        swal({
+                            title: "Error",
+                            text: response.data.message || "Something went wrong with registration",
+                            icon: "error",
+                        });
+                    }
+                    closeModal();
+                } catch (error) {
                     swal({
                         title: "Error",
-                        text: response.data.message || "Something went wrong with registration",
+                        text: "An error occurred during registration",
                         icon: "error",
                     });
+                } finally {
+                    setIsLoading(false);
                 }
-                closeModal();
-            } catch (error) {
-                swal({
-                    title: "Error",
-                    text: "An error occurred during registration",
-                    icon: "error",
-                });
-            } finally {
-                setIsLoading(false);
             }
         }
     };
@@ -418,6 +626,18 @@ const ExploreViewEvent: React.FC = () => {
 
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
+
+            {/* Render Iframe for Payment */}
+            {paymentUrl && (
+                <iframe
+                    ref={iframeRef}
+                    src={paymentUrl}
+                    className="w-full z-[100] h-screen backdrop-blur-md fixed top-0 left-0" // Adjust as needed
+                    title="Payment"
+                    onLoad={handleIframeLoad}
+                />
+            )}
+
             <div className='!text-black w-full z-30 fixed top-0 left-0'>
                 <Navbar />
             </div>
@@ -427,7 +647,7 @@ const ExploreViewEvent: React.FC = () => {
                 <div className='space-y-4'>
                     <span className='text-gray-700 text-sm'>By {currentEvent?.company_name}</span>
 
-                    <h1 className='text-2xl font-semibold !mt-0'>{currentEvent?.title}</h1>
+                    <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <span className='badge bg-brand-primary text-brand-text font-normal badge-sm'>Paid</span>}</h1>
 
                     {/* Row for Start Date */}
                     <div className='flex gap-2'>

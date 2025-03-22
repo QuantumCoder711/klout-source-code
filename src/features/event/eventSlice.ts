@@ -51,6 +51,8 @@ type eventType = {
     total_pending_delegate: number,
     event_otp: string;
     view_agenda_by: number;
+    event_fee: number;
+    paid_event: number;
 }
 
 // type AgendaType = {

@@ -22,6 +22,7 @@ import { FaXTwitter } from 'react-icons/fa6';
 import { Link } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
 import GoogleMapComponent from './GoogleMapComponent';
+import { TiArrowRight } from 'react-icons/ti';
 
 // interface Form {
 //     title: string;
@@ -67,6 +68,8 @@ interface FormUI {
     feedback: number;
     event_otp: string;
     view_agenda_by: number;
+    event_fee: string;
+    paid_event: number;
 }
 
 const addGoogleMapsScript = () => {
@@ -88,6 +91,7 @@ const AddEvent: React.FC = () => {
         event_start_date: '',
         event_end_date: '',
         event_date: '',
+        event_fee: '',
         start_time: '', // New field
         start_minute_time: '', // New field
         start_time_type: '', // New field
@@ -98,8 +102,10 @@ const AddEvent: React.FC = () => {
         status: 1,
         event_otp: "000000",
         view_agenda_by: 0,
+        paid_event: 0
     });
     const navigate = useNavigate();
+    const [eventFee , setEventFee] = useState<string>("0");
     const [selectedStartDate, setSelectedStartDate] = useState('');
     const [selectedEndDate, setSelectedEndDate] = useState('');
     const [color, setColor] = useState<string>("#FFFFFF");
@@ -119,6 +125,20 @@ const AddEvent: React.FC = () => {
         const modal = modalRef.current;
         if (modal) {
             modal.showModal();
+        }
+    };
+
+    const handleToggleEventFeeChange = (e: any) => {
+        const isPaid = e.target.checked ? 1 : 0;
+        setPaidEvent(isPaid);
+        
+        // Reset event fee to 0 when switching to free event
+        if (isPaid === 0) {
+            setEventFee("0");
+            setErrors((prevErrors: any) => ({
+                ...prevErrors,
+                event_fee: '', // Clear any event fee errors
+            }));
         }
     };
 
@@ -161,6 +181,9 @@ const AddEvent: React.FC = () => {
     const imageRef = useRef<HTMLDivElement | null>(null);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [templateImageData, setTemplateImageData] = useState<string | undefined>(undefined);
+
+    const [paidEvent, setPaidEvent] = useState(0);
+
 
     const handleStartDateChange = (e: any) => {
         setFormData((prev) => ({
@@ -225,6 +248,23 @@ const AddEvent: React.FC = () => {
         }));
     };
 
+    // Handle event fee change with validation
+    const handleEventFeeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        
+        // Only allow numbers
+        if (!/^\d*\.?\d*$/.test(value) && value !== '') {
+            return;
+        }
+        
+        setEventFee(value);
+        
+        // Clear error when user starts typing
+        setErrors((prevErrors: any) => ({
+            ...prevErrors,
+            event_fee: '',
+        }));
+    };
 
     // Handle file input (for the banner image)
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -295,6 +335,18 @@ const AddEvent: React.FC = () => {
         if (!formData.end_minute_time) validationErrors.end_minute_time = 'End Minute is required.'; // Updated field name
         if (!formData.end_time_type) validationErrors.end_time_type = 'End Time Type is required.'; // Updated field name
         if (!locationInfo) validationErrors.locationInfo = 'Location is required.'; // Updated field name
+        
+        // Validate event fee if it's a paid event
+        if (paidEvent === 1) {
+            if (!eventFee || eventFee === '0') {
+                validationErrors.event_fee = 'Event fee is required for paid events and must be at least 1.';
+            } else {
+                const feeValue = parseFloat(eventFee);
+                if (isNaN(feeValue) || feeValue < 1) {
+                    validationErrors.event_fee = 'Event fee must be at least 1.';
+                }
+            }
+        }
 
         // If validation fails, set the errors state
         // If validation fails, set the errors state and scroll to top
@@ -340,6 +392,8 @@ const AddEvent: React.FC = () => {
             city,
             country,
             pincode,
+            event_fee: paidEvent === 1 ? eventFee : "0",
+            paid_event: paidEvent,
             google_map_link: locationInfo.url
         };
 
@@ -384,6 +438,8 @@ const AddEvent: React.FC = () => {
                     status: 1,
                     event_otp: "000000",
                     view_agenda_by: 0,
+                    event_fee: '',
+                    paid_event: 0
                 });
                 validationErrors = [];
 
@@ -450,6 +506,43 @@ const AddEvent: React.FC = () => {
             {/* All Fields Wrapper */}
             <div ref={formRef} className='justify-center w-full items-center md:items-start flex flex-col-reverse md:flex-row gap-5 p-5 absolute top-20'>
                 <div className='space-y-5 max-w-screen-sm w-full'>
+                    <div className='flex gap-3'>
+                        {/* Printer Count */}
+                        <div className='flex flex-col gap-3 w-full'>
+                            <label htmlFor='paid_event' className="input cursor-pointer input-bordered bg-white text-black flex items-center gap-2">
+                                <span className="font-semibold text-green-700 flex justify-between items-center">
+                                    Event Type &nbsp;
+                                    <TiArrowRight className='mt-1' />
+                                </span>
+                                <span className='text-sm text-gray-600'>Free</span>
+                                <input
+                                    type="checkbox"
+                                    checked={paidEvent === 1} // Control the checkbox based on state
+                                    onChange={handleToggleEventFeeChange} // Handle the change event
+                                    id="paidEvent"
+                                    className="toggle toggle-md toggle-success"
+                                />
+                                <span className='text-sm text-gray-600'>Paid</span>
+                            </label>
+                        </div>
+
+                        {paidEvent === 1 && (
+                            <div className='flex flex-col gap-3 w-full'>
+                                <label htmlFor="event_fee" className="input input-bordered bg-white text-black flex items-center gap-2">
+                                    <span className="font-semibold text-green-700 min-w-fit flex justify-between items-center">Event Fee &nbsp; <TiArrowRight className='mt-1' /> </span>
+                                    <input 
+                                        id="event_fee" 
+                                        type="text" 
+                                        className="grow w-fit" 
+                                        value={eventFee}
+                                        onChange={handleEventFeeChange}
+                                        placeholder="Minimum 1" 
+                                    />
+                                </label>
+                                {errors.event_fee && <p className="text-red-600 text-xs">{errors.event_fee}</p>}
+                            </div>
+                        )}
+                    </div>
                     {/* Event Name */}
                     <div className='flex flex-col'>
                         <span className='text-xl'>Event Name</span>
