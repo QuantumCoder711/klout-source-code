@@ -237,6 +237,8 @@ import EventsHome from "./features/homepage/events-home";
 import AddEvent from "./features/homepage/add-event";
 import ExploreViewEvent from "./features/homepage/explore-view-event";
 import ExploreAllEvents from "./features/homepage/ExploreAllEvents";
+import SearchPeople from "./features/event/component/SearchPeople";
+import NotFound from "./NotFound";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -277,6 +279,7 @@ const App: React.FC = () => {
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/events" element={<EventPage />} />
+          <Route path="/events/search-people/:uuid" element={<SearchPeople />} />
           <Route path="/ai-transcribers" element={<AITranscribers />} />
           <Route path="/ai-transcribers/transcriber/:uuid" element={<Transcriber />} />
           <Route path="/events/add-event" element={<AddEventPage />} />
@@ -315,6 +318,7 @@ const App: React.FC = () => {
           <Route path="/all-charts/event-chart/:uuid" element={<ChartsData />} />
           <Route path="/all-reports/whatsapp-report/:uuid" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
           <Route path="/all-reports/mail-report/:uuid" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}
+          <Route path="/*" element={<NotFound />} />
         </Route>
       </Routes>
 

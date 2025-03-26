@@ -28,6 +28,7 @@ interface EventRowProps {
     end_time_type?: string,
     date: string,
     id: number,
+    isUpcoming?: boolean | false,
 }
 
 const EventRow: React.FC<EventRowProps> = (props) => {
@@ -204,6 +205,9 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
             {/* Links */}
             <div className='min-w-fit'>
+                {props.isUpcoming && <><Link to={`/events/search-people/${props.uuid}`} onClick={() => {
+                    dispatch(eventUUID(props.uuid)); dispatch(heading('Search People'));
+                }} className="text-lime-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs">Search People</Link> <br /></>}
                 <Link to={`/events/view-event/${props.uuid}`} className="text-pink-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('View Event'));
                 }}>View Event</Link> <br />

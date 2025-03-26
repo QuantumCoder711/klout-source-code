@@ -39,7 +39,7 @@ const Event: React.FC = () => {
     // Get events data from the store
     const { events, loading } = useSelector((state: RootState) => state.events);
 
-    const today = new Date().toISOString().slice(0, 10);;
+    const today = new Date().toISOString().slice(0, 10);
 
     const pastEvents = events.filter((event: eventType) => {
         const eventDate = event.event_start_date;
@@ -135,7 +135,6 @@ const Event: React.FC = () => {
                 </div>
 
 
-
                 {/* Event Table */}
                 <div className="overflow-x-auto rounded-lg">
                     {
@@ -147,6 +146,7 @@ const Event: React.FC = () => {
                             currentEvents.map((event) => (
                                 <EventRow
                                     key={event.uuid}
+                                    isUpcoming={activeTab === 'upcoming' ? true : false}
                                     uuid={event.uuid}
                                     date={event.event_start_date}
                                     id={event.id}
