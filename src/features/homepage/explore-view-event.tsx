@@ -427,6 +427,11 @@ const ExploreViewEvent: React.FC = () => {
                     heightAuto: false,
                     customClass: {
                         popup: 'swal2-fullscreen'
+                    },
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading();
                     }
                 }).then(() => {
                     window.location.reload();

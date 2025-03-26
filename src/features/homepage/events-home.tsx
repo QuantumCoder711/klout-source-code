@@ -50,7 +50,9 @@ const Events: React.FC = () => {
           </h1>
           <p className='max-w-[500px] text-sm md:text-base mt-3'>Effortlessly create, manage, and elevate your events
             All in one place. From hassle-free check-ins to
-            AI-powered insights, Make Your event management smarter!</p>
+            AI-powered insights, Make Your event management smarter! <br /> <br /></p>
+
+            <p>Powerful, free event management tool designed to streamline your event experience. From QR code check-ins and AI-enhanced networking to real-time attendee insights and post-event session summaries, Klout Club makes organizing events seamless. Whether you're hosting a conference, summit, or exhibition, our platform helps you manage attendees efficiently while fostering meaningful connections. Set up your event in just 10 minutes and enhance engagement with smart networking features. Join thousands of organizers who trust Klout Club to create impactful events. Start now and transform the way you manage and experience events effortlessly!</p>
 
           <div className='mt-14 md:mt-20'>
             <h2 className='text-3xl sm:text-4xl xl:text-5xl font-bold capitalize'><span className='curly'>Ready</span> to host a smarter event<span className='curly'>?</span></h2>
