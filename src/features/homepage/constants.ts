@@ -31,4 +31,6 @@ export const apiKey: string = import.meta.env.VITE_API_KEY;
 export const options = {
     types: ['establishment'], // Adjust types based on your needs
     componentRestrictions: { country: 'in' }, // Optional: Restrict by country code
+    async: true,
+    defer: true,
 };

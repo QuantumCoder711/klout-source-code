@@ -8,6 +8,7 @@ import Loader from '../../../component/Loader';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { TiChevronLeft, TiChevronRight } from 'react-icons/ti';
+import * as XLSX from 'xlsx';
 
 interface Person {
     _id: string;
@@ -37,6 +38,7 @@ const SearchPeople: React.FC = () => {
     const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const [exportLoading, setExportLoading] = useState(false);
 
     const appBaseUrl = import.meta.env.VITE_APP_BASE_URL;
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -101,6 +103,31 @@ const SearchPeople: React.FC = () => {
             const allCurrentIds = peopleList.map(person => person._id);
             setSelectedPeople(allCurrentIds);
         }
+    }
+
+    const handleExportData = () => {
+        setExportLoading(true);
+        
+        const dataToExport = peopleList.map((person) => ({
+            'First Name': person.firstName,
+            'Last Name': person.lastName,
+            'Designation': person.designation,
+            'Company': person.company,
+            'Industry': person.industry,
+            'City': person.city,
+            'Email': person.email,
+            'Phone Number': person.phone_number,
+            'LinkedIn': person.linkedinUrl
+        }));
+
+        // Create a new workbook and a worksheet
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'People List');
+
+        // Generate Excel file and offer download
+        XLSX.writeFile(workbook, `People_List_${new Date().toISOString().split('T')[0]}.xlsx`);
+        setExportLoading(false);
     }
 
     const renderPaginationNumbers = () => {
@@ -196,7 +223,7 @@ const SearchPeople: React.FC = () => {
         }
     }
 
-    if (loading) {
+    if (loading || exportLoading) {
         return <Loader />
     }
 
@@ -218,8 +245,8 @@ const SearchPeople: React.FC = () => {
 
             <div className='mt-10'>
                 <div className='flex gap-3 items-center justify-center mb-6'>
-                    <input type="text" placeholder='Search by City' className='input input-bordered w-full input-sm max-w-xs' name='city' value={searchData.city} onChange={handleSearchData} />
                     <input type="text" placeholder='Search by Designation' className='input input-bordered input-sm w-full max-w-xs' name='designation' value={searchData.designation} onChange={handleSearchData} />
+                    <input type="text" placeholder='Search by City' className='input input-bordered w-full input-sm max-w-xs' name='city' value={searchData.city} onChange={handleSearchData} />
                     <button onClick={handleGetPeopleList} className='btn btn-primary btn-sm'>Search</button>
                 </div>
 
@@ -233,9 +260,16 @@ const SearchPeople: React.FC = () => {
                                 {selectedPeople.length > 0 && (
                                     <div className=" bg-gray-100 rounded-lg flex items-center gap-2">
                                         <p className="font-semibold">{selectedPeople.length} people selected</p>
-                                        <button onClick={handleInvitePeople} className="btn btn-primary btn-sm">Invite Selected People</button>
+                                        <button onClick={handleInvitePeople} className="btn btn-primary btn-sm">Add Selected People</button>
                                     </div>
                                 )}
+                                <button 
+                                    onClick={handleExportData} 
+                                    className="btn btn-success btn-sm text-white"
+                                    disabled={peopleList.length === 0}
+                                >
+                                    Export to Excel
+                                </button>
                                 <div className="">
                                     <label htmlFor="itemsPerPage" className="mr-2 text-gray-800 font-semibold">Show:</label>
                                     <select

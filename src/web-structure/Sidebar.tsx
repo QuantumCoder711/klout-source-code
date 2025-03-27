@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { heading } from "../features/heading/headingSlice";
 import { RootState } from "../redux/store";
 import { useSelector } from "react-redux";
-import { MdDashboard, MdOutlinePhotoSizeSelectActual } from "react-icons/md";
+import { MdDashboard, MdOndemandVideo, MdOutlinePhotoSizeSelectActual } from "react-icons/md";
 import { LuBrainCircuit } from "react-icons/lu";
 import { MdEmojiEvents } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
@@ -217,6 +217,20 @@ const Sidebar: React.FC = () => {
               <LuBrainCircuit className="size-6" />
               {collapse && <span>
                 AI Transcriber
+              </span>}
+            </div>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/tutorials"
+            onClick={handlePageTitle}
+            className="p-5 block rounded font-semibold"
+          >
+            <div className="flex items-center gap-3 ">
+              <MdOndemandVideo className="size-6" />
+              {collapse && <span>
+                Tutorials
               </span>}
             </div>
           </Link>

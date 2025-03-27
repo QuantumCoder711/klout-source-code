@@ -7,8 +7,7 @@ import { TiChevronLeft, TiChevronRight } from 'react-icons/ti'; // Import icons 
 
 const AllPhotos: React.FC = () => {
 
-  const { events, loading } = useSelector((state: RootState) => state.events);
-  const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
+  const { events, loading } = useSelector((state: RootState) => state.events)
 
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 6;
@@ -60,7 +59,7 @@ const AllPhotos: React.FC = () => {
             title={event.title}
             venue={event.event_venue_name}
             date={event.event_date}
-            image={`${imageBaseUrl}/${event.image}`}
+            image={`${event.image}`}
           />
         ))}
       </div>

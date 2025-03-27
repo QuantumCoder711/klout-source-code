@@ -239,6 +239,7 @@ import ExploreViewEvent from "./features/homepage/explore-view-event";
 import ExploreAllEvents from "./features/homepage/ExploreAllEvents";
 import SearchPeople from "./features/event/component/SearchPeople";
 import NotFound from "./NotFound";
+import Tutorials from "./features/tutorials";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -315,6 +316,7 @@ const App: React.FC = () => {
           <Route path="/all-photos" element={<AllPhotosPage />} />
           <Route path="/all-photos/photo/:uuid" element={<Photos />} />
           <Route path="/all-charts" element={<AllCharts />} />
+          <Route path="/tutorials" element={<Tutorials />} />
           <Route path="/all-charts/event-chart/:uuid" element={<ChartsData />} />
           <Route path="/all-reports/whatsapp-report/:uuid" element={<WhatsAppReport />} /> {/* Dynamic Route for WhatsApp Reports */}
           <Route path="/all-reports/mail-report/:uuid" element={<MailReport />} /> {/* Dynamic Route for WhatsApp Reports */}

@@ -43,12 +43,10 @@ const WhatsAppReport: React.FC = () => {
     const [changeCardStatus, setChangeCartStatus] = useState<string>("Sent");
 
     const userID = user?.id;
-    console.log(userID);
 
     const currentEvent = events.find((event) => event.uuid === uuid);
 
     useEffect(() => {
-
         axios.post("https://app.klout.club/api/organiser/v1/whatsapp/all-recipt",
             {
                 eventUUID: uuid,
@@ -60,8 +58,8 @@ const WhatsAppReport: React.FC = () => {
                     "Content-Type": "application/json",
                 }
             }).then(res => {
-                console.log(res.data.data);
                 setAllData(res.data.data);
+                console.log("The data from api is: ", res.data.data);
                 setTotalMessage(res.data.data.length)
                 const delivered = res.data.data.filter((item: ReciptState) => item.messageID && item.messageID.messageStatus === "Delivered");
                 setTotalDelivered(delivered.length);

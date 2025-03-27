@@ -14,7 +14,7 @@ import Bg2 from "/bg2.jpeg";
 import Bg3 from "/bg3.jpg";
 import Bg4 from "/bg4.jpg";
 import GoogleMapComponent from '../../homepage/GoogleMapComponent';
-import { options } from '../../homepage/constants';
+import { apiKey, options } from '../../homepage/constants';
 import { Helmet } from 'react-helmet-async';
 
 // type formInputType = {
@@ -357,30 +357,45 @@ const AddEvent: React.FC = () => {
 
 
     useEffect(() => {
-        if (inputRef.current && window.google) {
-            console.log(inputRef.current.value)
-            const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, options);
-
-            // Add listener for when a place is selected
-            autocomplete.addListener('place_changed', () => {
-                const place = autocomplete.getPlace();
-                if (place && place.vicinity) {
-                    setLocationInfo(place);
-                    setLocation(place.vicinity);  // Store the place name in the state
-
-                    const longitude = place.geometry?.location?.lng();
-                    const latitude = place.geometry?.location?.lat();
-
-                    if (longitude && latitude) {
-                        setCenter({
-                            lat: latitude,
-                            lng: longitude
-                        })
-                    }
-                }
+        const loadGoogleMapsScript = () => {
+            if (!window.google) {
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+                script.defer = true;
+                script.async = true;
+                script.onload = initializeAutocomplete;
+                document.head.appendChild(script);
+            } else {
+                initializeAutocomplete();
             }
-            )
-        }
+        };
+
+        const initializeAutocomplete = () => {
+            if (inputRef.current && window.google) {
+                const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, options);
+
+                // Add listener for when a place is selected
+                autocomplete.addListener('place_changed', () => {
+                    const place = autocomplete.getPlace();
+                    if (place && place.vicinity) {
+                        setLocationInfo(place);
+                        setLocation(place.vicinity);  // Store the place name in the state
+
+                        const longitude = place.geometry?.location?.lng();
+                        const latitude = place.geometry?.location?.lat();
+
+                        if (longitude && latitude) {
+                            setCenter({
+                                lat: latitude,
+                                lng: longitude
+                            });
+                        }
+                    }
+                });
+            }
+        };
+
+        loadGoogleMapsScript();
     }, [inputRef.current]); // Only run when the inputRef is set
 
 

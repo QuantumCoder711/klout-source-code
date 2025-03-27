@@ -242,6 +242,16 @@ const ExploreViewEvent: React.FC = () => {
         if (!address) return;
 
         try {
+            // Create a script element for Google Maps API
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+            
+            // Wait for script to load before making the geocoding request
+            await new Promise(resolve => script.onload = resolve);
+            
             const response = await fetch(
                 `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
             );
