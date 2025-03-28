@@ -13,7 +13,7 @@ import { apiKey } from './constants';
 import Footer from './Footer';
 import swal from 'sweetalert';
 import Swal from 'sweetalert2';
-
+import DummyImage from "/dummyImage.jpg";
 
 type EventType = {
     id: number;
@@ -137,6 +137,8 @@ const ExploreViewEvent: React.FC = () => {
     const [count, setCount] = useState(0);
     const [paymentCancelled, _] = useState(false);
     const [paymentSuccess, __] = useState(false);
+
+    const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
 
     const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -288,6 +290,22 @@ const ExploreViewEvent: React.FC = () => {
         }
     }, [currentEvent]);
 
+    useEffect(() => {
+        if (currentEvent) {
+            axios.post(`${apiBaseUrl}/api/event_details_attendee_list/`, {
+                event_uuid: currentEvent.uuid,
+                phone_number: 9643314331
+            })
+            .then((res) => {
+                console.log("The data is",res.data.data.speakers);
+                setAllSpeakers(res.data.data.speakers);
+            })
+            .catch((err) => {
+                console.log("The error is",err);
+            });
+        }
+    }, [currentEvent]);
+
     // Handle Input Changes
     const handleChange = (e: any) => {
         const { name, value } = e.target;
@@ -316,15 +334,15 @@ const ExploreViewEvent: React.FC = () => {
         axios.get(`${domain}/api/companies`).then(res => setCompanies(res.data.data));
     }, []);
 
-    const allSpeakers = agendaData.flatMap((agenda) =>
-        agenda.speakers.map((speaker) => ({
-            first_name: speaker.first_name,
-            last_name: speaker.last_name,
-            company_name: speaker.company_name,
-            job_title: speaker.job_title,
-            image: speaker.image
-        }))
-    );
+    // const allSpeakers = agendaData.flatMap((agenda) =>
+    //     agenda.speakers.map((speaker) => ({
+    //         first_name: speaker.first_name,
+    //         last_name: speaker.last_name,
+    //         company_name: speaker.company_name,
+    //         job_title: speaker.job_title,
+    //         image: speaker.image
+    //     }))
+    // );
 
     useEffect(() => {
         // Extract coordinates from Google Maps link
@@ -902,7 +920,11 @@ const ExploreViewEvent: React.FC = () => {
                             {/* Single Speaker Deatils */}
                             {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
                                 <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
-                                    <img src={apiBaseUrl + "/" + speaker.image} alt="Speaker" className='rounded-full mx-auto size-24' />
+                                    <img 
+                                        src={speaker.image ? apiBaseUrl + "/" + speaker.image : DummyImage} 
+                                        alt="Speaker" 
+                                        className='rounded-full mx-auto size-24' 
+                                    />
                                     <p className='font-semibold overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.first_name + ' ' + speaker.last_name}</p>
                                     <p className='overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.job_title}</p>
                                     <p className='text-sm font-light overflow-hidden text-ellipsis whitespace-nowrap'>{speaker.company_name}</p>

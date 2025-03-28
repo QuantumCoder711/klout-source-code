@@ -21,6 +21,7 @@ interface Person {
     city: string;
     email: string;
     phone_number: string;
+    employeeSize: string;
 }
 
 const SearchPeople: React.FC = () => {
@@ -70,7 +71,7 @@ const SearchPeople: React.FC = () => {
                 }
             });
 
-            setPeopleList(response.data.data.peoples);
+            setPeopleList(response.data.data.peoplesWithCompanySize);
             setCurrentPage(1); // Reset to first page on new search
         } catch (error) {
             console.log("The error is", error);
@@ -113,6 +114,7 @@ const SearchPeople: React.FC = () => {
             'Last Name': person.lastName,
             'Designation': person.designation,
             'Company': person.company,
+            'Company Size': person.employeeSize,
             'Industry': person.industry,
             'City': person.city,
             'Email': person.email,
@@ -305,6 +307,7 @@ const SearchPeople: React.FC = () => {
                                         <th className="py-3 px-4 text-start text-nowrap">Name</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Designation</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Company</th>
+                                        <th className="py-3 px-4 text-start text-nowrap">Company Size</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Industry</th>
                                         <th className="py-3 px-4 text-start text-nowrap">City</th>
                                         <th className="py-3 px-4 text-start text-nowrap">LinkedIn</th>
@@ -325,6 +328,7 @@ const SearchPeople: React.FC = () => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.firstName} {person.lastName}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.designation}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.company}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.employeeSize}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.industry}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.city}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">
