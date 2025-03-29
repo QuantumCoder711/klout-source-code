@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../../redux/store';
@@ -30,12 +30,26 @@ const SearchPeople: React.FC = () => {
     const allEvents = useSelector((state: RootState) => state.events.events);
     const event = allEvents.find((event) => event.uuid === uuid);
     const [searchData, setSearchData] = useState({
+        designation: "",
         city: "",
-        designation: ""
     });
+
+    //For revealing the button
+    const [showButton, setShowButton] = useState<boolean>(false);
+    const sequenceRef = useRef("");
+
+    const [filters, setFilters] = useState({
+        designation: "",
+        company: "",
+        city: "",
+        companySize: "",
+        industry: ""
+    });
+
     const { user } = useSelector((state: RootState) => state.auth);
     const { token } = useSelector((state: RootState) => state.auth);
     const [peopleList, setPeopleList] = useState<Person[]>([]);
+    const [filteredPeopleList, setFilteredPeopleList] = useState<Person[]>([]);
     const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
@@ -45,11 +59,81 @@ const SearchPeople: React.FC = () => {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const [loading, setLoading] = useState(false);
 
+    // Apply filters whenever filters or peopleList changes
+    useEffect(() => {
+        applyFilters();
+    }, [filters, peopleList]);
+
+     // Reveal function
+     useEffect(() => {
+        const handleButtonDisplay = (event: KeyboardEvent) => {
+            sequenceRef.current += event.key.toLowerCase(); // Append the typed key
+
+            // Keep only the last 6 characters
+            if (sequenceRef.current.length > 6) {
+                sequenceRef.current = sequenceRef.current.slice(-6);
+            }
+
+            // Check if sequence matches "reveal"
+            if (sequenceRef.current === "reveal") {
+                setShowButton(true);
+                sequenceRef.current = ""; // Reset sequence
+            }
+
+            // Check if sequence matches "hide"
+            if (sequenceRef.current === "hide") {
+                setShowButton(false);
+                sequenceRef.current = ""; // Reset sequence
+            }
+        };
+
+        window.addEventListener("keydown", handleButtonDisplay);
+        return () => window.removeEventListener("keydown", handleButtonDisplay);
+    }, []);
+
+    // Apply filters to the people list
+    const applyFilters = () => {
+        let filtered = [...peopleList];
+
+        if (filters.designation) {
+            filtered = filtered.filter(person => 
+                person.designation.toLowerCase().includes(filters.designation.toLowerCase())
+            );
+        }
+
+        if (filters.company) {
+            filtered = filtered.filter(person => 
+                person.company.toLowerCase().includes(filters.company.toLowerCase())
+            );
+        }
+
+        if (filters.city) {
+            filtered = filtered.filter(person => 
+                person.city.toLowerCase().includes(filters.city.toLowerCase())
+            );
+        }
+
+        if (filters.companySize) {
+            filtered = filtered.filter(person => 
+                person.employeeSize.toLowerCase().includes(filters.companySize.toLowerCase())
+            );
+        }
+
+        if (filters.industry) {
+            filtered = filtered.filter(person => 
+                person.industry.toLowerCase().includes(filters.industry.toLowerCase())
+            );
+        }
+
+        setFilteredPeopleList(filtered);
+        setCurrentPage(1); // Reset to first page when filters change
+    };
+
     // Pagination calculations
-    const totalPages = Math.ceil(peopleList.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredPeopleList.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentPeople = peopleList.slice(startIndex, endIndex);
+    const currentPeople = filteredPeopleList.slice(startIndex, endIndex);
 
     const handlePageChange = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -58,6 +142,13 @@ const SearchPeople: React.FC = () => {
     const handleSearchData = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchData({
             ...searchData,
+            [e.target.name]: e.target.value
+        });
+    }
+
+    const handleFilterData = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilters({
+            ...filters,
             [e.target.name]: e.target.value
         });
     }
@@ -96,20 +187,20 @@ const SearchPeople: React.FC = () => {
     }
 
     const handleSelectAll = () => {
-        if (selectedPeople.length === peopleList.length) {
+        if (selectedPeople.length === filteredPeopleList.length) {
             // If all are selected, unselect all
             setSelectedPeople([]);
         } else {
             // Otherwise, select all current visible people
-            const allCurrentIds = peopleList.map(person => person._id);
+            const allCurrentIds = filteredPeopleList.map(person => person._id);
             setSelectedPeople(allCurrentIds);
         }
     }
 
     const handleExportData = () => {
         setExportLoading(true);
-        
-        const dataToExport = peopleList.map((person) => ({
+
+        const dataToExport = filteredPeopleList.map((person) => ({
             'First Name': person.firstName,
             'Last Name': person.lastName,
             'Designation': person.designation,
@@ -174,7 +265,7 @@ const SearchPeople: React.FC = () => {
                 icon: "error",
             });
         }
-        
+
         const attendees = selectedPeople.map((personId) => {
             const person = peopleList.find(p => p._id === personId);
             return {
@@ -256,7 +347,7 @@ const SearchPeople: React.FC = () => {
                     <>
                         <div className="mb-2 flex justify-between items-center">
                             <span className="text-gray-800 font-semibold">
-                                Showing {currentPeople.length} entries out of {peopleList.length}
+                                Showing {currentPeople.length} entries out of {filteredPeopleList.length}
                             </span>
                             <div className='gap-5 flex items-center'>
                                 {selectedPeople.length > 0 && (
@@ -265,28 +356,43 @@ const SearchPeople: React.FC = () => {
                                         <button onClick={handleInvitePeople} className="btn btn-primary btn-sm">Add Selected People</button>
                                     </div>
                                 )}
-                                <button 
-                                    onClick={handleExportData} 
+                                {showButton && <button
+                                    onClick={handleExportData}
                                     className="btn btn-success btn-sm text-white"
-                                    disabled={peopleList.length === 0}
+                                    disabled={filteredPeopleList.length === 0}
                                 >
                                     Export to Excel
-                                </button>
-                                <div className="">
-                                    <label htmlFor="itemsPerPage" className="mr-2 text-gray-800 font-semibold">Show:</label>
-                                    <select
-                                        id="itemsPerPage"
-                                        className="border border-gray-500 rounded-md p-2 bg-white outline-none"
-                                        value={itemsPerPage}
-                                        onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                                    >
-                                        <option value={10}>10</option>
-                                        <option value={25}>25</option>
-                                        <option value={50}>50</option>
-                                        <option value={100}>100</option>
-                                    </select>
+                                </button>}
+                                <div className="flex items-center gap-2">
+                                    <div>
+                                        <label htmlFor="itemsPerPage" className="mr-2 text-gray-800 font-semibold">Show:</label>
+                                        <select
+                                            id="itemsPerPage"
+                                            className="border border-gray-500 rounded-md p-2 bg-white outline-none"
+                                            value={itemsPerPage}
+                                            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                                        >
+                                            <option value={10}>10</option>
+                                            <option value={25}>25</option>
+                                            <option value={50}>50</option>
+                                            <option value={100}>100</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
+                        <div className='my-3 flex gap-3'>
+                            {/* Filter by designation */}
+                            <input type="text" placeholder='Search by Designation' className='input input-bordered input-sm w-full' name='designation' value={filters.designation} onChange={handleFilterData} />
+
+                            {/* Filter by Company */}
+                            <input type="text" placeholder='Search by Company' className='input input-bordered input-sm w-full' name='company' value={filters.company} onChange={handleFilterData} />
+
+                            {/* Filter by Company Size */}
+                            <input type="text" placeholder='Search by Company Size' className='input input-bordered input-sm w-full' name='companySize' value={filters.companySize} onChange={handleFilterData} />
+
+                            {/* Filter by Industry */}
+                            <input type="text" placeholder='Search by Industry' className='input input-bordered input-sm w-full' name='industry' value={filters.industry} onChange={handleFilterData} />
                         </div>
                         <div className="overflow-x-auto">
                             <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
@@ -297,7 +403,7 @@ const SearchPeople: React.FC = () => {
                                                 <input
                                                     type="checkbox"
                                                     className="checkbox"
-                                                    checked={peopleList.length > 0 && selectedPeople.length === peopleList.length}
+                                                    checked={filteredPeopleList.length > 0 && selectedPeople.length === filteredPeopleList.length}
                                                     onChange={handleSelectAll}
                                                 />
                                                 {/* <span className="ml-2">Select All</span> */}
