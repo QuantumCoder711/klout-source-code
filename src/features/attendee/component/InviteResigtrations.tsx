@@ -352,7 +352,26 @@ const InviteRegistrations: React.FC = () => {
                                     // onEditorChange={(e)=>setTitle()}
                                     // className={`form-control ${errors.message ? "is-invalid" : ""
                                     //     }`}
-                                    initialValue="<p>Please type here...</p>"
+                                    initialValue={`<p>
+                                    From: ${user?.company_name}<br />
+                                    Subject: Exclusive Invitation: ${currentEvent?.title}- Join Industry Leaders!<br /><br />
+
+                                    We are delighted to invite you to the ${currentEvent?.title}, an exclusive gathering of top thought
+                                    leaders and industry experts. This premier event is designed to foster meaningful
+                                    discussions, networking, and recognition of excellence in the industry.<br /><br />
+
+                                    📅 Date: ${currentEvent?.event_start_date}<br />
+                                    📍 Location: ${currentEvent?.event_venue_name}<br /><br />
+
+                                    Join us for an evening/day based on timing of the event of insights, connections, and
+                                    celebration.<br /><br />
+
+                                    We look forward to your participation!<br /><br />
+
+                                    Best regards,<br />
+                                    ${user?.first_name} ${user?.last_name}<br />
+                                    ${user?.company_name}
+                                </p>`}
                                     init={{
                                         height: 500,
                                         menubar: false,
