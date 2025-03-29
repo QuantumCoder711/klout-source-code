@@ -651,6 +651,19 @@ const ExploreViewEvent: React.FC = () => {
         };
     }, [isModalOpen]);
 
+    // Check if event date has passed
+    const isEventDatePassed = () => {
+        if (!currentEvent?.event_start_date) return false;
+        
+        const eventDate = new Date(currentEvent.event_start_date);
+        eventDate.setHours(0, 0, 0, 0);
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        return eventDate < today;
+    };
+
     if (isLoading) {
         return <div className='w-full h-screen flex justify-center items-center'>
             <Loader />
@@ -711,15 +724,15 @@ const ExploreViewEvent: React.FC = () => {
                     {/* Row for Registration */}
                     <div className='border border-white rounded-[10px]'>
                         <p className='text-sm p-[10px]'>
-                            {new Date(currentEvent?.event_date || '') < new Date() ?
+                            {isEventDatePassed() ?
                                 'Registration Closed' :
                                 'Registration'
                             }
                         </p>
 
-                        <div className={`rounded-b-[10px] bg-white ${new Date(currentEvent?.event_date || '') < new Date() ? 'opacity-50' : ''}`}>
+                        <div className={`rounded-b-[10px] bg-white ${isEventDatePassed() ? 'opacity-50' : ''}`}>
 
-                            <div className={`flex gap-2 p-[10px] border-b ${new Date(currentEvent?.event_date || '') < new Date() ? 'blur-[2px]' : ''}`}>
+                            <div className={`flex gap-2 p-[10px] border-b ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
                                 <div className='rounded-md grid place-content-center size-10 bg-white'>
                                     {/* < size={30} className='text-brand-gray' /> */}
                                     <img src={Invite} alt="Invite" />
@@ -731,13 +744,13 @@ const ExploreViewEvent: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className={`p-[10px] ${new Date(currentEvent?.event_date || '') < new Date() ? 'blur-[2px]' : ''}`}>
+                            <div className={`p-[10px] ${isEventDatePassed() ? 'blur-[2px]' : ''}`}>
                                 <p className='text-sm'>Welcome! Register below to request event access.</p>
                                 {/* <button className="btn" onClick={openModal}>open modal</button> */}
                                 <button
                                     className='w-full mt-[10px] p-3 bg-brand-primary rounded-lg text-white'
                                     onClick={openModal}
-                                    disabled={new Date(currentEvent?.event_date || '') < new Date()}
+                                    disabled={isEventDatePassed()}
                                 >
                                     Get an Invite
                                 </button>
