@@ -240,6 +240,7 @@ import ExploreAllEvents from "./features/homepage/ExploreAllEvents";
 import SearchPeople from "./features/event/component/SearchPeople";
 import NotFound from "./NotFound";
 import Tutorials from "./features/tutorials";
+import PaymentStatus from "./features/homepage/payment-status";
 // import Photos from "./features/photos/photos";
 
 axios.defaults.withCredentials = false;
@@ -270,6 +271,7 @@ const App: React.FC = () => {
         <Route path="/add-first-event" element={<AddEvent />} />
         <Route path="/explore-events/event/:slug" element={<ExploreViewEvent />} />
         <Route path="/explore-events/:city" element={<ExploreAllEvents />} />
+        <Route path="/payment/:status/:id" element={<PaymentStatus />} />
 
         {/* All other routes wrapped in Layout */}
         <Route
@@ -279,6 +281,7 @@ const App: React.FC = () => {
           <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+
           <Route path="/events" element={<EventPage />} />
           <Route path="/events/search-people/:uuid" element={<SearchPeople />} />
           <Route path="/ai-transcribers" element={<AITranscribers />} />
