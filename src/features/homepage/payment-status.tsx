@@ -1,123 +1,112 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { domain } from './constants';
 
 const PaymentStatus: React.FC = () => {
-  const { status, id } = useParams<{ status: string; id: string }>();
-  const navigate = useNavigate();
-  const [paymentDetails, setPaymentDetails] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { status, id } = useParams<{ status: string, id: string }>();
 
   useEffect(() => {
-    const fetchPaymentDetails = async () => {
-      if (id) {
-        try {
-          const appBaseUrl = import.meta.env.VITE_API_BASE_URL;
-          const response = await axios.get(`${appBaseUrl}/api/v1/payment/status/${id}`);
-          setPaymentDetails(response.data);
-        } catch (error) {
-          console.error('Error fetching payment details:', error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
-    };
-
-    fetchPaymentDetails();
-  }, [id]);
-
-  const handleGoHome = () => {
-    navigate('/');
-  };
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
 
   const getStatusIcon = () => {
-    if (status === 'success') {
-      return (
-        <div className="w-20 h-20 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center shadow-md">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-      );
-    } else if (status === 'failed') {
-      return (
-        <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center shadow-md">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </div>
-      );
+    if (status?.toLowerCase() === 'success') {
+      return <CheckCircle className="w-20 h-20 text-green-500 mb-4" />;
+    } else if (status?.toLowerCase() === 'failed') {
+      return <XCircle className="w-20 h-20 text-red-500 mb-4" />;
     } else {
-      return (
-        <div className="w-20 h-20 mx-auto mb-6 bg-yellow-100 rounded-full flex items-center justify-center shadow-md">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
-      );
+      return <AlertCircle className="w-20 h-20 text-yellow-500 mb-4" />;
+    }
+  };
+
+  const getStatusColor = () => {
+    if (status?.toLowerCase() === 'success') {
+      return 'text-green-600';
+    } else if (status?.toLowerCase() === 'failed') {
+      return 'text-red-600';
+    } else {
+      return 'text-yellow-600';
     }
   };
 
   const getStatusMessage = () => {
-    if (status === 'success') {
-      return 'Payment Successful';
-    } else if (status === 'failed') {
-      return 'Payment Failed';
+    if (status?.toLowerCase() === 'success') {
+      return 'Your payment was successful!';
+    } else if (status?.toLowerCase() === 'failed') {
+      return 'Your payment was unsuccessful.';
     } else {
-      return 'Payment Pending';
+      return 'Payment status is pending.';
     }
   };
 
+  useEffect(() => {
+    const pendingRegistrationData = localStorage.getItem('pendingRegistrationData');
+    if (pendingRegistrationData && status?.toLowerCase() === 'success') {
+      const newObj = JSON.parse(pendingRegistrationData);
+
+      axios.post(`${domain}/api/request_event_invitation`, {
+        ...newObj
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+        .then(response => {
+          console.log('Registration successful:', response.data);
+          // Clear the stored data after successful registration
+          localStorage.removeItem('pendingRegistrationData');
+          localStorage.removeItem('pendingEventSlug');
+        })
+        .catch(error => {
+          console.error('Registration error:', error);
+        });
+    }
+  }, [status]);
+
   return (
-    <div className='min-h-screen w-full grid place-content-center bg-gradient-to-b from-gray-50 to-gray-100 py-10'>
-      <div className='bg-white rounded-xl p-8 shadow-lg max-w-md w-full border border-gray-100'>
-        {loading ? (
-          <div className="flex flex-col items-center py-8">
-            <div className="animate-spin rounded-full h-14 w-14 border-b-3 border-t-3 border-brand-primary"></div>
-            <p className="mt-6 text-gray-700 font-medium">Loading payment details...</p>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full border border-gray-100">
+        <div className="flex flex-col items-center text-center">
+          {getStatusIcon()}
+
+          <h1 className="text-3xl font-bold mb-2">Payment Status</h1>
+
+          <div className={`text-xl font-semibold mb-4 ${getStatusColor()}`}>
+            {status?.toUpperCase()}
           </div>
-        ) : (
-          <>
-            {getStatusIcon()}
-            <h1 className='text-2xl font-bold text-center mb-6 text-gray-800'>{getStatusMessage()}</h1>
-            
-            {paymentDetails && (
-              <div className="mb-8 border-t border-b border-gray-200 py-5 my-5 bg-gray-50 rounded-lg px-4">
-                <div className="flex justify-between mb-3">
-                  <span className="text-gray-700 font-medium">Transaction ID:</span>
-                  <span className="font-semibold text-gray-900">{paymentDetails.transaction_id || id}</span>
-                </div>
-                {paymentDetails.amount && (
-                  <div className="flex justify-between mb-3">
-                    <span className="text-gray-700 font-medium">Amount:</span>
-                    <span className="font-semibold text-gray-900">₹{paymentDetails.amount}</span>
-                  </div>
-                )}
-                {paymentDetails.event_name && (
-                  <div className="flex justify-between mb-3">
-                    <span className="text-gray-700 font-medium">Event:</span>
-                    <span className="font-semibold text-gray-900">{paymentDetails.event_name}</span>
-                  </div>
-                )}
-                {paymentDetails.date && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-700 font-medium">Date:</span>
-                    <span className="font-semibold text-gray-900">{new Date(paymentDetails.date).toLocaleString()}</span>
-                  </div>
-                )}
-              </div>
-            )}
-            
-            <button 
-              onClick={handleGoHome}
-              className='w-full bg-brand-primary text-white px-5 py-4 rounded-lg hover:bg-opacity-90 transition-colors font-semibold text-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-transform'
+
+          <p className="text-gray-700 mb-6">{getStatusMessage()}</p>
+
+          {status === "success" && <p className="text-gray-700 mb-4 font-medium bg-green-50 p-3 rounded-lg border border-green-100">
+            <span className="text-green-600">✓</span> You've successfully registered for this event!
+          </p>}
+
+          {id && status === "success" && (
+            <div className="bg-gray-50 p-3 rounded-lg w-full mb-6">
+              <p className="text-sm text-gray-500 mb-1">Transaction ID</p>
+              <p className="text-gray-800 font-medium break-all">{id}</p>
+            </div>
+          )}
+
+          <div className="flex gap-4 w-full">
+            <Link
+              to="/"
+              className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-center transition-colors"
             >
-              Return to Home
-            </button>
-          </>
-        )}
+              Back to Home
+            </Link>
+
+            <Link
+              to="/explore-events/all"
+              className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-center transition-colors"
+            >
+              Explore Events
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

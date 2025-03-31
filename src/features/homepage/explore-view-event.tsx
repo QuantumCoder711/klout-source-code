@@ -395,36 +395,81 @@ const ExploreViewEvent: React.FC = () => {
                     event_fee: currentEvent?.event_fee
                 };
 
-                // Log the registration data
-                console.log("Registration Data:", newObj);
+                // Check if user is already registered for both paid and free events
+                try {
+                    const checkResponse = await axios.post(`${apiBaseUrl}/api/check-existing-attendee`, {
+                        email_id: userDetails.email_id,
+                        phone_number: userDetails.phone_number,
+                        event_uuid: currentEvent?.uuid
+                    });
 
-                // If the event is paid, hit the payment API
-                if (currentEvent?.paid_event === 1) {
-                    const response = await (await axios.post(`${appBaseUrl}/api/v1/payment/get-payment`, {
-                        amount: Number(currentEvent?.event_fee),
-                        product: {
-                            title: currentEvent.title,
-                            price: Number(currentEvent.event_fee)
-                        },
-                        firstname: userDetails.first_name,
-                        email: userDetails.email_id,
-                        mobile: userDetails.phone_number
-                    })).data;
-                    console.log("Payment Response:", response.data);
+                    if (checkResponse.data.data) {
+                        // User is already registered
+                        swal({
+                            title: "Already Registered",
+                            text: "You have already registered for this event",
+                            icon: "info",
+                        });
+                        closeModal();
+                        return;
+                    }
 
-                    setForm(response);
-                } else {
-                    const response = await 
+                    // If the event is paid, proceed with payment
+                    if (currentEvent?.paid_event === 1) {
+                        // Store registration data in localStorage
+                        localStorage.setItem('pendingRegistrationData', JSON.stringify(newObj));
+                        
+                        // Hit the payment API
+                        const response = await (await axios.post(`${appBaseUrl}/api/v1/payment/get-payment`, {
+                            amount: Number(currentEvent?.event_fee),
+                            product: {
+                                title: currentEvent.title,
+                                price: Number(currentEvent.event_fee)
+                            },
+                            firstname: userDetails.first_name,
+                            email: userDetails.email_id,
+                            mobile: userDetails.phone_number
+                        })).data;
+                        setForm(response);
+                        
+                        // Store the event slug in localStorage for retrieval after payment
+                        if (currentEvent?.slug) {
+                            localStorage.setItem('pendingEventSlug', currentEvent.slug);
+                        }
+                        closeModal();
+                    } else if (currentEvent?.paid_event === 0) {
+                        // For free events
+                        const response = await axios.post(`${domain}/api/request_event_invitation`, {
+                            ...newObj
+                        }, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+
+                        if (response.data.status === 200) {
+                            swal({
+                                title: "Success",
+                                text: response.data.message || "Registration Successful",
+                                icon: "success",
+                            });
+                        } else {
+                            swal({
+                                title: "Error",
+                                text: response.data.message || "Something went wrong with registration",
+                                icon: "error",
+                            });
+                        }
+                        closeModal();
+                    }
+                } catch (error) {
+                    console.error("Error checking existing attendee:", error);
+                    swal({
+                        title: "Error",
+                        text: "An error occurred while checking registration status",
+                        icon: "error",
+                    });
                 }
-
-                // Show success message
-                swal({
-                    title: "Success",
-                    text: "Registration data logged to console",
-                    icon: "success",
-                });
-
-                closeModal();
             } catch (error) {
                 console.error("Registration error:", error);
                 swal({
