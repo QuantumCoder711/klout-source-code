@@ -170,9 +170,13 @@ const AddEvent: React.FC = () => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [locationInfo, setLocationInfo] = useState<any>(null);
     const [location, setLocation] = useState<string>("");
+    const [state, setState] = useState<string>("");
+    const [city, setCity] = useState<string>("");
+    const [country, setCountry] = useState<string>("");
+    const [pincode, setPincode] = useState<string>("");
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
-        lat: -3.745,  // Default latitude (you can change it to a default location)
-        lng: -38.523, // Default longitude
+        lat: -3.745,
+        lng: -38.523,
     });
 
 
@@ -491,6 +495,25 @@ const AddEvent: React.FC = () => {
         }
     }, [inputRef.current]); // Only run when the inputRef is set
 
+    useEffect(() => {
+        if (locationInfo) {
+            locationInfo.address_components.forEach((component: any) => {
+                const types = component.types;
+                if (types.includes('locality')) {
+                    setCity(component.long_name);
+                }
+                if (types.includes('administrative_area_level_1')) {
+                    setState(component.long_name);
+                }
+                if (types.includes('country')) {
+                    setCountry(component.long_name);
+                }
+                if (types.includes('postal_code')) {
+                    setPincode(component.long_name);
+                }
+            });
+        }
+    }, [locationInfo]);
 
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 bg-brand-foreground text-black'>
@@ -750,7 +773,17 @@ const AddEvent: React.FC = () => {
 
                 <dialog ref={modalRef} className="modal">
                     <div className="modal-box bg-brand-lightBlue w-fit m-5 max-w-screen-sm p-5">
-                        <AccountCreate closeModal={closeModal} eventDetails={formData} />
+                        <AccountCreate 
+                            closeModal={closeModal} 
+                            eventDetails={formData}
+                            locationInfo={locationInfo}
+                            state={state}
+                            city={city}
+                            country={country}
+                            pincode={pincode}
+                            paidEvent={paidEvent}
+                            eventFee={eventFee}
+                        />
                     </div>
                     <form method="dialog" className="modal-backdrop" onSubmit={closeModal}>
                         <button type="submit">Close</button>

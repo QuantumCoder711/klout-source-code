@@ -7,6 +7,7 @@ import Spinner from '../../component/Loader';
 import { useAppDispatch } from '../../redux/store';
 import { login } from '../auth/authSlice';
 import { addNewEvent } from '../event/eventSlice';
+import Swal from 'sweetalert2';
 
 interface Signup {
     first_name: string;
@@ -64,9 +65,16 @@ interface ApiType {
 interface AccountCreateProps {
     closeModal: () => void;
     eventDetails: any;
+    locationInfo: any;
+    state: string;
+    city: string;
+    country: string;
+    pincode: string;
+    paidEvent: number;
+    eventFee: string;
 }
 
-const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails }) => {
+const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails, locationInfo, state, city, country, pincode, paidEvent, eventFee }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [userDetails, setUserDetails] = useState<Signup>({
@@ -247,8 +255,9 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails 
                 }
             });
 
+            console.log("The response of register is: ", res);
+
             if (res.data.status === 200) {
-                setAccountCreated(true);
                 const obj = {
                     email: userDetails.email,
                     password: userDetails.password
@@ -258,11 +267,52 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails 
                     ...eventDetails,
                     event_venue_address_2: eventDetails.event_venue_address_1,
                     event_date: eventDetails.event_start_date,
+                    event_venue_name: locationInfo.name,
+                    event_venue_address_1: locationInfo.formatted_address,
+                    state,
+                    city,
+                    country,
+                    pincode,
+                    event_fee: paidEvent === 1 ? eventFee : "0",
+                    paid_event: paidEvent,
+                    google_map_link: locationInfo.url
+
                 }
 
+                // await dispatch(login(obj));
+                // await dispatch(addNewEvent({ eventData: newEvent, token: res.data.access_token })).unwrap(); // unwrap if using createAsyncThunk
+                // await navigate("/dashboard");
+
+                const response = await axios.post(`${domain}/api/login`, {
+                    email: userDetails.email,
+                    password: userDetails.password
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
                 await dispatch(login(obj));
-                await dispatch(addNewEvent({ eventData: newEvent, token: res.data.access_token })).unwrap(); // unwrap if using createAsyncThunk
-                await navigate("/dashboard");
+
+                const eventResponse = await axios.post(`${domain}/api/events`, newEvent, {
+                    headers: {
+                        'Authorization': `Bearer ${response.data.access_token}`,
+                        'Content-Type': 'multipart/form-data',
+                    }
+                });
+
+                console.log("The event response is: ", eventResponse);
+
+                if (eventResponse.data.status === 200) {
+                        closeModal();
+                    Swal.fire({
+                        title: 'Event Created Successfully',
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    }).then(() => {
+                        navigate("/dashboard");
+                    });
+                }
             }
 
             // console.log("The response is: ", res.data)
@@ -460,9 +510,9 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails 
                                 onChange={handleChange}
                                 className='size-4'
                             />
-                            <span>I agree to company 
+                            <span>I agree to company
                                 <a href="https://www.klout.club/terms-and-condition" className='mx-1 text-brand-primary' target='_blank'>Terms & Conditions</a>
-                                and 
+                                and
                                 <a href="https://www.klout.club/privacypolicy.html" className='mx-1 text-brand-primary' target='_blank'>Privacy Policy</a>
                             </span>
                         </div>
@@ -538,12 +588,6 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails 
                     </div>
                 </div>
             }
-
-            {accountCreated && <div className=''>
-                <h1 className='text-2xl font-semibold text-center'>Account Created Successfully</h1>
-                <button onClick={handleClose} className='w-full px-3 py-1 rounded-lg bg-brand-primary text-white mt-10'>Ok</button>
-            </div>}
-
         </>
     );
 };
