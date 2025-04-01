@@ -40,6 +40,11 @@ type attendeeType = {
     not_invited: boolean;
     image: string;
     id: number;
+    confirmed_status: string;
+    reaching_out_status: string;
+    follow_up: string;
+    managed_by: string;
+    remark: string;
 };
 
 const AllRequestedAttendee: React.FC = () => {
@@ -488,6 +493,11 @@ const AllRequestedAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Alternate Mobile</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Role</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Confirmed Status</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Reaching Out Status</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Follow Up</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Managed By</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">Remark</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Action</th>
                                 </tr>
                             </thead>
@@ -510,6 +520,11 @@ const AllRequestedAttendee: React.FC = () => {
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number ? attendee.alternate_mobile_number : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.confirmed_status || "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.reaching_out_status || "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.follow_up || "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.managed_by || "-"}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.remark || "-"}</td>
 
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-2">
                                                 <span
