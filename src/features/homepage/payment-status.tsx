@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import axios from 'axios';
@@ -6,8 +6,14 @@ import { domain } from './constants';
 
 const PaymentStatus: React.FC = () => {
   const { status, id } = useParams<{ status: string, id: string }>();
+  const [eventSlug, setEventSlug] = useState<string>('');
 
   useEffect(() => {
+    // Get the event slug from localStorage
+    const slug = localStorage.getItem('pendingEventSlug');
+    if (slug) {
+      setEventSlug(slug);
+    }
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
@@ -93,17 +99,10 @@ const PaymentStatus: React.FC = () => {
 
           <div className="flex gap-4 w-full">
             <Link
-              to="/"
-              className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-center transition-colors"
-            >
-              Back to Home
-            </Link>
-
-            <Link
-              to="/explore-events/all"
+              to={eventSlug ? `/explore-events/event/${eventSlug}` : '/'}
               className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg text-center transition-colors"
             >
-              Explore Events
+              Go Back
             </Link>
           </div>
         </div>
