@@ -6,7 +6,6 @@ import { Eye, EyeOff } from 'lucide-react';
 import Spinner from '../../component/Loader';
 import { useAppDispatch } from '../../redux/store';
 import { login } from '../auth/authSlice';
-import { addNewEvent } from '../event/eventSlice';
 import Swal from 'sweetalert2';
 
 interface Signup {
@@ -101,7 +100,6 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails,
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formErrors, setFormErrors] = useState<string[] | null>(null);
-    const [accountCreated, setAccountCreated] = useState<boolean>(false);
 
     // Add state for errors
     const [errors, setErrors] = useState<any>({});
@@ -172,13 +170,6 @@ const AccountCreate: React.FC<AccountCreateProps> = ({ closeModal, eventDetails,
         setErrors(newErrors);
 
         return Object.keys(newErrors).length === 0; // Return false if there are errors
-    };
-
-    const handleClose = () => {
-        closeModal();
-        // setAccountCreated(false);
-        // setShowRegistrationPopup(false);
-        // setIsPopupComplete(true); // Indicate that the popup action is completed
     };
 
     // Handle form submission
