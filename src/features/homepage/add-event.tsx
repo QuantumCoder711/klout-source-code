@@ -23,6 +23,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
 import GoogleMapComponent from './GoogleMapComponent';
 import { TiArrowRight } from 'react-icons/ti';
+import Swal from 'sweetalert2';
 
 // interface Form {
 //     title: string;
@@ -284,13 +285,27 @@ const AddEvent: React.FC = () => {
     };
 
     // Handle Templates Change
-    const handleTemplateChange = (template: string) => {
+    const handleTemplateChange = async (template: string) => {
         setSelectedImage(template);
         if (imageRef.current) {
-            // Generate the image from the HTML content
-            htmlToImage.toPng(imageRef.current).then((dataUrl) => {
+            try {
+                // Generate the image from the HTML content
+                const dataUrl = await htmlToImage.toPng(imageRef.current);
                 setTemplateImageData(dataUrl);
-            });
+                
+                // Convert the Data URL to a Blob and create a File
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                const file = new File([blob], 'template.png', { type: 'image/png' });
+                
+                // Update the form data with the new file
+                setFormData(prevData => ({
+                    ...prevData,
+                    image: file
+                }));
+            } catch (error) {
+                console.error('Error processing template:', error);
+            }
         }
     }
 
@@ -413,9 +428,7 @@ const AddEvent: React.FC = () => {
         }
 
         if (isPopupComplete || token) {
-            console.log("The token is:", token);
             try {
-                console.log("The form data for event creation is: ", updatedFormData);
                 const response = await axios.post(`${domain}/api/events`, updatedFormData, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -423,7 +436,13 @@ const AddEvent: React.FC = () => {
                     },
                 });
                 console.log("The response is: ", response.data);
-                alert("Event Created Successfully");
+                Swal.fire({
+                    title: 'Event Created Successfully',
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                }).then(() => {
+                    navigate("/dashboard");
+                });
 
                 setFormData({
                     title: '',
@@ -454,7 +473,7 @@ const AddEvent: React.FC = () => {
                             'Content-Type': 'application/json'
                         }
                     }).then(() => {
-                        navigate("/");
+                        navigate("/dashboard");
                     })
                 } catch (error) {
                     // console.log(error);
