@@ -25,6 +25,11 @@ type FormInputType = {
     status: string;
     event_id: number | string | null | undefined;
     image: File;
+    confirmed_status: string;
+    reaching_out_status: string;
+    follow_up: string;
+    managed_by: string;
+    remark: string;
 };
 
 type ApiType = {
@@ -43,7 +48,7 @@ const EditRequestedAttendee: React.FC = () => {
 
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-    const { token } = useSelector((state: RootState) => (state.auth));
+    const { token, user } = useSelector((state: RootState) => (state.auth));
     const { events } = useSelector((state: RootState) => (state.events));
 
     const currentEvent = events.find((event) => event.id === Number(attendee_uuid));
@@ -109,6 +114,11 @@ const EditRequestedAttendee: React.FC = () => {
                 setValue("status", attendeeData.status);
                 setValue("company_name", attendeeData.company_name);
                 setValue("job_title", attendeeData.job_title);
+                setValue("confirmed_status", attendeeData.confirmed_status || "0");
+                setValue("reaching_out_status", attendeeData.reaching_out_status);
+                setValue("follow_up", attendeeData.follow_up);
+                setValue("managed_by", attendeeData.managed_by || user?.email || "");
+                setValue("remark", attendeeData.remark);
                 setCompanyFilled(attendeeData.company_name);
                 setJobFilled(attendeeData.job_title);
 
@@ -139,7 +149,11 @@ const EditRequestedAttendee: React.FC = () => {
 
         // formData.append("_method", "PUT");
 
+        // formData.append("industry", "others");
+
         console.log("The formData is: ", formData);
+
+        formData.append("user_id", String(user?.id));
 
         axios
             .post(`${apiBaseUrl}/api/update-requested-attendee/${uuid}`, formData, {
@@ -193,7 +207,7 @@ const EditRequestedAttendee: React.FC = () => {
                 <div className='flex w-full gap-3'>
                     <div className="w-full">
                         <label htmlFor="email_id" className="input input-bordered bg-white text-black flex items-center gap-2">
-                        <span className="font-semibold text-green-700 flex max-h-fit justify-between items-center h-fit">Email &nbsp; <TiArrowRight className='mt-1 h-fit' /> </span>
+                            <span className="font-semibold text-green-700 flex max-h-fit justify-between items-center h-fit">Email &nbsp; <TiArrowRight className='mt-1 h-fit' /> </span>
                             <input id="email_id" className="w-full grow" type="email" {...register('email_id', { required: 'Email is required' })} />
                         </label>
                         {errors.email_id && <p className="text-red-600">{errors.email_id.message}</p>}
@@ -332,6 +346,117 @@ const EditRequestedAttendee: React.FC = () => {
                             <input id="alternate_mobile_number" type="tel" className="grow" {...register('alternate_mobile_number')} />
                         </label>
                         {errors.alternate_mobile_number && <p className="text-red-600">{errors.alternate_mobile_number.message}</p>}
+                    </div>
+                </div>
+
+                <div className='flex w-full gap-3'>
+                    <div className="w-full">
+                        <label htmlFor="confirmed_status" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">Confirmed Status &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <select id="confirmed_status" className="grow bg-white" {...register('confirmed_status')}>
+                                <option value="">Select Status</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </label>
+                        {errors.confirmed_status && <p className="text-red-600">{errors.confirmed_status.message}</p>}
+                    </div>
+
+                    <div className="w-full">
+                        <label htmlFor="reaching_out_status" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">Reaching Out Status &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <input id="reaching_out_status" type="text" defaultValue={"Fresh Call"} className="grow" {...register('reaching_out_status', {
+                                required: false,
+                            })} />
+                        </label>
+                        {errors.reaching_out_status && <p className="text-red-600">{errors.reaching_out_status.message}</p>}
+                    </div>
+                </div>
+
+                <div className='flex w-full gap-3'>
+                    <div className="w-full">
+                        <label htmlFor="follow_up" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Follow Up Date & Time &nbsp; <TiArrowRight className='mt-1' />
+                            </span>
+                            <input
+                                id="follow_up"
+                                type="datetime-local"
+                                className="grow"
+                                {...register('follow_up', {
+                                    required: false,
+                                    setValueAs: (value) => {
+                                        if (!value) return '';
+                                        // Convert datetime-local format to YYYY-MM-DD HH:MM:SS in 24-hour format
+                                        const date = new Date(value);
+                                        const year = date.getFullYear();
+                                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                                        const day = String(date.getDate()).padStart(2, '0');
+                                        const hours = String(date.getHours()).padStart(2, '0');
+                                        const minutes = String(date.getMinutes()).padStart(2, '0');
+                                        const seconds = String(date.getSeconds()).padStart(2, '0');
+                                        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                                    }
+                                })}
+                                placeholder="Select date and time"
+                                onClick={(e) => e.currentTarget.showPicker()}
+                                onFocus={(e) => e.currentTarget.showPicker()}
+                                min={(() => {
+                                    const now = new Date();
+                                    const year = now.getFullYear();
+                                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                                    const day = String(now.getDate()).padStart(2, '0');
+                                    const hours = String(now.getHours()).padStart(2, '0');
+                                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                                    // Set min value to the current date and time, down to the minute
+                                    return `${year}-${month}-${day}T${hours}:${minutes}`;
+                                })()} // Prevent selecting previous time for the same day
+                            />
+                        </label>
+
+                        <p className="text-xs text-gray-500">Format: YYYY-MM-DD HH:MM:SS (e.g., 2025-04-01 18:54:00)</p>
+                        {errors.follow_up && <p className="text-red-600">{errors.follow_up.message}</p>}
+                    </div>
+
+                    <div className="w-full">
+                        <label htmlFor="managed_by" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Managed By &nbsp; <TiArrowRight className="mt-1" />
+                            </span>
+                            <input
+                                id="managed_by"
+                                type="text"
+                                className="grow"
+                                {...register('managed_by')}
+                                defaultValue={user?.email}
+                                onChange={(e) => {
+                                    if (e.target.value === "") {
+                                        setValue('managed_by', user?.email || "")
+                                    } else {
+                                        setValue("managed_by", e.target.value);
+                                    };
+                                }}
+                                placeholder="Enter the email of the person who will manage the attendee"
+                            />
+                        </label>
+                        {errors.managed_by && <p className="text-red-600">{errors.managed_by.message}</p>}
+                    </div>
+                </div>
+
+                <div className='flex w-full gap-3'>
+                    <div className="w-full">
+                        <label htmlFor="remark" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">
+                                Remark &nbsp; <TiArrowRight className="mt-1" />
+                            </span>
+                            <input
+                                id="remark"
+                                type="text"
+                                className="grow"
+                                {...register('remark')}
+                            />
+                        </label>
+                        {errors.remark && <p className="text-red-600">{errors.remark.message}</p>}
                     </div>
                 </div>
 

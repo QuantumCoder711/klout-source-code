@@ -53,6 +53,10 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({ uuid }) => {
   const { token } = useSelector((state: RootState) => (state.auth));
   // const { currentEventUUID } = useSelector((state: RootState) => (state.events));
   const currentEventUUID = uuid;
+  const allEvents = useSelector((state: RootState) => (state.events.events));
+
+  const currentEvent = allEvents.find((event) => event.uuid === currentEventUUID);
+  console.log("Current Event: ", currentEvent);
   // const { currentAttendeeUUID } = useSelector((state: RootState) => (state.attende));
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormInputType>();
   const [selectedExcelFile, setSelectedExcelFile] = useState<File | null>(null);
@@ -127,7 +131,7 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({ uuid }) => {
     });
 
     if (currentEventUUID) {
-      formData.append("event_id", currentEventUUID);
+      formData.append("event_id", String(currentEvent?.id));
     }
 
     if (image) {

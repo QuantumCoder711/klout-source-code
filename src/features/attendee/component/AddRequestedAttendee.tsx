@@ -22,11 +22,6 @@ type FormInputType = {
     status: string;
     event_id: number;
     excel_file: File | null;
-    confirmed_status: string;
-    reaching_out_status: string;
-    follow_up: string;
-    managed_by: string;
-    remark: string;
 };
 
 
@@ -256,7 +251,6 @@ const AddRequestedAttendee: React.FC = () => {
 
         Object.keys(data).forEach((key) => {
             const value = data[key as keyof FormInputType];
-
             formData.append(key, value ? value.toString() : "");
         });
 
@@ -268,7 +262,7 @@ const AddRequestedAttendee: React.FC = () => {
             formData.append("user_id", String(currentEvent.user_id));
         }
 
-        formData.append("industry", "Not Available");
+        // formData.append("industry", "others");
 
         console.log(formData);
 
@@ -490,84 +484,6 @@ const AddRequestedAttendee: React.FC = () => {
                             </select>
                         </label>
                         {errors.status && <p className="text-red-600">{errors.status.message}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-3 my-4">
-                        <label htmlFor="confirmed_status" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Confirmed Status &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <select id="confirmed_status" className="grow bg-white" {...register('confirmed_status')}>
-                                <option value="">Select Status</option>
-                                <option value="yes">Yes</option>
-                                <option value="no">No</option>
-                            </select>
-                        </label>
-                        {errors.confirmed_status && <p className="text-red-600">{errors.confirmed_status.message}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-3 my-4">
-                        <label htmlFor="reaching_out_status" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Reaching Out Status &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input id="reaching_out_status" type="text" defaultValue={"Fresh Call"} className="grow" {...register('reaching_out_status', {
-                                required: false,
-                            })} />
-                        </label>
-                        {errors.reaching_out_status && <p className="text-red-600">{errors.reaching_out_status.message}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-3 my-4">
-                        <label htmlFor="follow_up" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">Follow Up Date & Time &nbsp; <TiArrowRight className='mt-1' /> </span>
-                            <input
-                                id="follow_up"
-                                type="datetime-local"
-                                className="grow"
-                                {...register('follow_up', {
-                                    required: false,
-                                    setValueAs: (value) => {
-                                        if (!value) return '';
-                                        // Convert datetime-local format to YYYY-MM-DD HH:MM:SS
-                                        const date = new Date(value);
-                                        return date.toISOString().slice(0, 19).replace('T', ' ');
-                                    }
-                                })}
-                                placeholder="Select date and time"
-                                onClick={(e) => e.currentTarget.showPicker()}
-                                onFocus={(e) => e.currentTarget.showPicker()}
-                            />
-                        </label>
-                        <p className="text-xs text-gray-500">Format: YYYY-MM-DD HH:MM:SS (e.g., 2025-04-01 18:54:00)</p>
-                        {errors.follow_up && <p className="text-red-600">{errors.follow_up.message}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-3 my-4">
-                        <label htmlFor="managed_by" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">
-                                Managed By &nbsp; <TiArrowRight className="mt-1" />
-                            </span>
-                            <input
-                                id="managed_by"
-                                type="text"
-                                className="grow"
-                                placeholder="Enter the email of the person who will manage the attendee"
-                                {...register('managed_by')}
-                            />
-                        </label>
-                        {errors.managed_by && <p className="text-red-600">{errors.managed_by.message}</p>}
-                    </div>
-
-                    <div className="flex flex-col gap-3 my-4">
-                        <label htmlFor="remark" className="input input-bordered bg-white text-black flex items-center gap-2">
-                            <span className="font-semibold text-green-700 flex justify-between items-center">
-                                Remark &nbsp; <TiArrowRight className="mt-1" />
-                            </span>
-                            <input
-                                id="remark"
-                                type="text"
-                                className="grow"
-                                {...register('remark')}
-                            />
-                        </label>
-                        {errors.remark && <p className="text-red-600">{errors.remark.message}</p>}
                     </div>
 
                     <div className="col-span-3 flex justify-center mt-4">
