@@ -96,6 +96,7 @@ const AllRequestedAttendee: React.FC = () => {
     const [searchName, setSearchName] = useState('');
     const [searchCompany, setSearchCompany] = useState('');
     const [searchDesignation, setSearchDesignation] = useState('');
+    const [managedBy, setManagedBy] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
 
     // Filter attendees based on the search terms
@@ -104,8 +105,9 @@ const AllRequestedAttendee: React.FC = () => {
             const matchesName = `${attendee.first_name ?? ''} ${attendee.last_name ?? ''}`.toLowerCase().includes(searchName.toLowerCase());
             const matchesCompany = (attendee.company_name ?? '').toLowerCase().includes(searchCompany.toLowerCase());
             const matchesDesignation = (attendee.job_title ?? '').toLowerCase().includes(searchDesignation.toLowerCase());
+            const matchesManaged = (attendee.managed_by ?? '').toLowerCase().includes(managedBy.toLowerCase());
             const matchesRole = roleFilter === '' || (attendee.status ?? '').toLowerCase() === roleFilter.toLowerCase();
-            return matchesName && matchesCompany && matchesDesignation && matchesRole;
+            return matchesName && matchesCompany && matchesDesignation && matchesRole && matchesManaged;
         })
 
     // console.log("Checked Users are: ", checkedUsers2ndDay);
@@ -433,6 +435,16 @@ const AllRequestedAttendee: React.FC = () => {
                             value={searchDesignation}
                             onChange={(e) => {
                                 setSearchDesignation(e.target.value);
+                                setCurrentPage(1); // Reset to the first page when searching
+                            }}
+                        />
+                        <input
+                            type="text"
+                            className="border border-gray-500 rounded-md p-1 max-h-[40px] bg-white outline-none text-black"
+                            placeholder="Managed By"
+                            value={managedBy}
+                            onChange={(e) => {
+                                setManagedBy(e.target.value);
                                 setCurrentPage(1); // Reset to the first page when searching
                             }}
                         />
