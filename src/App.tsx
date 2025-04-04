@@ -242,7 +242,8 @@ import NotFound from "./NotFound";
 import Tutorials from "./features/tutorials";
 import PaymentStatus from "./features/homepage/payment-status";
 // import Photos from "./features/photos/photos";
-
+import ExploreEmbededViewEvent from "./features/homepage/embeded-view-event";
+import EmbededPaymentStatus from "./features/homepage/embeded-payment-status";
 axios.defaults.withCredentials = false;
 
 const App: React.FC = () => {
@@ -270,9 +271,10 @@ const App: React.FC = () => {
         <Route path="/" element={<EventsHome />} />
         <Route path="/add-first-event" element={<AddEvent />} />
         <Route path="/explore-events/event/:slug" element={<ExploreViewEvent />} />
+        <Route path="/embed/explore-events/event/:uuid" element={<ExploreEmbededViewEvent />} />
         <Route path="/explore-events/:city" element={<ExploreAllEvents />} />
         <Route path="/payment/:status/:id" element={<PaymentStatus />} />
-
+        <Route path="/embed/payment/:status/:id" element={<EmbededPaymentStatus />} />
         {/* All other routes wrapped in Layout */}
         <Route
           element={<Layout />}

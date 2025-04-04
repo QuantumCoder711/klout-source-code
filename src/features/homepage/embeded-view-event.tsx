@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import Navbar from './Navbar';
 import { IoMdArrowForward } from 'react-icons/io';
 import { IoLocationSharp } from 'react-icons/io5';
 import Invite from "./invite.svg";
@@ -10,14 +9,13 @@ import GoogleMapComponent from './GoogleMapComponent';
 import Loader from '../../component/Loader';
 import { domain } from './constants';
 import { apiKey } from './constants';
-import Footer from './Footer';
 import swal from 'sweetalert';
 import DummyImage from "/dummyImage.jpg";
 import { FaIndianRupeeSign } from 'react-icons/fa6';
 
 type EventType = {
     id: number;
-    uuid: string;
+    slug: string;
     user_id: number;
     company_name: string;
     title: string;
@@ -49,7 +47,7 @@ type EventType = {
     why_attend_info: string | null;
     more_information: string | null;
     t_and_conditions: string | null;
-    slug: string;
+    uuid: string;
     google_map_link: string;
     total_attendee: number;
     total_accepted: number;
@@ -117,9 +115,9 @@ type AgendaType = {
     speakers: attendeeType[];
 };
 
-const ExploreViewEvent: React.FC = () => {
+const ExploreEmbededViewEvent: React.FC = () => {
 
-    const { slug } = useParams<{ slug: string }>();
+    const { uuid } = useParams<{ uuid: string }>();
     const [isLoading, setIsLoading] = useState(false);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
@@ -223,12 +221,12 @@ const ExploreViewEvent: React.FC = () => {
     const appBaseUrl = import.meta.env.VITE_APP_BASE_URL;
 
     useEffect(() => {
-        if (slug) {
+        if (uuid) {
             try {
                 setIsLoading(true);
                 axios.get(`${apiBaseUrl}/api/all_events`)
                     .then((res: any) => {
-                        setCurrentEvent(res.data.data.find((event: any) => event.slug === slug));
+                        setCurrentEvent(res.data.data.find((event: any) => event.uuid === uuid));
                     })
                     .catch((err: any) => {
                         console.log(err);
@@ -242,7 +240,7 @@ const ExploreViewEvent: React.FC = () => {
                 setIsLoading(false);
             }
         }
-    }, [slug]);
+    }, [uuid]);
 
     // Extract coordinates from Google Maps link
     const extractCoordinates = async (address: string | undefined) => {
@@ -421,7 +419,7 @@ const ExploreViewEvent: React.FC = () => {
                         localStorage.setItem('pendingRegistrationData', JSON.stringify(newObj));
 
                         // Hit the payment API
-                        const response = await (await axios.post(`${appBaseUrl}/api/v1/payment/get-payment`, {
+                        const response = await (await axios.post(`${appBaseUrl}/api/v1/payment/embed-get-payment`, {
                             amount: Number(currentEvent?.event_fee),
                             product: {
                                 title: currentEvent.title,
@@ -433,9 +431,9 @@ const ExploreViewEvent: React.FC = () => {
                         })).data;
                         setForm(response);
 
-                        // Store the event slug in localStorage for retrieval after payment
-                        if (currentEvent?.slug) {
-                            localStorage.setItem('pendingEventSlug', currentEvent.slug);
+                        // Store the event uuid in localStorage for retrieval after payment
+                        if (currentEvent?.uuid) {
+                            localStorage.setItem('pendingEventUuid', currentEvent.uuid);
                         }
                         closeModal();
                     } else if (currentEvent?.paid_event === 0) {
@@ -531,20 +529,16 @@ const ExploreViewEvent: React.FC = () => {
 
             <div
                 dangerouslySetInnerHTML={{ __html: form }}
-                style={{opacity: 0}}
+                style={{ opacity: "0" }}
             />
 
-            <div className='!text-black w-full z-30 fixed top-0 left-0'>
-                <Navbar />
-            </div>
-
-            <div className='max-w-screen-lg flex flex-col-reverse md:flex-row gap-7 justify-center !mx-auto mt-20 space-y-4'>
+            <div className='max-w-screen-lg flex flex-col-reverse md:flex-row gap-7 justify-center !mx-auto space-y-4'>
                 {/* Left Div */}
                 <div className='space-y-4'>
                     <span className='text-gray-700 text-sm'>By {currentEvent?.company_name}</span>
 
                     <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <span className='badge bg-brand-primary text-brand-text font-normal badge-sm'>Paid</span>}</h1>
-                    
+
                     {/* Row for Start Date */}
                     <div className='flex gap-2'>
                         <div className='rounded-md grid place-content-center size-10 bg-white'>
@@ -576,7 +570,7 @@ const ExploreViewEvent: React.FC = () => {
                     </div>
 
                     {/* Row for Event Fee */}
-                    {currentEvent?.paid_event===1 && <div className='flex gap-2'>
+                    {currentEvent?.paid_event === 1 && <div className='flex gap-2'>
                         <div className='flex gap-2'>
                             <div className='rounded-md grid place-content-center size-10 bg-white'>
                                 <FaIndianRupeeSign size={30} className='text-brand-gray' />
@@ -829,7 +823,7 @@ const ExploreViewEvent: React.FC = () => {
                 <div className='max-w-full mx-auto md:max-w-[300px]'>
                     <img src={apiBaseUrl + "/" + currentEvent?.image} alt="Background Image" className='rounded-lg w-60 mx-auto md:w-full' />
 
-                    <div className='mt-10 hidden md:block md:mt-[5.8rem]'>
+                    <div className='mt-10 md:block hidden md:mt-[5.8rem]'>
                         <h3 className='font-semibold text-lg'>Location</h3>
                         <hr className='border-t-2 border-white !my-[10px]' />
                         <p className='text-brand-gray'><strong className='text-black'>{currentEvent?.event_venue_name}</strong> <br />
@@ -840,12 +834,8 @@ const ExploreViewEvent: React.FC = () => {
                     </div>
                 </div>
             </div>
-
-            <div className='p-5'>
-                <Footer />
-            </div>
         </div>
     )
 }
 
-export default ExploreViewEvent;
+export default ExploreEmbededViewEvent;

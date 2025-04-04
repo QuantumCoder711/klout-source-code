@@ -410,13 +410,13 @@ const SearchPeople: React.FC = () => {
                                             </div>
                                         </th>
                                         <th className="py-3 px-4 text-start text-nowrap">S.No</th>
+                                        <th className="py-3 px-4 text-start text-nowrap">LinkedIn</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Name</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Designation</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Company</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Company Size</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Industry</th>
                                         <th className="py-3 px-4 text-start text-nowrap">City</th>
-                                        <th className="py-3 px-4 text-start text-nowrap">LinkedIn</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -431,12 +431,6 @@ const SearchPeople: React.FC = () => {
                                                 />
                                             </td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.firstName} {person.lastName}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.designation}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.company}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.employeeSize}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.industry}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.city}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">
                                                 {person.linkedinUrl && (
                                                     <a
@@ -449,6 +443,12 @@ const SearchPeople: React.FC = () => {
                                                     </a>
                                                 )}
                                             </td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.firstName} {person.lastName}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.designation}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.company}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.employeeSize}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.industry}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.city}</td>
                                         </tr>
                                     ))}
                                 </tbody>

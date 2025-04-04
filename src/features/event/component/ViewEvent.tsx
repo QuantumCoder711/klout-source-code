@@ -32,12 +32,14 @@ type eventType = {
     google_map_link: string,
     event_otp: string;
     view_agenda_by: number;
+    slug: string;
 }
 
 const ViewEvent: React.FC<ViewEventProps> = ({ uuid }) => {
     console.log("The id is: ", uuid);
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useAppDispatch();
+    const websiteURL: string = import.meta.env.VITE_WEBSITE_URL;
 
     const { token } = useSelector((state: RootState) => state.auth);
     const { currentEvent, loading, allEvent } = useSelector((state: RootState) => ({
@@ -47,7 +49,6 @@ const ViewEvent: React.FC<ViewEventProps> = ({ uuid }) => {
     }));
 
     useEffect(() => {
-
         const event = allEvent.find((event: eventType) => {
             return uuid === event.uuid;
         });
@@ -115,31 +116,82 @@ const ViewEvent: React.FC<ViewEventProps> = ({ uuid }) => {
 
             {/* Event Details Section */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-gray-900 text-xl font-semibold">Description</h3>
-                <p className="text-gray-700 mb-2">{currentEvent.description}</p>
+                <div className='flex gap-5 justify-between'>
+                    <div>
+                        <h3 className="text-gray-900 text-xl font-semibold">Description</h3>
+                        <p className="text-gray-700 mb-2">{currentEvent.description}</p>
 
-                {/* Date and Time */}
-                <h3 className="text-gray-900 text-xl font-semibold">Date</h3>
-                <p className="text-gray-700 mb-2">
-                    {currentEvent.event_start_date + ' - ' + currentEvent.event_end_date}
-                </p>
+                        {/* Date and Time */}
+                        <h3 className="text-gray-900 text-xl font-semibold">Date</h3>
+                        <p className="text-gray-700 mb-2">
+                            {currentEvent.event_start_date + ' - ' + currentEvent.event_end_date}
+                        </p>
 
-                {/* Event OTP */}
-                <h3 className="text-gray-900 text-xl font-semibold">Event OTP</h3>
-                <p className="text-gray-700 mb-2">
-                    {currentEvent.event_otp}
-                </p>
+                        {/* Event OTP */}
+                        <h3 className="text-gray-900 text-xl font-semibold">Event OTP</h3>
+                        <p className="text-gray-700 mb-2">
+                            {currentEvent.event_otp}
+                        </p>
 
-                {/* View Agenda By */}
-                <h3 className="text-gray-900 text-xl font-semibold">View Agenda By</h3>
-                <p className="text-gray-700 mb-2">
-                    {currentEvent.view_agenda_by === 0 ? "All" : "Checked In"}
-                </p>
+                        {/* View Agenda By */}
+                        <h3 className="text-gray-900 text-xl font-semibold">View Agenda By</h3>
+                        <p className="text-gray-700 mb-2">
+                            {currentEvent.view_agenda_by === 0 ? "All" : "Checked In"}
+                        </p>
 
-                <h3 className="text-gray-900 text-xl font-semibold">Time</h3>
-                <p className="text-gray-700 mb-4">
-                    {currentEvent.start_time + ':' + currentEvent.start_minute_time + ' ' + currentEvent.start_time_type + ' - ' + currentEvent.end_time + ':' + currentEvent.end_minute_time + ' ' + currentEvent.end_time_type}
-                </p>
+                        <h3 className="text-gray-900 text-xl font-semibold">Time</h3>
+                        <p className="text-gray-700 mb-4">
+                            {currentEvent.start_time + ':' + currentEvent.start_minute_time + ' ' + currentEvent.start_time_type + ' - ' + currentEvent.end_time + ':' + currentEvent.end_minute_time + ' ' + currentEvent.end_time_type}
+                        </p>
+                    </div>
+
+                    <div className='w-80'>
+                        <h3 className="text-gray-900 text-xl font-semibold">Embed Code</h3>
+                        <div className="relative bg-gray-50 p-4 rounded-md">
+                            <button
+                                className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 p-2 rounded-md text-xs"
+                                onClick={() => {
+                                    const code =
+                                        `<iframe
+                                          src="${websiteURL}/embed/explore-events/event/${currentEvent.uuid}"
+                                          width="600"
+  height="450"
+  frameborder="0"
+  style="border: 1px solid #bfcbda88; border-radius: 4px;"
+  allowfullscreen=""
+  aria-hidden="false"
+  tabindex="0"
+                                        />`;
+                                    navigator.clipboard.writeText(code);
+                                    // Show copied notification
+                                    const button = document.getElementById('copyButton');
+                                    if (button) {
+                                        const originalText = button.textContent;
+                                        button.textContent = 'Copied!';
+                                        setTimeout(() => {
+                                            button.textContent = originalText;
+                                        }, 2000);
+                                    }
+                                }}
+                                id="copyButton"
+                            >
+                                Copy
+                            </button>
+                            <code className="block whitespace-pre bg-gray-50 p-2 rounded overflow-scroll text-sm">
+                                {`<iframe
+  src="${websiteURL}/embed/explore-events/event/${currentEvent.uuid}"
+  width="600"
+  height="450"
+  frameborder="0"
+  style="border: 1px solid #bfcbda88; border-radius: 4px;"
+  allowfullscreen=""
+  aria-hidden="false"
+  tabindex="0"
+/>`}
+                            </code>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Location */}
                 <h3 className="text-gray-900 text-xl font-semibold">Location</h3>
