@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { heading } from '../../heading/headingSlice';
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import Loader from '../../../component/Loader';
 
 type Role = 'all' | 'speaker' | 'delegate' | 'sponsor' | 'moderator' | 'panelist';
 
@@ -23,9 +24,8 @@ const InviteRegistrations: React.FC = () => {
     const [selectedRoles, setSelectedRoles] = useState<Role[]>(["all"]);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'email' | null>("email");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now"); // State for "now" and "later" radio buttons
-    const [title, setTitle] = useState<string>("");
     const [message, setMessage] = useState<string>("");
-
+    
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState<boolean>(false);
@@ -33,8 +33,8 @@ const InviteRegistrations: React.FC = () => {
     const { events } = useSelector((state: RootState) => state.events);
 
     const currentEvent = events.find((event) => event.uuid === uuid);
-
-    console.log(currentEvent);
+    
+    const [title, setTitle] = useState<string>(`Exclusive Invitation: ${currentEvent?.title}- Join Industry Leaders!`);
 
 
     // Effect to ensure 'all' is checked if no other roles are selected
@@ -93,8 +93,9 @@ const InviteRegistrations: React.FC = () => {
     const handleSendTimeChange = (time: 'now' | 'later') => {
         setSendTime(time);
     };
-
+    
     const handleSubmit = () => {
+        setLoading(true);
         // Validate that Subject and Message are filled in
         if (selectedMethod == "email") {
             if (!title || !message) {
@@ -130,7 +131,6 @@ const InviteRegistrations: React.FC = () => {
             };
         }
 
-        setLoading(true);
 
         // try {
         //     axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
@@ -179,12 +179,25 @@ const InviteRegistrations: React.FC = () => {
                 },
             })
                 .then(res => {
-                    setLoading(false);
                     if (res.status === 200) {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Success',
-                            text: 'The invitation was sent successfully!',
+                            title: '<span class="text-green-600 font-bold">Success!</span>',
+                            html: `<div class="text-left p-3">
+                                <p class="mb-2">✅ Your campaign has been <strong class="text-green-600">successfully scheduled</strong>!</p>
+                                <p class="mb-2">⏱️ It will be delivered within the next <strong>24 hours</strong>.</p>
+                                <p class="mb-2">📧 You will receive <strong>confirmation emails</strong> shortly.</p>
+                                <p>📊 Track the confirmation under <a href="/events/pending-user-request/${currentEvent?.uuid}" class="text-blue-600">Pending User Delegates</a> section in your dashboard.</p>
+                                </div>`,
+                            customClass: {
+                                popup: 'rounded-lg',
+                                title: 'text-xl mb-4',
+                                htmlContainer: 'text-base'
+                            },
+                            backdrop: `rgba(0,0,123,0.1)`,
+                            showConfirmButton: true,
+                            confirmButtonColor: '#4CAF50',
+                            confirmButtonText: 'Great!'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 window.history.back();
@@ -193,14 +206,26 @@ const InviteRegistrations: React.FC = () => {
                     }
                 })
                 .catch(error => {
-                    setLoading(false);
-
                     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
                         // Handle timeout error
                         Swal.fire({
                             icon: 'success',
-                            title: 'Success',
-                            text: 'The invitation was sent successfully!',
+                            title: '<span class="text-green-600 font-bold">Success!</span>',
+                            html: '<div class="text-left p-3">' +
+                                '<p class="mb-2">✅ Your campaign has been <strong class="text-green-600">successfully scheduled</strong>!</p>' +
+                                '<p class="mb-2">⏱️ It will be delivered within the next <strong>24 hours</strong>.</p>' +
+                                '<p class="mb-2">📧 You will receive <strong>confirmation emails</strong> shortly.</p>' +
+                                '<p>📊 Track the status under <strong class="text-blue-600">"Pending User Delegates"</strong> section in your dashboard.</p>' +
+                                '</div>',
+                            customClass: {
+                                popup: 'rounded-lg',
+                                title: 'text-xl mb-4',
+                                htmlContainer: 'text-base'
+                            },
+                            backdrop: `rgba(0,0,123,0.1)`,
+                            showConfirmButton: true,
+                            confirmButtonColor: '#4CAF50',
+                            confirmButtonText: 'Great!'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 window.location.href = "/events/all-attendee";
@@ -225,12 +250,13 @@ const InviteRegistrations: React.FC = () => {
                 });
         } catch (error) {
             console.log("The error is: ", error);
-            setLoading(false);
             Swal.fire({
                 icon: 'error',
                 title: 'Something went wrong',
                 text: 'An unexpected error occurred.',
             });
+        } finally {
+            setLoading(false);
         }
 
     };
@@ -238,6 +264,10 @@ const InviteRegistrations: React.FC = () => {
 
     if (!currentEvent) {
         return;
+    }
+
+    if(loading){
+        return <Loader />  
     }
 
     return (
@@ -336,7 +366,14 @@ const InviteRegistrations: React.FC = () => {
                         {/* Subject Input */}
                         {selectedMethod === "email" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Subject <span className="text-red-600 ml-1">*</span></label>
-                            <input type="text" name="Subject" onChange={(e) => setTitle(e.target.value)} id="subject" className='input w-full mt-2' />
+                            <input 
+                                type="text"
+                                value={title}
+                                name="Subject"
+                                onChange={(e) => setTitle(e.target.value)}
+                                id="subject"
+                                className='input w-full mt-2'
+                            />
                         </div>}
 
                         {/* Rich Textarea */}
@@ -353,9 +390,6 @@ const InviteRegistrations: React.FC = () => {
                                     // className={`form-control ${errors.message ? "is-invalid" : ""
                                     //     }`}
                                     initialValue={`<p>
-                                    From: ${user?.company_name}<br />
-                                    Subject: Exclusive Invitation: ${currentEvent?.title}- Join Industry Leaders!<br /><br />
-
                                     We are delighted to invite you to the ${currentEvent?.title}, an exclusive gathering of top thought
                                     leaders and industry experts. This premier event is designed to foster meaningful
                                     discussions, networking, and recognition of excellence in the industry.<br /><br />
@@ -404,7 +438,7 @@ const InviteRegistrations: React.FC = () => {
                         </div>}
 
                         {/* Send Time: Now or Later */}
-                        <div className='mt-10'>
+                        <div className='mt-10 hidden'>
                             <h5 className='font-semibold mb-3'>Delivery Schedule</h5>
                             <div className="flex gap-10 pl-5">
                                 {/* Radio button for Now */}

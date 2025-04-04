@@ -20,8 +20,6 @@ const SendInvitation: React.FC = () => {
 
     const { currentEvent } = useSelector((state: RootState) => state.events);
 
-    console.log(currentEvent);
-
     // Handle change of checkboxes
     const handleCheckboxChange = (role: string) => {
         if (role === 'all') {
