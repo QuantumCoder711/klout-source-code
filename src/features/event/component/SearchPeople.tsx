@@ -20,8 +20,14 @@ interface Person {
     industry: string;
     city: string;
     email: string;
-    phone_number: string;
+    mobileNumber: string;
     employeeSize: string;
+}
+
+interface LinkedInUrl {
+    email: string;
+    linkedinUrl: string;
+    mobile: string;
 }
 
 const SearchPeople: React.FC = () => {
@@ -53,6 +59,7 @@ const SearchPeople: React.FC = () => {
     const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
+    const [_, setSelectedPeopleLinkedin] = useState<LinkedInUrl[]>([]);
     const [exportLoading, setExportLoading] = useState(false);
 
     const appBaseUrl = import.meta.env.VITE_APP_BASE_URL;
@@ -64,8 +71,8 @@ const SearchPeople: React.FC = () => {
         applyFilters();
     }, [filters, peopleList]);
 
-     // Reveal function
-     useEffect(() => {
+    // Reveal function
+    useEffect(() => {
         const handleButtonDisplay = (event: KeyboardEvent) => {
             sequenceRef.current += event.key.toLowerCase(); // Append the typed key
 
@@ -96,31 +103,31 @@ const SearchPeople: React.FC = () => {
         let filtered = [...peopleList];
 
         if (filters.designation) {
-            filtered = filtered.filter(person => 
+            filtered = filtered.filter(person =>
                 person.designation.toLowerCase().includes(filters.designation.toLowerCase())
             );
         }
 
         if (filters.company) {
-            filtered = filtered.filter(person => 
+            filtered = filtered.filter(person =>
                 person.company.toLowerCase().includes(filters.company.toLowerCase())
             );
         }
 
         if (filters.city) {
-            filtered = filtered.filter(person => 
+            filtered = filtered.filter(person =>
                 person.city.toLowerCase().includes(filters.city.toLowerCase())
             );
         }
 
         if (filters.companySize) {
-            filtered = filtered.filter(person => 
+            filtered = filtered.filter(person =>
                 person.employeeSize.toLowerCase().includes(filters.companySize.toLowerCase())
             );
         }
 
         if (filters.industry) {
-            filtered = filtered.filter(person => 
+            filtered = filtered.filter(person =>
                 person.industry.toLowerCase().includes(filters.industry.toLowerCase())
             );
         }
@@ -209,7 +216,7 @@ const SearchPeople: React.FC = () => {
             'Industry': person.industry,
             'City': person.city,
             'Email': person.email,
-            'Phone Number': person.phone_number,
+            'Phone Number': person.mobileNumber,
             'LinkedIn': person.linkedinUrl
         }));
 
@@ -272,7 +279,7 @@ const SearchPeople: React.FC = () => {
                 first_name: person?.firstName || "",
                 last_name: person?.lastName || "",
                 email_id: person?.email || "",
-                phone_number: person?.phone_number || "",
+                phone_number: String(person?.mobileNumber) || "",
                 status: "delegate",
                 alternate_mobile_number: "",
                 alternate_email: "",
@@ -316,6 +323,44 @@ const SearchPeople: React.FC = () => {
         }
     }
 
+    const handleGetContacts = async () => {
+        setLoading(true);
+        const linkedinUrls = selectedPeople.map(person => peopleList.find(p => p._id === person)?.linkedinUrl);
+        try {
+            const response = await axios.post(`${apiBaseUrl}/api/extract-numbers-in-bulk`, {
+                linkedinUrls
+            }, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            setSelectedPeopleLinkedin(response.data);
+
+            const data = response.data;
+            for(let singleEntry of data){
+                if(singleEntry.email !== ""){
+                    peopleList.map((person) => {
+                        if(person.linkedinUrl === singleEntry.linkedinUrl){
+                            person.email = singleEntry.email;
+                        }
+                    });
+                }
+
+                if(singleEntry.mobile !== ""){
+                    peopleList.map((person) => {
+                        if(person.linkedinUrl === singleEntry.linkedinUrl){
+                            person.mobileNumber = singleEntry.mobile;   
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.log("The error is: ", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     if (loading || exportLoading) {
         return <Loader />
     }
@@ -354,6 +399,7 @@ const SearchPeople: React.FC = () => {
                                     <div className=" bg-gray-100 rounded-lg flex items-center gap-2">
                                         <p className="font-semibold">{selectedPeople.length} people selected</p>
                                         <button onClick={handleInvitePeople} className="btn btn-primary btn-sm">Add Selected People</button>
+                                        <button onClick={handleGetContacts} className='btn btn-success btn-sm text-white'>Get Contacts</button>
                                     </div>
                                 )}
                                 {showButton && <button
@@ -412,7 +458,10 @@ const SearchPeople: React.FC = () => {
                                         <th className="py-3 px-4 text-start text-nowrap">S.No</th>
                                         <th className="py-3 px-4 text-start text-nowrap">LinkedIn</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Name</th>
+                                        <th className="py-3 px-4 text-start text-nowrap">Email</th>
+                                        <th className="py-3 px-4 text-start text-nowrap">Mobile Number</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Designation</th>
+                                        <th className="py-3 px-4 text-start text-nowrap">Mobile Number</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Company</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Company Size</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Industry</th>
@@ -444,6 +493,8 @@ const SearchPeople: React.FC = () => {
                                                 )}
                                             </td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.firstName} {person.lastName}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.email}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.mobileNumber}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.designation}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.company}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.employeeSize}</td>
