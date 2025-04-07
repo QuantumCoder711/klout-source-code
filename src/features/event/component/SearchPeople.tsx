@@ -24,11 +24,11 @@ interface Person {
     employeeSize: string;
 }
 
-interface LinkedInUrl {
-    email: string;
-    linkedinUrl: string;
-    mobile: string;
-}
+// interface LinkedInUrl {
+//     email: string;
+//     linkedinUrl: string;
+//     mobile: string;
+// }
 
 const SearchPeople: React.FC = () => {
     const { uuid } = useParams();
@@ -59,7 +59,7 @@ const SearchPeople: React.FC = () => {
     const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    const [_, setSelectedPeopleLinkedin] = useState<LinkedInUrl[]>([]);
+    // const [_, setSelectedPeopleLinkedin] = useState<LinkedInUrl[]>([]);
     const [exportLoading, setExportLoading] = useState(false);
 
     const appBaseUrl = import.meta.env.VITE_APP_BASE_URL;
@@ -279,7 +279,7 @@ const SearchPeople: React.FC = () => {
                 first_name: person?.firstName || "",
                 last_name: person?.lastName || "",
                 email_id: person?.email || "",
-                phone_number: person?.mobileNumber || "",
+                phone_number: String(person?.mobileNumber) || "",
                 status: "delegate",
                 alternate_mobile_number: "",
                 alternate_email: "",
@@ -322,43 +322,43 @@ const SearchPeople: React.FC = () => {
         }
     }
 
-    const handleGetContacts = async () => {
-        setLoading(true);
-        const linkedinUrls = selectedPeople.map(person => peopleList.find(p => p._id === person)?.linkedinUrl);
-        try {
-            const response = await axios.post(`${apiBaseUrl}/api/extract-numbers-in-bulk`, {
-                linkedinUrls
-            }, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-            setSelectedPeopleLinkedin(response.data);
+    // const handleGetContacts = async () => {
+    //     setLoading(true);
+    //     const linkedinUrls = selectedPeople.map(person => peopleList.find(p => p._id === person)?.linkedinUrl);
+    //     try {
+    //         const response = await axios.post(`${apiBaseUrl}/api/extract-numbers-in-bulk`, {
+    //             linkedinUrls
+    //         }, {
+    //             headers: {
+    //                 "Authorization": `Bearer ${token}`
+    //             }
+    //         });
+    //         setSelectedPeopleLinkedin(response.data);
 
-            const data = response.data;
-            for(let singleEntry of data){
-                if(singleEntry.email !== ""){
-                    peopleList.map((person) => {
-                        if(person.linkedinUrl === singleEntry.linkedinUrl){
-                            person.email = singleEntry.email;
-                        }
-                    });
-                }
+    //         const data = response.data;
+    //         for(let singleEntry of data){
+    //             if(singleEntry.email !== ""){
+    //                 peopleList.map((person) => {
+    //                     if(person.linkedinUrl === singleEntry.linkedinUrl){
+    //                         person.email = singleEntry.email;
+    //                     }
+    //                 });
+    //             }
 
-                if(singleEntry.mobile !== ""){
-                    peopleList.map((person) => {
-                        if(person.linkedinUrl === singleEntry.linkedinUrl){
-                            person.mobileNumber = singleEntry.mobile;   
-                        }
-                    });
-                }
-            }
-        } catch (error) {
-            console.log("The error is: ", error);
-        } finally {
-            setLoading(false);
-        }
-    }
+    //             if(singleEntry.mobile !== ""){
+    //                 peopleList.map((person) => {
+    //                     if(person.linkedinUrl === singleEntry.linkedinUrl){
+    //                         person.mobileNumber = singleEntry.mobile;   
+    //                     }
+    //                 });
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.log("The error is: ", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
 
     if (loading || exportLoading) {
         return <Loader />
@@ -398,7 +398,7 @@ const SearchPeople: React.FC = () => {
                                     <div className=" bg-gray-100 rounded-lg flex items-center gap-2">
                                         <p className="font-semibold">{selectedPeople.length} people selected</p>
                                         <button onClick={handleInvitePeople} className="btn btn-primary btn-sm">Add Selected People</button>
-                                        <button onClick={handleGetContacts} className='btn btn-success btn-sm text-white'>Get Contacts</button>
+                                        {/* <button onClick={handleGetContacts} className='btn btn-success btn-sm text-white'>Get Contacts</button> */}
                                     </div>
                                 )}
                                 {showButton && <button
@@ -491,8 +491,12 @@ const SearchPeople: React.FC = () => {
                                                 )}
                                             </td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.firstName} {person.lastName}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.email}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.mobileNumber}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">
+                                                {person.email ? person.email.split('@')[0].substring(0, 2) + '...@...' : '-'}
+                                            </td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">
+                                                {person.mobileNumber ? (typeof person.mobileNumber === 'string' ? person.mobileNumber.substring(0, 2) + 'xxxxxxxx' : String(person.mobileNumber).substring(0, 2) + 'xxxxxxxx') : '-'}
+                                            </td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.designation}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.company}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">{person.employeeSize}</td>

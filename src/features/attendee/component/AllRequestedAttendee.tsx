@@ -59,6 +59,7 @@ const AllRequestedAttendee: React.FC = () => {
     const [deleteArray, setDeleteArray] = useState<number[]>([]);
 
     const [deletingAttendee, setDeletingAttendee] = useState<boolean>(false);
+    // const [fetchingContacts, setFetchingContacts] = useState<boolean>(false);
 
     // const [selectedAction, setSelectedAction] = useState('');
 
@@ -283,6 +284,85 @@ const AllRequestedAttendee: React.FC = () => {
         }
     };
 
+    // const handleGetContacts = async () => {
+    //     setFetchingContacts(true);
+        
+    //     try {
+    //         // Get LinkedIn URLs from selected attendees
+    //         const selectedAttendees = filteredAttendees.filter(attendee => deleteArray.includes(attendee.id));
+    //         const linkedinUrls = selectedAttendees
+    //             .filter(attendee => attendee.linkedin_url)
+    //             .map(attendee => attendee.linkedin_url);
+            
+    //         if (linkedinUrls.length === 0) {
+    //             Swal.fire({
+    //                 icon: "warning",
+    //                 title: "No LinkedIn URLs",
+    //                 text: "None of the selected attendees have LinkedIn URLs.",
+    //                 showConfirmButton: true,
+    //             });
+    //             setFetchingContacts(false);
+    //             return;
+    //         }
+            
+    //         // Make API call to extract contact information
+    //         const response = await axios.post(
+    //             `${apiBaseUrl}/api/extract-numbers-in-bulk`, 
+    //             { linkedinUrls },
+    //             {
+    //                 headers: {
+    //                     "Authorization": `Bearer ${token}`
+    //                 }
+    //             }
+    //         );
+            
+    //         // Update attendee data with extracted information
+    //         const updatedAttendees = [...eventAttendee];
+            
+    //         response.data.forEach((contactInfo: any) => {
+    //             if (!contactInfo.linkedinUrl) return;
+                
+    //             const attendeeIndex = updatedAttendees.findIndex(
+    //                 attendee => attendee.linkedin_url === contactInfo.linkedinUrl
+    //             );
+                
+    //             if (attendeeIndex !== -1) {
+    //                 if (contactInfo.email) {
+    //                     updatedAttendees[attendeeIndex].email_id = contactInfo.email;
+    //                 }
+                    
+    //                 if (contactInfo.mobile) {
+    //                     updatedAttendees[attendeeIndex].phone_number = contactInfo.mobile;
+    //                 }
+    //             }
+    //         });
+            
+    //         setEventAttendee(updatedAttendees);
+            
+    //         // Show success message
+    //         Swal.fire({
+    //             icon: "success",
+    //             title: "Contacts Retrieved",
+    //             text: `Successfully retrieved contact information for ${response.data.length} attendees.`,
+    //             showConfirmButton: true,
+    //         });
+            
+    //     } catch (error) {
+    //         console.error("Error fetching contacts:", error);
+    //         Swal.fire({
+    //             icon: "error",
+    //             title: "Error Retrieving Contacts",
+    //             text: "There was an error retrieving contact information. Please try again.",
+    //             showConfirmButton: true,
+    //         });
+    //     } finally {
+    //         setFetchingContacts(false);
+    //     }
+    // };
+    
+    
+    
+    
     // useEffect to track changes in deleteArray (optional, for logging or side effects)
     useEffect(() => {
         console.log('Delete array updated:', deleteArray);
@@ -467,6 +547,14 @@ const AllRequestedAttendee: React.FC = () => {
                             <option value="moderator">Moderator</option>
                         </select>
 
+                        {/* <button 
+                            className='btn btn-success btn-sm text-white'
+                            onClick={handleGetContacts}
+                            disabled={deleteArray.length === 0}
+                        >
+                            Get Contacts
+                        </button> */}
+
                         {/* For Deleting multiple Attendees */}
                         <button onClick={handleDeleteAttendees} disabled={deleteArray.length === 0 ? true : false} className='bg-red-500 disabled:bg-neutral-300 text-white btn-sm max-h-[40px] h-full rounded-md'>Delete Attendees</button>
                     </div>
@@ -515,6 +603,7 @@ const AllRequestedAttendee: React.FC = () => {
                                     <th className="py-3 px-4 text-start text-nowrap">Action</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 {currentAttendees.length > 0 ? (
                                     currentAttendees.map((attendee: attendeeType, index) => (
