@@ -279,16 +279,15 @@ const SearchPeople: React.FC = () => {
                 first_name: person?.firstName || "",
                 last_name: person?.lastName || "",
                 email_id: person?.email || "",
-                phone_number: String(person?.mobileNumber) || "",
+                phone_number: person?.mobileNumber || "",
                 status: "delegate",
                 alternate_mobile_number: "",
                 alternate_email: "",
                 company_name: person?.company || "",
                 job_title: person?.designation || "",
+                linkedin_url: person?.linkedinUrl || "",
             };
         });
-
-        console.log(attendees);
 
 
         try {

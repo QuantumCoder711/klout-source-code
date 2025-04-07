@@ -22,6 +22,7 @@ type FormInputType = {
     status: string;
     event_id: number;
     excel_file: File | null;
+    linkedin_url: string;
 };
 
 
@@ -90,6 +91,7 @@ const AddRequestedAttendee: React.FC = () => {
                 "alternate_email_id",
                 "company_name",
                 "job_title",
+                "linkedin_url",
             ],
             [
                 "John",
@@ -101,6 +103,7 @@ const AddRequestedAttendee: React.FC = () => {
                 "johndoe@alternatemail.com",
                 "Digimantra",
                 "CEO",
+                "https://linkedin.com/in/johndoe",
             ],
         ];
 
@@ -468,6 +471,14 @@ const AddRequestedAttendee: React.FC = () => {
                             })} />
                         </label>
                         {errors.alternate_mobile_number && <p className="text-red-600">{errors.alternate_mobile_number.message}</p>}
+                    </div>
+
+                    <div className="flex flex-col gap-3 my-4">
+                        <label htmlFor="linkedin_url" className="input input-bordered bg-white text-black flex items-center gap-2">
+                            <span className="font-semibold text-green-700 flex justify-between items-center">LinkedIn URL &nbsp; <TiArrowRight className='mt-1' /> </span>
+                            <input id="linkedin_url" type="url" className="grow" {...register('linkedin_url')} />
+                        </label>
+                        {errors.linkedin_url && <p className="text-red-600">{errors.linkedin_url.message}</p>}
                     </div>
 
                     <div className="flex flex-col gap-3 my-4">
