@@ -40,6 +40,7 @@ type attendeeType = {
     not_invited: boolean;
     image: string;
     id: number;
+    linkedin_url: string;
     confirmed_status: string;
     reaching_out_status: string;
     follow_up: string;
@@ -497,6 +498,7 @@ const AllRequestedAttendee: React.FC = () => {
                                 <tr className="bg-klt_primary-500 text-white">
                                     <th className="py-3 px-4 text-start text-nowrap"><input type="checkbox" className='size-5' onClick={(e: any) => handleSelectAll(e.target.checked)} /></th>
                                     <th className="py-3 px-4 text-start text-nowrap">#</th>
+                                    <th className="py-3 px-4 text-start text-nowrap">LinkedIn</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Name</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Designation</th>
                                     <th className="py-3 px-4 text-start text-nowrap">Company</th>
@@ -524,12 +526,24 @@ const AllRequestedAttendee: React.FC = () => {
                                         >
                                             <td className='py-3 px-4 !size-5'><input type='checkbox' checked={deleteArray.includes(attendee.id)} onClick={(e: any) => deleteAttendee(attendee.id, e.target.checked)} /></td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{startIndex + index + 1}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap capitalize ">
+                                                {attendee.linkedin_url ? (
+                                                    <a
+                                                        href={attendee.linkedin_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-500 hover:underline"
+                                                    >
+                                                        View Profile
+                                                    </a>
+                                                ): '-'}
+                                            </td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{`${attendee.first_name} ${attendee.last_name}`}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.company_name}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_email ? attendee.alternate_email : "-"}</td>
-                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number}</td>
+                                            <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.phone_number === "undefined" ? "-" : attendee.phone_number}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.alternate_mobile_number ? attendee.alternate_mobile_number : "-"}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.status}</td>
                                             <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.confirmed_status || "-"}</td>

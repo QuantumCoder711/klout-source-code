@@ -461,7 +461,6 @@ const SearchPeople: React.FC = () => {
                                         <th className="py-3 px-4 text-start text-nowrap">Email</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Mobile Number</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Designation</th>
-                                        <th className="py-3 px-4 text-start text-nowrap">Mobile Number</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Company</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Company Size</th>
                                         <th className="py-3 px-4 text-start text-nowrap">Industry</th>
