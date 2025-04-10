@@ -20,12 +20,11 @@ const InviteRegistrations: React.FC = () => {
     const { uuid } = useParams<{ uuid: string }>();
     // State to keep track of selected roles and selected sending method
     const { token, user } = useSelector((state: RootState) => state.auth);
-    console.log(user);
     const [selectedRoles, setSelectedRoles] = useState<Role[]>(["all"]);
     const [selectedMethod, setSelectedMethod] = useState<'whatsapp' | 'email' | null>("email");
     const [sendTime, setSendTime] = useState<'now' | 'later' | null>("now"); // State for "now" and "later" radio buttons
     const [message, setMessage] = useState<string>("");
-    
+
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState<boolean>(false);
@@ -33,7 +32,7 @@ const InviteRegistrations: React.FC = () => {
     const { events } = useSelector((state: RootState) => state.events);
 
     const currentEvent = events.find((event) => event.uuid === uuid);
-    
+
     const [title, setTitle] = useState<string>(`Exclusive Invitation: ${currentEvent?.title}- Join Industry Leaders!`);
 
 
@@ -93,7 +92,7 @@ const InviteRegistrations: React.FC = () => {
     const handleSendTimeChange = (time: 'now' | 'later') => {
         setSendTime(time);
     };
-    
+
     const handleSubmit = () => {
         setLoading(true);
         // Validate that Subject and Message are filled in
@@ -105,6 +104,7 @@ const InviteRegistrations: React.FC = () => {
                     title: 'Validation Error',
                     text: 'Subject and Message are required.',
                 });
+                setLoading(false);
                 return;
             }
 
@@ -130,46 +130,6 @@ const InviteRegistrations: React.FC = () => {
                 "status": 1,
             };
         }
-
-
-        // try {
-        //     axios.post(`${imageBaseUrl}/api/notifications`, dataObj, {
-        //         headers: {
-        //             "Content-Type": "multipart/form-data",
-        //             "Authorization": `Bearer ${token}`,
-        //         },
-        //     })
-        //         .then(res => {
-        //             setLoading(false);
-        //             if (res.status === 200) {
-        //                 Swal.fire({
-        //                     icon: 'success',
-        //                     title: 'Success',
-        //                     text: 'The invitation was sent successfully!',
-        //                 }).then((result) => {
-        //                     if (result.isConfirmed) {
-        //                         window.location.href = "/events/all-attendee";
-        //                     }
-        //                 });
-        //             }
-        //         })
-        //         .catch(error => {
-        //             setLoading(false);
-        //             Swal.fire({
-        //                 icon: 'error',
-        //                 title: 'Something went wrong',
-        //                 text: error.response?.data?.message || 'An error occurred. Please try again.',
-        //             });
-        //         });
-        // } catch (error) {
-        //     console.log("The error is: ", error);
-        //     setLoading(false);
-        //     Swal.fire({
-        //         icon: 'error',
-        //         title: 'Something went wrong',
-        //         text: 'An unexpected error occurred.',
-        //     });
-        // }
 
         try {
             axios.post(`${imageBaseUrl}/api/invitation-request-message`, dataObj, {
@@ -204,8 +164,10 @@ const InviteRegistrations: React.FC = () => {
                             }
                         });
                     }
+                    setLoading(false);
                 })
                 .catch(error => {
+                    setLoading(false);
                     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
                         // Handle timeout error
                         Swal.fire({
@@ -255,10 +217,8 @@ const InviteRegistrations: React.FC = () => {
                 title: 'Something went wrong',
                 text: 'An unexpected error occurred.',
             });
-        } finally {
             setLoading(false);
         }
-
     };
 
 
@@ -266,8 +226,8 @@ const InviteRegistrations: React.FC = () => {
         return;
     }
 
-    if(loading){
-        return <Loader />  
+    if (loading) {
+        return <Loader />
     }
 
     return (
@@ -331,33 +291,29 @@ const InviteRegistrations: React.FC = () => {
                             </div>
                         </div>
 
+                        {selectedMethod === "whatsapp" && (
+                            <div 
+                                role="alert" 
+                                className="bg-sky-400/10 border-2 border-sky-500 p-3 rounded-lg mt-10 flex items-center"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-sky-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="font-medium text-sky-700">You need to first send emails.</span>
+                            </div>
+                        )}
+
                         {/* WhatsApp Message */}
                         {selectedMethod === "whatsapp" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Your Message</label>
                             <div className='w-2/3 bg-zinc-200 mt-5 rounded-xl p-5'>
-                                {/* <p>
-                                    Dear <strong>"Attendee Name"</strong>,
-                                    <br />
-                                    <br />
-                                    Thank you for registering for <strong>{currentEvent.title}</strong>. <br />
-                                    This is a reminder message that the event will be held on <strong>{currentEvent.event_date}</strong> at <strong>{currentEvent.event_venue_name}</strong>. <br /> <br />
-
-                                    Registration and check-in for the event will happen with the Klout Club app. <br />
-                                    To ensure a smooth check-in and networking experience. You can download it here: <strong>"Link"</strong>. <br />
-                                    We look forward to welcoming you to the event! <br /><br />
-
-                                    Regards, Team  <strong>{user?.company_name}</strong> <br />
-                                </p> */}
                                 <p>
-                                    📢 You're Invited! <br /> <br />
-
-                                    Team <strong>{user?.company_name}</strong> warmly invites you to the {currentEvent.title}, an exclusive gathering of top thought leaders and industry experts. <br /> <br />
-
-                                    🗓 Date: <strong>{currentEvent.event_date}</strong> <br />
-                                    📍 Location: <strong>{currentEvent.event_venue_name}</strong> <br /> <br />
-
-                                    👉 Click below to learn more and express your interest:
-                                    We look forward to your participation!
+                                    Hello, this is a follow-up reminder for the email sent for {<strong>{currentEvent.title}</strong>} happening on {<strong>{currentEvent.event_start_date}</strong>} at {<strong>{currentEvent.event_venue_name}</strong>}. <br /><br />
+                                    
+                                    Kindly review the same or check the link below for more details on the invitation. <br /><br />
+                                    
+                                    Best Regards, <br />
+                                    {user?.company_name}
                                 </p>
                             </div>
                         </div>}
@@ -366,7 +322,7 @@ const InviteRegistrations: React.FC = () => {
                         {/* Subject Input */}
                         {selectedMethod === "email" && <div className="mt-10">
                             <label htmlFor="Subject" className='block font-semibold'>Subject <span className="text-red-600 ml-1">*</span></label>
-                            <input 
+                            <input
                                 type="text"
                                 value={title}
                                 name="Subject"

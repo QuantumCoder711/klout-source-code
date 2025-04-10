@@ -30,13 +30,16 @@ const ExploreAllEvents: React.FC = () => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const upcomingEvents = res.data.data.filter((event: any) => {
+        // Filter out event with id 443
+        const filteredEvents = res.data.data.filter((event: any) => event.id !== 443);
+
+        const upcomingEvents = filteredEvents.filter((event: any) => {
           const eventDate = new Date(event.event_start_date);
           eventDate.setHours(0, 0, 0, 0);
           return eventDate >= today;
         });
 
-        const pastEvents = res.data.data.filter((event: any) => {
+        const pastEvents = filteredEvents.filter((event: any) => {
           const eventDate = new Date(event.event_start_date);
           eventDate.setHours(0, 0, 0, 0);
           return eventDate < today;
@@ -45,7 +48,7 @@ const ExploreAllEvents: React.FC = () => {
         });
 
         // Extract unique cities from events and convert to lowercase
-        const uniqueCities: any[] = Array.from(new Set(res.data.data.map((event: any) => {
+        const uniqueCities: any[] = Array.from(new Set(filteredEvents.map((event: any) => {
           return event.city.toLowerCase();
         })));
 
