@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { Link } from 'react-router-dom';
 import { heading } from '../../heading/headingSlice';
+import { Helmet } from 'react-helmet-async';
 
 interface ViewEventProps {
     uuid: string | undefined;
@@ -67,6 +68,9 @@ const ViewEvent: React.FC<ViewEventProps> = ({ uuid }) => {
 
     return (
         <div className="p-6 pt-0">
+            <Helmet>
+                <title>{currentEvent.title}</title>
+            </Helmet>
             {/* Heading */}
             <div className="mb-4 flex justify-between items-center">
                 <HeadingH2 title={currentEvent.title} />

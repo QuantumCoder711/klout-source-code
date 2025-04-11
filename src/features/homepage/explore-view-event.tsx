@@ -14,6 +14,7 @@ import Footer from './Footer';
 import swal from 'sweetalert';
 import DummyImage from "/dummyImage.jpg";
 import { FaIndianRupeeSign } from 'react-icons/fa6';
+import { Helmet } from 'react-helmet-async';
 
 type EventType = {
     id: number;
@@ -528,7 +529,9 @@ const ExploreViewEvent: React.FC = () => {
 
     return (
         <div className='w-full h-full overflow-auto top-0 absolute left-0 p-5 bg-brand-foreground text-black'>
-
+            <Helmet>
+                <title>{currentEvent?.title}</title>
+            </Helmet>
             <div
                 dangerouslySetInnerHTML={{ __html: form }}
                 style={{opacity: 0}}
