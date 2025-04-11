@@ -24,12 +24,6 @@ interface Person {
     employeeSize: string;
 }
 
-// interface LinkedInUrl {
-//     email: string;
-//     linkedinUrl: string;
-//     mobile: string;
-// }
-
 const SearchPeople: React.FC = () => {
     const { uuid } = useParams();
     const dispatch = useAppDispatch();
@@ -59,7 +53,6 @@ const SearchPeople: React.FC = () => {
     const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
-    // const [_, setSelectedPeopleLinkedin] = useState<LinkedInUrl[]>([]);
     const [exportLoading, setExportLoading] = useState(false);
 
     const appBaseUrl = import.meta.env.VITE_APP_BASE_URL;
@@ -307,8 +300,8 @@ const SearchPeople: React.FC = () => {
                     title: "Success!",
                     text: "People added to list successfully.",
                     icon: "success",
-                }).then(() => {
-                    window.location.href = `/events/all-requested-attendees/${uuid}`;
+                }).then(()=>{
+                    setSelectedPeople([]);
                 })
             }
         } catch (error) {

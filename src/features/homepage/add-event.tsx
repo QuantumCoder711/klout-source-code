@@ -25,33 +25,6 @@ import GoogleMapComponent from './GoogleMapComponent';
 import { TiArrowRight } from 'react-icons/ti';
 import Swal from 'sweetalert2';
 
-// interface Form {
-//     title: string;
-//     image: File | string | null; // This can be either a File from the file input or a string for selected template URLs
-//     description: string;
-//     event_start_date: string;
-//     event_end_date: string;
-//     event_date: string;
-//     start_time: string; // New field for formatted start time (e.g., '16:05')
-//     start_minute_time: string; // New field for start time minute part (e.g., '05')
-//     start_time_type: string; // New field for AM/PM designation (e.g., 'PM')
-//     end_time: string; // New field for formatted end time (e.g., '17:05')
-//     end_minute_time: string; // New field for end time minute part (e.g., '05')
-//     end_time_type: string; // New field for AM/PM designation (e.g., 'PM')
-//     event_venue_name: string;
-//     event_venue_address_1: string;
-//     event_venue_address_2: string;
-//     country: string;
-//     state: string;
-//     city: string;
-//     pincode: string;
-//     google_map_link: string;
-//     status: number;
-//     feedback: number;
-//     event_otp: string;
-//     view_agenda_by: number;
-// }
-
 interface FormUI {
     title: string;
     image: File | string | null; // This can be either a File from the file input or a string for selected template URLs
@@ -176,8 +149,8 @@ const AddEvent: React.FC = () => {
     const [country, setCountry] = useState<string>("");
     const [pincode, setPincode] = useState<string>("");
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
-        lat: -3.745,
-        lng: -38.523,
+        lat: 19.0896, 
+        lng: 72.8656, // Coordinates for Chhatrapati Shivaji Maharaj International Airport Mumbai
     });
 
 

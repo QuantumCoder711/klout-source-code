@@ -102,8 +102,8 @@ const AddEvent: React.FC = () => {
     const [locationInfo, setLocationInfo] = useState<any>(null);
     const [location, setLocation] = useState<string>("");
     const [center, setCenter] = useState<{ lat: number; lng: number }>({
-        lat: -3.745,  // Default latitude (you can change it to a default location)
-        lng: -38.523, // Default longitude
+        lat: 19.0896, 
+        lng: 72.8656,  // Default latitude (you can change it to a default location)
     });
 
 
