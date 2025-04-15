@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
             </Link>
 
             <div className='text-xs lg:text-sm font-light'>
-                <p className='flex gap-1 items-center flex-wrap'>Copyright &copy; {year}-{nextYear} All rights reserved | The Klout Club is made with <Heart size={18} /></p>
+                <p className='flex gap-1 items-center flex-wrap'>Copyright &copy; {year}-{nextYear} All rights reserved | The Klout Club is made with <Heart size={18} /> Zirclez Innovation</p>
                 <div className='flex gap-2 mt-2 items-center justify-center'>
                     <a href="https://www.klout.club/privacypolicy.html" target='_blank' className='underline underline-offset-1'>Privacy Policy</a>
                     <span>|</span>

@@ -133,6 +133,7 @@ const ExploreViewEvent: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
+    const [viewAgendaBy, setViewAgendaBy] = useState<number>(0);
 
     const [form, setForm] = useState({
         amount: 0,
@@ -305,6 +306,7 @@ const ExploreViewEvent: React.FC = () => {
                 .then((res) => {
                     console.log("The data is", res.data.data.speakers);
                     setAllSpeakers(res.data.data.speakers);
+                    setViewAgendaBy(res.data.data.view_agenda_by);
                 })
                 .catch((err) => {
                     console.log("The error is", err);
@@ -534,7 +536,7 @@ const ExploreViewEvent: React.FC = () => {
             </Helmet>
             <div
                 dangerouslySetInnerHTML={{ __html: form }}
-                style={{opacity: 0}}
+                style={{ opacity: 0 }}
             />
 
             <div className='!text-black w-full z-30 fixed top-0 left-0'>
@@ -547,7 +549,7 @@ const ExploreViewEvent: React.FC = () => {
                     <span className='text-gray-700 text-sm'>By {currentEvent?.company_name}</span>
 
                     <h1 className='text-2xl font-semibold !mt-0 flex items-center gap-2'>{currentEvent?.title} {currentEvent?.paid_event === 1 && <span className='badge bg-brand-primary text-brand-text font-normal badge-sm'>Paid</span>}</h1>
-                    
+
                     {/* Row for Start Date */}
                     <div className='flex gap-2'>
                         <div className='rounded-md grid place-content-center size-10 bg-white'>
@@ -579,7 +581,7 @@ const ExploreViewEvent: React.FC = () => {
                     </div>
 
                     {/* Row for Event Fee */}
-                    {currentEvent?.paid_event===1 && <div className='flex gap-2'>
+                    {currentEvent?.paid_event === 1 && <div className='flex gap-2'>
                         <div className='flex gap-2'>
                             <div className='rounded-md grid place-content-center size-10 bg-white'>
                                 <FaIndianRupeeSign size={30} className='text-brand-gray' />
@@ -750,8 +752,33 @@ const ExploreViewEvent: React.FC = () => {
                         <p className='text-brand-gray'>{currentEvent?.description}</p>
                     </div>
 
-                    {/* Agenda Details */}
+                    {/* Speakers */}
                     <div className='mt-6'>
+                        <h3 className='font-semibold text-lg'>Speakers</h3>
+                        <hr className='border-t-2 border-white !my-[10px]' />
+
+
+                        {/* All Speakers */}
+                        <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
+
+                            {/* Single Speaker Deatils */}
+                            {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
+                                <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
+                                    <img
+                                        src={speaker.image ? apiBaseUrl + "/" + speaker.image : DummyImage}
+                                        alt="Speaker"
+                                        className='rounded-full mx-auto size-24'
+                                    />
+                                    <p className='font-semibold text-wrap'>{speaker.first_name + ' ' + speaker.last_name}</p>
+                                    <p className='text-wrap text-sm'>{speaker.job_title}</p>
+                                    <p className='text-sm font-bold text-wrap capitalize'>{speaker.company_name}</p>
+                                </div>
+                            )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
+                        </div>
+                    </div>
+
+                    {/* Agenda Details */}
+                    {viewAgendaBy == 0 && <div className='mt-6'>
                         <h3 className='font-semibold text-lg'>Agenda Details</h3>
                         <hr className='border-t-2 border-white !my-[10px]' />
 
@@ -790,32 +817,7 @@ const ExploreViewEvent: React.FC = () => {
                             </div>
                         </div>
 
-                    </div>
-
-                    {/* Speakers */}
-                    <div className='mt-6'>
-                        <h3 className='font-semibold text-lg'>Agenda Speakers</h3>
-                        <hr className='border-t-2 border-white !my-[10px]' />
-
-
-                        {/* All Speakers */}
-                        <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
-
-                            {/* Single Speaker Deatils */}
-                            {allSpeakers.length > 0 ? allSpeakers.map((speaker, index) => (
-                                <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
-                                    <img
-                                        src={speaker.image ? apiBaseUrl + "/" + speaker.image : DummyImage}
-                                        alt="Speaker"
-                                        className='rounded-full mx-auto size-24'
-                                    />
-                                    <p className='font-semibold text-wrap'>{speaker.first_name + ' ' + speaker.last_name}</p>
-                                    <p className='text-wrap text-sm'>{speaker.job_title}</p>
-                                    <p className='text-sm font-light text-wrap'>{speaker.company_name}</p>
-                                </div>
-                            )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
-                        </div>
-                    </div>
+                    </div>}
 
                     <div className='mt-10 md:hidden md:mt-[5.8rem]'>
                         <h3 className='font-semibold text-lg'>Location</h3>
