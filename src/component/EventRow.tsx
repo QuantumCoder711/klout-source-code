@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { eventUUID } from '../features/event/eventSlice';
 import { useDispatch } from 'react-redux';
@@ -36,6 +36,8 @@ const EventRow: React.FC<EventRowProps> = (props) => {
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const [isLive, setIsLive] = useState(false);
+    const [showSearchPeople, setShowSearchPeople] = useState(false);
+    const sequenceRef = useRef("");
 
     const {count} = useGlobalContext();
 
@@ -68,6 +70,33 @@ const EventRow: React.FC<EventRowProps> = (props) => {
             setIsLive(false);
         }
     }, [eventStartTime, eventEndTime, props.date]);
+
+    // Effect to handle keyboard sequence for revealing/hiding search people link
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            sequenceRef.current += event.key.toLowerCase();
+            
+            // Keep only the last 6 characters
+            if (sequenceRef.current.length > 6) {
+                sequenceRef.current = sequenceRef.current.slice(-6);
+            }
+            
+            // Check if sequence matches "reveal"
+            if (sequenceRef.current === "reveal") {
+                setShowSearchPeople(true);
+                sequenceRef.current = ""; // Reset sequence
+            }
+            
+            // Check if sequence matches "hide"
+            if (sequenceRef.current === "hide") {
+                setShowSearchPeople(false);
+                sequenceRef.current = ""; // Reset sequence
+            }
+        };
+        
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
 
     // useEffect(() => {
     //     console.log("Inside Use Effect Hook");
@@ -205,7 +234,7 @@ const EventRow: React.FC<EventRowProps> = (props) => {
 
             {/* Links */}
             <div className='min-w-fit'>
-                {props.isUpcoming && <><Link to={`/events/search-people/${props.uuid}`} onClick={() => {
+                {props.isUpcoming && showSearchPeople && <><Link to={`/events/search-people/${props.uuid}`} onClick={() => {
                     dispatch(eventUUID(props.uuid)); dispatch(heading('Search People'));
                 }} className="text-lime-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs">Search People</Link> <br /></>}
                 <Link to={`/events/view-event/${props.uuid}`} className="text-pink-500 hover:underline px-3 inline-block mb-1 rounded-md text-xs" onClick={() => {
