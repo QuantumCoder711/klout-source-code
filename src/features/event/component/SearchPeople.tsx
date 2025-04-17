@@ -24,11 +24,18 @@ interface Person {
     employeeSize: string;
 }
 
+const cities: string[] = [
+    "Mumbai", "Delhi", "Bengaluru", "Gurgaon", "Chennai", "Pune",
+    "Hyderabad", "Noida", "New Delhi", "Ahmedabad", "Jaipur", "Kolkata",
+    "Patna", "Visakhapatnam", "Lucknow", "Bhopal", "Chandigarh", "Mohali"
+];
+
 const SearchPeople: React.FC = () => {
     const { uuid } = useParams();
     const dispatch = useAppDispatch();
     const allEvents = useSelector((state: RootState) => state.events.events);
     const event = allEvents.find((event) => event.uuid === uuid);
+
     const [searchData, setSearchData] = useState({
         designation: "",
         city: "",
@@ -143,6 +150,13 @@ const SearchPeople: React.FC = () => {
         setSearchData({
             ...searchData,
             [e.target.name]: e.target.value
+        });
+    }
+
+    const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSearchData({
+            ...searchData,
+            city: e.target.value
         });
     }
 
@@ -300,7 +314,7 @@ const SearchPeople: React.FC = () => {
                     title: "Success!",
                     text: "People added to list successfully.",
                     icon: "success",
-                }).then(()=>{
+                }).then(() => {
                     setSelectedPeople([]);
                 })
             }
@@ -376,7 +390,17 @@ const SearchPeople: React.FC = () => {
             <div className='mt-10'>
                 <div className='flex gap-3 items-center justify-center mb-6'>
                     <input type="text" placeholder='Search by Designation' className='input input-bordered input-sm w-full max-w-xs' name='designation' value={searchData.designation} onChange={handleSearchData} />
-                    <input type="text" placeholder='Search by City' className='input input-bordered w-full input-sm max-w-xs' name='city' value={searchData.city} onChange={handleSearchData} />
+                    <select 
+                        className='select select-bordered select-sm w-full max-w-xs'
+                        name='city'
+                        value={searchData.city}
+                        onChange={handleCityChange}
+                    >
+                        <option value="">Select City</option>
+                        {cities.map((city, index) => (
+                            <option key={index} value={city}>{city}</option>
+                        ))}
+                    </select>
                     <button onClick={handleGetPeopleList} className='btn btn-primary btn-sm'>Search</button>
                 </div>
 

@@ -201,7 +201,7 @@ const Profile: React.FC = () => {
 
             <div className="flex justify-end">
                 {/* <HeadingH2 title="Profile" /> */}
-                <Link to="/" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
+                <Link to="/dashboard" onClick={() => dispatch(heading("Dashboard"))} className="btn btn-error text-white btn-sm">
                     <IoMdArrowRoundBack size={20} /> Go To Dasboard
                 </Link>
             </div>
