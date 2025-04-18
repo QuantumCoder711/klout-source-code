@@ -133,13 +133,14 @@ const AllRequestedAttendee: React.FC = () => {
             'First Name': attendee.first_name,
             'Last Name': attendee.last_name,
             'Email': attendee.email_id,
-            'Mobile': attendee.phone_number,
+            'Mobile': attendee.phone_number === "undefined" ? "" : attendee.phone_number,
             'Role': attendee.status,
             'Altername Mobile': attendee.alternate_mobile_number,
             'Alternate Email': attendee.alternate_email,
             'Designation': attendee.job_title,
             'Company': attendee.company_name,
             'Event Name': attendee.event_name,
+            "LinkedIn": attendee.linkedin_url,
         }));
 
         // Create a new workbook and a worksheet
