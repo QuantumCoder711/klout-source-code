@@ -141,12 +141,10 @@ const Photos: React.FC = () => {
                 const response = await fetch('https://additional.klout.club/api/v1/faces/uploadChunk', {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    }
                 });
 
                 const result = await response.json();
+                console.log("The result is: ", result);
                 if (result.completedStep) {
                     completedStep = result.completedStep;
                 }
