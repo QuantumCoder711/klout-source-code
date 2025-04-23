@@ -35,7 +35,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className={`relative min-h-screen ${collapse ? "w-44 xl:w-56" : "w-fit pt-[72px]"} flex-shrink-0 bg-klt_primary-900 text-white`}>
-      {collapse && <span>
+      {collapse && <Link to="/dashboard" onClick={()=>dispatch(heading("Dashboard"))}>
         {
           user?.company_logo &&
           <div className="border-b border-white">
@@ -49,7 +49,7 @@ const Sidebar: React.FC = () => {
           KLOUT CLUB
         </div>
         }
-      </span>}
+      </Link>}
 
       <div onClick={() => setCollapse(prev => !prev)} className="bg-white w-8 h-8 rounded-full absolute grid place-content-center top-1/2 -bottom-1/2 -translate-y-1/2 -right-4 shadow-lg cursor-pointer">
         <MdKeyboardDoubleArrowLeft className={`${!collapse ? "rotate-180" : "rotate-0"} size-7 text-black`} />
