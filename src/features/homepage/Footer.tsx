@@ -11,38 +11,6 @@ const Footer: React.FC = () => {
     const nextYear = (new Date().getFullYear() + 1) % 100;
 
     return (
-        // <footer className='w-full mt-10 flex justify-between flex-col gap-4 md:flex-row items-center'>
-        //     <Link to={"/home"}>
-        //         <img src={WhiteLogo} alt="Klout Club" width={96} height={96} className={`${window.location.pathname.includes("/explore-events") ? 'invert' : ''}`}/>
-        //     </Link>
-
-        //     <div className='text-xs lg:text-sm font-light'>
-        //         <p className='flex gap-1 items-center flex-wrap'>Copyright &copy; {year}-{nextYear} All rights reserved | The Klout Club is made with <Heart size={18} /> Zirclez Innovation</p>
-        //         <div className='flex gap-2 mt-2 items-center justify-center'>
-        //             <a href="https://www.klout.club/privacypolicy.html" target='_blank' className='underline underline-offset-1'>Privacy Policy</a>
-        //             <span>|</span>
-        //             <a href="https://www.klout.club/terms-and-condition" target='_blank' className='underline underline-offset-1'>Terms and Conditions</a>
-        //             <span>|</span>
-        //             <a href="https://www.klout.club/cancellation-policy" target='_blank' className='underline underline-offset-1'>Refund Policy</a>
-        //         </div>
-        //     </div>
-
-        //     <div className='flex gap-4'>
-        //         <a target='_blank' href="https://www.facebook.com/thekloutclub">
-        //             <FaFacebookF />
-        //         </a>
-        //         <a target='_blank' href="https://x.com/TheKloutClub">
-        //             <FaXTwitter />
-        //         </a>
-        //         <a target='_blank' href="https://www.linkedin.com/company/klout-club/">
-        //             <FaLinkedinIn />
-        //         </a>
-        //         <a target='_blank' href="https://www.instagram.com/klout_club/">
-        //             <FaInstagram />
-        //         </a>
-        //     </div>
-        // </footer>
-
         <footer className='w-full p-5 relative top-10 mx-auto h-fit bg-black/10 backdrop-blur-lg rounded-lg'>
             <h3 className='text-center text-lg'>Klout Club: Where every connection counts.</h3>
             <div className='flex justify-center gap-5 flex-wrap md:justify-between items-center md:absolute w-full mx-auto left-0 right-0 top-0 p-5'>
