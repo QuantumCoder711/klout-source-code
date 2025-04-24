@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
     const nextYear = (new Date().getFullYear() + 1) % 100;
 
     return (
-        <footer className='w-full p-5 relative top-10 mx-auto h-fit bg-black/10 backdrop-blur-lg rounded-lg'>
+        <footer className='w-full p-5 relative top-10 mx-auto h-fit bg-black/10 backdrop-blur-lg rounded-lg z-10'>
             <h3 className='text-center text-lg'>Klout Club: Where every connection counts.</h3>
             <div className='flex justify-center gap-5 flex-wrap md:justify-between items-center md:absolute w-full mx-auto left-0 right-0 top-0 p-5'>
                 <div className='flex md:flex-col flex-wrap gap-2'>

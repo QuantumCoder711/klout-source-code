@@ -194,6 +194,7 @@ import EventPage from "./pages/EventPage";
 import AddEventPage from "./pages/AddEventPage";
 import AllAttendeePage from "./pages/AllAttendeePage";
 import AllSponsorPage from "./pages/AllSponsorPage";
+import AddSponsorPage from "./pages/AddSponsorPage";
 import ViewEventPage from "./pages/ViewEventPage";
 import EditEventPage from "./pages/EditEventPage"
 import LoginPage from "./pages/LoginPage";
@@ -304,6 +305,7 @@ const App: React.FC = () => {
           <Route path="/events/send-to-app/:uuid" element={<SendToApp />} />
           <Route path="/events/add-attendee/:uuid" element={<AddEventAttendeePage />} />
           <Route path="/events/add-requested-attendee/:uuid" element={<AddRequestedAttendee />} />
+          <Route path="/events/add-sponsor/:uuid" element={<AddSponsorPage />} />
           <Route path="/events/send-reminder/:uuid" element={<SendReminder />} />
           <Route path="/events/send-poll/:uuid" element={<SendPoll />} />
           <Route path="/events/invite-registrations/:uuid" element={<InviteResgistations />} />
@@ -317,6 +319,7 @@ const App: React.FC = () => {
           <Route path="/events/same-day-reminder/:uuid" element={<SameDayReminder />} />
           <Route path="/all-attendees" element={<AllAttendeePage />} />
           <Route path="/all-sponsors" element={<AllSponsorPage />} />
+          <Route path="/events/all-sponsors" element={<AllSponsorPage />} />
           <Route path="/all-reports" element={<AllReports />} />
           <Route path="/all-photos" element={<AllPhotosPage />} />
           <Route path="/all-photos/photo/:uuid" element={<Photos />} />
