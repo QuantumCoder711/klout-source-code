@@ -43,12 +43,18 @@ const Dashboard: React.FC = () => {
     const eventDate: Date = new Date(event.event_start_date);
     eventDate.setHours(0, 0, 0, 0);
     return eventDate < today;
+  }).sort((a: eventType, b: eventType) => {
+    // Sort by decreasing date (descending order) for past events
+    return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
   }).slice(0, 4);
 
   const upcomingEvents = events.filter((event: eventType) => {
     const eventDate: Date = new Date(event.event_start_date);
     eventDate.setHours(0, 0, 0, 0);
     return eventDate >= today;
+  }).sort((a: eventType, b: eventType) => {
+    // Sort by increasing date (ascending order)
+    return new Date(a.event_start_date).getTime() - new Date(b.event_start_date).getTime();
   }).slice(0, 4);
 
   if (loading) return <p>loading...</p>;

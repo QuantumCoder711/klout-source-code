@@ -44,11 +44,17 @@ const Event: React.FC = () => {
     const pastEvents = events.filter((event: eventType) => {
         const eventDate = event.event_start_date;
         return eventDate < today;
+    }).sort((a: eventType, b: eventType) => {
+        // Sort by decreasing date (descending order) for past events
+        return new Date(b.event_start_date).getTime() - new Date(a.event_start_date).getTime();
     });
 
     const upcomingEvents = events.filter((event: eventType) => {
         const eventDate = event.event_start_date;
         return eventDate >= today;
+    }).sort((a: eventType, b: eventType) => {
+        // Sort by increasing date (ascending order) for upcoming events
+        return new Date(a.event_start_date).getTime() - new Date(b.event_start_date).getTime();
     });
 
     const handleTabChange = (tab: 'upcoming' | 'past') => {
