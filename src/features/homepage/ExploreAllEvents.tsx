@@ -37,6 +37,9 @@ const ExploreAllEvents: React.FC = () => {
           const eventDate = new Date(event.event_start_date);
           eventDate.setHours(0, 0, 0, 0);
           return eventDate >= today;
+        }).sort((a: any, b: any) => {
+          // Sort by increasing date (ascending order)
+          return new Date(a.event_start_date).getTime() - new Date(b.event_start_date).getTime();
         });
 
         const pastEvents = filteredEvents.filter((event: any) => {
