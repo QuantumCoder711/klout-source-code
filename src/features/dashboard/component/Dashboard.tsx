@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
                 key={upcomingEvent.id}
                 title={upcomingEvent.title}
                 eventId={upcomingEvent.id}
-                imageUrl={`${imageBaseUrl}/${upcomingEvent.image}`}
+                imageUrl={`https://api.klout.club/${upcomingEvent.image}`}
                 start_minute_time={upcomingEvent.start_minute_time}
                 start_time={upcomingEvent.start_time}
                 start_time_type={upcomingEvent.start_time_type}
