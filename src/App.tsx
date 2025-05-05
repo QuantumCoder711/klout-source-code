@@ -245,6 +245,7 @@ import PaymentStatus from "./features/homepage/payment-status";
 // import Photos from "./features/photos/photos";
 import ExploreEmbededViewEvent from "./features/homepage/embeded-view-event";
 import EmbededPaymentStatus from "./features/homepage/embeded-payment-status";
+import WalletPaymentStatus from "./features/profile/components/WalletPaymentStatus";
 axios.defaults.withCredentials = false;
 
 const App: React.FC = () => {
@@ -284,6 +285,7 @@ const App: React.FC = () => {
           <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/wallet/:status" element={<WalletPaymentStatus />} />
 
           <Route path="/events" element={<EventPage />} />
           <Route path="/events/search-people/:uuid" element={<SearchPeople />} />

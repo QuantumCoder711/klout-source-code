@@ -11,6 +11,7 @@ import Loader from "../../../component/Loader";
 import { useDispatch } from "react-redux";
 import { heading } from "../../heading/headingSlice";
 import dummyImage from "/dummyImage.jpg";
+import AddCreditsModal from "./AddCreditsModal";
 
 type formInputType = {
     first_name: string,
@@ -48,12 +49,13 @@ type jobTitleType = {
 
 const Profile: React.FC = () => {
 
-    const { user, token, loading } = useSelector((state: RootState) => state.auth);
+    const { user, token, loading, wallet_balance } = useSelector((state: RootState) => state.auth);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     const dispatch = useDispatch<AppDispatch>()
 
     const [edit, setEdit] = useState<boolean>(false);
+    const [isAddCreditsModalOpen, setIsAddCreditsModalOpen] = useState<boolean>(false);
 
     const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
     const company_logo: string = user?.company_logo ? `${imageBaseUrl}/${user?.company_logo}` : "";
@@ -99,7 +101,7 @@ const Profile: React.FC = () => {
         const jId: any = jobTitle.filter((job: any) => job.name === e.target.value);
 
         setSelectedDesignationId(jId[0].id);
-        
+
         if (e.target.value !== "Others") {
             setSelectedDesignationId("252");
             setCustomDesignationName(''); // Reset custom name if a valid designation is selected
@@ -198,6 +200,11 @@ const Profile: React.FC = () => {
 
     return (
         <div>
+            {/* Add Credits Modal */}
+            <AddCreditsModal
+                isOpen={isAddCreditsModalOpen}
+                onClose={() => setIsAddCreditsModalOpen(false)}
+            />
 
             <div className="flex justify-end">
                 {/* <HeadingH2 title="Profile" /> */}
@@ -230,6 +237,18 @@ const Profile: React.FC = () => {
                             <p className="text-gray-500 text-sm">{user?.email}</p>
                             <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
                             <p className="text-gray-500 text-sm">{user?.address + ", " + user?.pincode}</p>
+
+                            <div className="flex items-center mt-4">
+                                <div className="bg-green-100 text-klt_primary-900 px-3 py-1 rounded-full font-semibold mr-3">
+                                    Credits: {wallet_balance !== undefined ? wallet_balance : 0}
+                                </div>
+                                <button
+                                    onClick={() => setIsAddCreditsModalOpen(true)}
+                                    className="text-klt_primary-900 font-semibold hover:underline"
+                                >
+                                    Add Credits
+                                </button>
+                            </div>
                         </div>
                     </div>
 
