@@ -21,7 +21,8 @@ type UserType = {
     image: string,
     company_name: string,
     designation_name: string | null,
-    deleted_at: string | null
+    deleted_at: string | null,
+    wallet_balance?: number
 };
 
 type authState = {
@@ -30,6 +31,7 @@ type authState = {
     error: string | null,
     loginError: string | null;
     user: UserType | null,  // Changed to single user instead of array
+    wallet_balance: number,
 };
 
 const initialState: authState = {
@@ -38,6 +40,7 @@ const initialState: authState = {
     error: null,
     loginError: null,
     user: null,
+    wallet_balance: 0,
 };
 
 export const login = createAsyncThunk(
@@ -124,6 +127,11 @@ const authSlice = createSlice({
             state.loading = false;
             state.user = action.payload;
             state.error = null;
+
+            // Check if wallet_balance exists in the response
+            if ('wallet_balance' in action.payload && typeof action.payload.wallet_balance === 'number') {
+                state.wallet_balance = action.payload.wallet_balance;
+            }
         });
 
         // rejected state for fetchUser

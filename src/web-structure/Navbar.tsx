@@ -11,6 +11,7 @@ import { heading } from "../features/heading/headingSlice";
 import socket from "../socket";
 import { useGlobalContext } from "../GlobalContext";
 import dummyImage from "/dummyImage.jpg";
+import Coin from "/src/assets/coin.png";
 
 type eventType = {
   title: string,
@@ -27,10 +28,9 @@ type eventType = {
   end_time_type?: string,
 }
 
-
 const Navbar: React.FC = () => {
   const dispatch = useAppDispatch();
-
+  const {wallet_balance} = useSelector((state:RootState)=>state.auth);
   const { setCount } = useGlobalContext();
 
   const imageBaseUrl: string = import.meta.env.VITE_API_BASE_URL;
@@ -45,20 +45,17 @@ const Navbar: React.FC = () => {
   const today: Date = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const pastEvents = events.filter((event: eventType) => {
-    const eventDate: Date = new Date(event.event_start_date);
-    eventDate.setHours(0, 0, 0, 0);
-    return eventDate < today;
-  }).slice(0, 4);
+  // const pastEvents = events.filter((event: eventType) => {
+  //   const eventDate: Date = new Date(event.event_start_date);
+  //   eventDate.setHours(0, 0, 0, 0);
+  //   return eventDate < today;
+  // }).slice(0, 4);
 
   const upcomingEvents = events.filter((event: eventType) => {
     const eventDate: Date = new Date(event.event_start_date);
     eventDate.setHours(0, 0, 0, 0);
     return eventDate >= today;
   }).slice(0, 4);
-
-  console.log(pastEvents);
-
 
 
   useEffect(() => {
@@ -128,7 +125,7 @@ const Navbar: React.FC = () => {
     return <Navigate to="/" />;
   }
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     await dispatch(logout());
   }
 
@@ -143,49 +140,54 @@ const Navbar: React.FC = () => {
         <div className="text-xl font-bold ml-6">{pageHeading}</div>
 
         {/* Right side - User profile with dropdown */}
-        <div
-          className="relative"
-          onMouseEnter={() => toggleDropdown(true)}
-          onMouseLeave={() => toggleDropdown(false)}
-        >
-          <div className="flex items-center space-x-2 cursor-pointer">
-            {/* User Avatar */}
-            <img
-              src={
-                user?.image === null ? dummyImage : `${imageBaseUrl}/${user?.image}`}
-              alt="User Avatar"
-              className="w-10 h-10 object-contain border-2 border-white rounded-full"
-            />
-            {/* User Name */}
-            <span className="font-bold">{user?.first_name}</span>
-          </div>
-
-          {/* Dropdown Menu */}
-          {isOpen && (
-            <div className="absolute z-10 right-0 mt-0 pt-2 w-48  text-black rounded-md shadow-lg">
-              <ul className="bg-white">
-                <Link
-                  to="/profile"
-                  onClick={handlePageTitle}
-                >
-                  <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
-                    Profile
-                  </li>
-                </Link>
-                <Link
-                  to="/change-password"
-                  onClick={handlePageTitle}
-                >
-                  <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
-                    Change Password
-                  </li>
-                </Link>
-                <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer" onClick={handleLogout}>
-                  Logout
-                </li>
-              </ul>
+        <div className="flex gap-5 items-center">
+          <span className="bg-white text-klt_primary-900 px-3 py-1 rounded-full font-semibold">
+            <img src={Coin} alt="Coin" className="size-6 inline-block mr-1 "/>Credits: {wallet_balance !== undefined ? wallet_balance : 0}
+          </span>
+          <div
+            className="relative"
+            onMouseEnter={() => toggleDropdown(true)}
+            onMouseLeave={() => toggleDropdown(false)}
+          >
+            <div className="flex items-center space-x-2 cursor-pointer">
+              {/* User Avatar */}
+              <img
+                src={
+                  user?.image === null ? dummyImage : `${imageBaseUrl}/${user?.image}`}
+                alt="User Avatar"
+                className="w-10 h-10 object-contain border-2 border-white rounded-full"
+              />
+              {/* User Name */}
+              <span className="font-bold">{user?.first_name}</span>
             </div>
-          )}
+
+            {/* Dropdown Menu */}
+            {isOpen && (
+              <div className="absolute z-10 right-0 mt-0 pt-2 w-48  text-black rounded-md shadow-lg">
+                <ul className="bg-white">
+                  <Link
+                    to="/profile"
+                    onClick={handlePageTitle}
+                  >
+                    <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
+                      Profile
+                    </li>
+                  </Link>
+                  <Link
+                    to="/change-password"
+                    onClick={handlePageTitle}
+                  >
+                    <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer">
+                      Change Password
+                    </li>
+                  </Link>
+                  <li className="px-4 py-2 font-semibold hover:bg-green-100 cursor-pointer" onClick={handleLogout}>
+                    Logout
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>

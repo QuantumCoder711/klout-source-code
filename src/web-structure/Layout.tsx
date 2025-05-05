@@ -7,7 +7,6 @@ import { GlobalProvider } from "../GlobalContext";
 import Footer from "../features/homepage/Footer";
 
 const Layout: React.FC<React.PropsWithChildren<{}>> = () => {
-
   return (
     <GlobalProvider> {/* Wrap the layout with the provider */}
       <div className="flex h-screen overflow-hidden">

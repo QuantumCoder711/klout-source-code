@@ -29,6 +29,16 @@ export const fetchUserApi = async (token: string | null) => {
                 'Authorization': `Bearer ${token}`
             }
         });
+        console.log("API Profile Response:", response.data);
+
+        // Check if wallet_balance exists in the response
+        if (response.data && response.data.wallet_balance !== undefined) {
+            // If wallet_balance is directly in the response, add it to the user object
+            if (!response.data.user.wallet_balance) {
+                response.data.user.wallet_balance = response.data.wallet_balance;
+            }
+        }
+
         return response.data;
     } catch (error) {
         throw error;
