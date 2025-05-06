@@ -2,3 +2,8 @@
   functions = "netlify/functions"
   publish = "dist"
   command = "npm install --force && npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "index.html"
+  status = 200
