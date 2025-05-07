@@ -645,11 +645,6 @@ const EditAttendee = () => {
       }).then((res) => {
         const attendeeData: FormInputType = res.data.data;
 
-        console.log("All Attendee Data is: ", attendeeData);
-        console.log("Job Titles are: ", jobTitles);
-        console.log("Companies are: ", companies);
-        console.log("Industries are: ", industries);
-
         const jobExist = jobTitles?.filter((job) => job.name == attendeeData.job_title);
         // const companyExist = companies?.filter((company) => company.name == attendeeData.company_name);
         const industryExist = industries?.filter((industry) => industry.name == attendeeData.industry);
@@ -1018,6 +1013,7 @@ const EditAttendee = () => {
                 <option value="sponsor">Sponsor</option>
                 <option value="delegate">Delegate</option>
                 <option value="moderator">Moderator</option>
+                <option value="jury">Jury</option>
                 <option value="others">Others</option>
               </select>
             </label>
