@@ -31,7 +31,7 @@ const ExploreAllEvents: React.FC = () => {
         today.setHours(0, 0, 0, 0);
 
         // Filter out event with id 443
-        const filteredEvents = res.data.data.filter((event: any) => event.id !== 443);
+        const filteredEvents = res.data.data;
 
         const upcomingEvents = filteredEvents.filter((event: any) => {
           const eventDate = new Date(event.event_start_date);

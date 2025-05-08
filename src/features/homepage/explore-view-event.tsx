@@ -782,7 +782,7 @@ const ExploreViewEvent: React.FC = () => {
 
 
                     {/* Jury */}
-                    <div className='mt-6'>
+                    {(allJury.length > 0) && <div className='mt-6'>
                         <h3 className='font-semibold text-lg'>Jury</h3>
                         <hr className='border-t-2 border-white !my-[10px]' />
 
@@ -791,7 +791,7 @@ const ExploreViewEvent: React.FC = () => {
                         <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
 
                             {/* Single Jury Deatils */}
-                            {allJury.length > 0 ? allJury.map((jury, index) => (
+                            {allJury.map((jury, index) => (
                                 <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
                                     <img
                                         src={jury.image ? apiBaseUrl + "/" + jury.image : DummyImage}
@@ -802,9 +802,11 @@ const ExploreViewEvent: React.FC = () => {
                                     <p className='text-wrap text-sm'>{jury.job_title}</p>
                                     <p className='text-sm font-bold text-wrap capitalize'>{jury.company_name}</p>
                                 </div>
-                            )) : <p className='text-brand-gray mb-10 text-nowrap'>No jury available</p>}
+                            ))
+                                //  : <p className='text-brand-gray mb-10 text-nowrap'>No jury available</p>
+                            }
                         </div>
-                    </div>
+                    </div>}
 
 
                     {/* Agenda Details */}
