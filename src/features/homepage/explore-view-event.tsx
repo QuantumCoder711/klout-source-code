@@ -133,6 +133,7 @@ const ExploreViewEvent: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [allSpeakers, setAllSpeakers] = useState<any[]>([]);
+    const [allJury, setAllJury] = useState<any[]>([]);
     const [viewAgendaBy, setViewAgendaBy] = useState<number>(0);
 
     const [form, setForm] = useState({
@@ -306,6 +307,7 @@ const ExploreViewEvent: React.FC = () => {
                 .then((res) => {
                     console.log("The data is", res.data.data.speakers);
                     setAllSpeakers(res.data.data.speakers);
+                    setAllJury(res.data.data.jury);
                     setViewAgendaBy(res.data.data.view_agenda_by);
                 })
                 .catch((err) => {
@@ -752,6 +754,7 @@ const ExploreViewEvent: React.FC = () => {
                         <p className='text-brand-gray'>{currentEvent?.description}</p>
                     </div>
 
+
                     {/* Speakers */}
                     <div className='mt-6'>
                         <h3 className='font-semibold text-lg'>Speakers</h3>
@@ -776,6 +779,35 @@ const ExploreViewEvent: React.FC = () => {
                             )) : <p className='text-brand-gray mb-10 text-nowrap'>No speakers available</p>}
                         </div>
                     </div>
+
+
+                    {/* Jury */}
+                    {(allJury.length > 0) && <div className='mt-6'>
+                        <h3 className='font-semibold text-lg'>Jury</h3>
+                        <hr className='border-t-2 border-white !my-[10px]' />
+
+
+                        {/* All Juries */}
+                        <div className='grid grid-cols-2 md:grid-cols-3 gap-5 justify-between'>
+
+                            {/* Single Jury Deatils */}
+                            {allJury.map((jury, index) => (
+                                <div key={index} className='max-w-60 max-h-96 overflow-hidden text-ellipsis text-center'>
+                                    <img
+                                        src={jury.image ? apiBaseUrl + "/" + jury.image : DummyImage}
+                                        alt="Jury"
+                                        className='rounded-full mx-auto size-24'
+                                    />
+                                    <p className='font-semibold text-wrap'>{jury.first_name + ' ' + jury.last_name}</p>
+                                    <p className='text-wrap text-sm'>{jury.job_title}</p>
+                                    <p className='text-sm font-bold text-wrap capitalize'>{jury.company_name}</p>
+                                </div>
+                            ))
+                                //  : <p className='text-brand-gray mb-10 text-nowrap'>No jury available</p>
+                            }
+                        </div>
+                    </div>}
+
 
                     {/* Agenda Details */}
                     {viewAgendaBy == 0 && <div className='mt-6'>

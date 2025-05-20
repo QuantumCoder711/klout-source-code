@@ -602,6 +602,7 @@ const AddEventAttendee: React.FC<AddEventAttendeeProps> = ({ uuid }) => {
                 <option value="sponsor">Sponsor</option>
                 <option value="delegate">Delegate</option>
                 <option value="moderator">Moderator</option>
+                <option value="jury">Jury</option>
                 <option value="others">Others</option>
                 {/* <option value="Awwards Winner">Awwards Winner</option> */}
               </select>
