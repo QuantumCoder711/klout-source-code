@@ -86,16 +86,25 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
 
     const [deletingAttendee, setDeletingAttendee] = useState<boolean>(false);
 
-    const [selectedSponsorAttendees, setSelectedSponsorAttendees] = useState<attendeeType[]>([]);
-    const [sponsorAttendees, setSponsorAttendees] = useState<attendeeType[]>([]);
+    const [dataForDeletion, setDataForDeletion] = useState<{attendee_id: number, uuid: string}[]>([]);
 
+    const [selectedSponsorAttendees, setSelectedSponsorAttendees] = useState<attendeeType[]>([]);
+    const [sponsorId, setSponsorId] = useState<number>(0);
 
     const handleSponsorAttendeeSelect = (attendee: attendeeType) => {
         setSelectedSponsorAttendees(prev => [...prev, attendee]);
     }
 
-    const handleRemoveSponsorAttendee = (id: number) => {
+    const handleRemoveSponsorAttendee = async (id: number) => {
+        const uuid = dataForDeletion.find((data) => data.attendee_id === id)?.uuid;
         setSelectedSponsorAttendees(prev => prev.filter(attendee => attendee.id !== id));
+
+        await axios.delete(`${apiBaseUrl}/api/delete-sponsor-attendee/${uuid}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
     }
 
     // const [selectedAction, setSelectedAction] = useState('');
@@ -235,13 +244,14 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
         XLSX.writeFile(workbook, eventAttendee[0].event_name + '.xlsx');
     };
 
-    const handleSaveSponsorAttendees = async (sponsor_id: string) => {
+    const handleSaveSponsorAttendees = async () => {
         setPageLoading(true);
         try {
+            const attendeeIds = selectedSponsorAttendees.map(attendee => attendee.id);
             const response = await axios.post(`${apiBaseUrl}/api/add-multiple-sponsor-attendee`, {
                 "event_id": currentEvent?.id,
-                "attendee_ids": selectedSponsorAttendees.map(attendee => attendee.id),
-                "sponsor_id": sponsor_id
+                "attendee_ids": attendeeIds,
+                "sponsor_id": sponsorId
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -269,6 +279,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
 
 
     const handleModal = async (id: number) => {
+        setSponsorId(id);
         (document.getElementById('sponsor_modal') as HTMLDialogElement).showModal();
 
         const response = await axios.post(`${apiBaseUrl}/api/get-sponsor-attendee`, {
@@ -282,32 +293,13 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
         });
 
         if (response.data.status === 200) {
-            setSelectedSponsorAttendees(response.data.attendee_ids);
+            setDataForDeletion(response.data.data);
+            const data = response.data.data.map((ids: any) => ids.attendee_id);
+            const attendeesarray = data.map((id: number) => {
+                return eventAttendee.find((attendee) => attendee.id === id);
+            });
+            setSelectedSponsorAttendees(attendeesarray);
         }
-    }
-
-    const handleRemove = async () => {
-        // const response = await axios.delete(`${apiBaseUrl}/api/remove-sponsor-attendee`,
-        //     {
-        //         "event_id": "492",
-        //         "attendee_id": "18715",
-        //         "sponsor_id": "18716"
-        //     });
-
-        // if (response.data.status === 200) {
-        //     await Swal.fire({
-        //         icon: "success",
-        //         title: "Success",
-        //         text: "Sponsor attendee removed successfully!",
-        //     });
-        //     window.location.reload();
-        // } else {
-        //     await Swal.fire({
-        //         icon: "error",
-        //         title: "Error",
-        //         text: "Something went wrong!",
-        //     });
-        // }
     }
 
     const renderPaginationNumbers = () => {
@@ -1070,7 +1062,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                                                                         >
                                                                             {attendee.first_name + attendee.last_name}
                                                                             <button
-                                                                                onClick={() => handleRemoveSponsorAttendee(attendee.id)}
+                                                                                onClick={()=>handleRemoveSponsorAttendee(attendee.id)}
                                                                                 className="text-green-800 hover:text-red-600"
                                                                             >
                                                                                 <IoIosClose size={20} />
@@ -1116,7 +1108,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
 
                                                         <div className="modal-action">
                                                             <form method="dialog" className="flex gap-2">
-                                                                <button className="btn btn-primary" onClick={() => handleSaveSponsorAttendees(String(attendee.id))}>Save</button>
+                                                                <button className="btn btn-primary" onClick={handleSaveSponsorAttendees}>Save</button>
                                                                 <button className="btn">Close</button>
                                                             </form>
                                                         </div>
