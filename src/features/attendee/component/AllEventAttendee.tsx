@@ -18,6 +18,8 @@ import { FaMessage } from 'react-icons/fa6';
 import { BiSolidMessageSquareDots } from 'react-icons/bi';
 import { useGlobalContext } from '../../../GlobalContext';
 import dummyImage from "/dummyImage.jpg";
+import { Stars } from 'lucide-react';
+import { IoIosClose } from "react-icons/io";
 
 type attendeeType = {
     uuid: string;
@@ -77,12 +79,24 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
     const dispatch = useAppDispatch();
 
     const { count } = useGlobalContext();
-
+    const [pageLoading, setPageLoading] = useState<boolean>(false);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     const [deleteArray, setDeleteArray] = useState<number[]>([]);
 
     const [deletingAttendee, setDeletingAttendee] = useState<boolean>(false);
+
+    const [selectedSponsorAttendees, setSelectedSponsorAttendees] = useState<attendeeType[]>([]);
+    const [sponsorAttendees, setSponsorAttendees] = useState<attendeeType[]>([]);
+
+
+    const handleSponsorAttendeeSelect = (attendee: attendeeType) => {
+        setSelectedSponsorAttendees(prev => [...prev, attendee]);
+    }
+
+    const handleRemoveSponsorAttendee = (id: number) => {
+        setSelectedSponsorAttendees(prev => prev.filter(attendee => attendee.id !== id));
+    }
 
     // const [selectedAction, setSelectedAction] = useState('');
 
@@ -220,6 +234,81 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
         // Generate Excel file and offer download
         XLSX.writeFile(workbook, eventAttendee[0].event_name + '.xlsx');
     };
+
+    const handleSaveSponsorAttendees = async (sponsor_id: string) => {
+        setPageLoading(true);
+        try {
+            const response = await axios.post(`${apiBaseUrl}/api/add-multiple-sponsor-attendee`, {
+                "event_id": currentEvent?.id,
+                "attendee_ids": selectedSponsorAttendees.map(attendee => attendee.id),
+                "sponsor_id": sponsor_id
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data.status) {
+                await Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Sponsor attendees saved successfully!",
+                });
+                window.location.reload();
+            }
+        } catch (error) {
+            await Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Something went wrong!",
+            });
+        } finally {
+            setPageLoading(false);
+        }
+    }
+
+
+    const handleModal = async (id: number) => {
+        (document.getElementById('sponsor_modal') as HTMLDialogElement).showModal();
+
+        const response = await axios.post(`${apiBaseUrl}/api/get-sponsor-attendee`, {
+            event_id: currentEvent?.id,
+            sponsor_id: id,
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        if (response.data.status === 200) {
+            setSelectedSponsorAttendees(response.data.attendee_ids);
+        }
+    }
+
+    const handleRemove = async () => {
+        // const response = await axios.delete(`${apiBaseUrl}/api/remove-sponsor-attendee`,
+        //     {
+        //         "event_id": "492",
+        //         "attendee_id": "18715",
+        //         "sponsor_id": "18716"
+        //     });
+
+        // if (response.data.status === 200) {
+        //     await Swal.fire({
+        //         icon: "success",
+        //         title: "Success",
+        //         text: "Sponsor attendee removed successfully!",
+        //     });
+        //     window.location.reload();
+        // } else {
+        //     await Swal.fire({
+        //         icon: "error",
+        //         title: "Error",
+        //         text: "Something went wrong!",
+        //     });
+        // }
+    }
 
     const renderPaginationNumbers = () => {
         const paginationNumbers = [];
@@ -500,7 +589,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                             title: "Success",
                             icon: "success",
                             text: "Attendee is marked check in now"
-                        }).then(()=>window.location.reload());
+                        }).then(() => window.location.reload());
                     }
                     else {
                         Swal.fire({
@@ -514,7 +603,7 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
         });
     }
 
-    if (loading || deletingAttendee) {
+    if (loading || deletingAttendee || pageLoading) {
         return <Loader />
     }
 
@@ -959,6 +1048,80 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                                                 </>
                                             )}
                                             <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-2">
+                                                {attendee.status === 'sponsor' && (
+                                                    <button onClick={() => handleModal(attendee.id)}>
+                                                        <Stars className='text-yellow-600 hover:text-yellow-700' />
+                                                    </button>
+                                                )}
+                                                <dialog id="sponsor_modal" className="modal">
+                                                    <div className="modal-box max-w-3xl">
+                                                        <h3 className="font-bold text-lg mb-4">Sponsor Details</h3>
+                                                        <p className="mb-4">This attendee is a sponsor.</p>
+
+                                                        {/* Tagged attendees section */}
+                                                        {selectedSponsorAttendees.length > 0 && (
+                                                            <div className="mb-4">
+                                                                <h4 className="font-semibold mb-2">Tagged Attendees:</h4>
+                                                                <div className="flex flex-wrap gap-2">
+                                                                    {selectedSponsorAttendees.map(attendee => (
+                                                                        <span
+                                                                            key={attendee.id}
+                                                                            className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center gap-1"
+                                                                        >
+                                                                            {attendee.first_name + attendee.last_name}
+                                                                            <button
+                                                                                onClick={() => handleRemoveSponsorAttendee(attendee.id)}
+                                                                                className="text-green-800 hover:text-red-600"
+                                                                            >
+                                                                                <IoIosClose size={20} />
+                                                                            </button>
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Attendees list */}
+                                                        <div className="mt-4">
+                                                            <h4 className="font-semibold mb-2">Select Attendees:</h4>
+                                                            <div className="overflow-y-auto max-h-60 border rounded-lg">
+                                                                <table className="min-w-full bg-white">
+                                                                    <thead className="bg-gray-50">
+                                                                        <tr>
+                                                                            <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                                                            <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                                                                            <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody className="divide-y divide-gray-200">
+                                                                        {currentAttendees.filter(attendee => attendee.status !== 'sponsor').map((attendee: attendeeType) => (
+                                                                            <tr key={attendee.id} className="hover:bg-gray-50">
+                                                                                <td className="py-2 px-4 text-sm text-gray-700">{attendee.first_name + attendee.last_name}</td>
+                                                                                <td className="py-2 px-4 text-sm text-gray-700">{attendee.company_name}</td>
+                                                                                <td className="py-2 px-4 text-sm">
+                                                                                    <button
+                                                                                        onClick={() => handleSponsorAttendeeSelect(attendee)}
+                                                                                        className="text-green-600 hover:text-green-800 disabled:text-gray-400"
+                                                                                        disabled={selectedSponsorAttendees.some(item => item.id === attendee.id)}
+                                                                                    >
+                                                                                        {selectedSponsorAttendees.some(item => item.id === attendee.id) ? 'Selected' : 'Select'}
+                                                                                    </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="modal-action">
+                                                            <form method="dialog" className="flex gap-2">
+                                                                <button className="btn btn-primary" onClick={() => handleSaveSponsorAttendees(String(attendee.id))}>Save</button>
+                                                                <button className="btn">Close</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </dialog>
                                                 <span
                                                     onClick={() => showImage(
                                                         attendee.image,
@@ -996,61 +1159,6 @@ const AllEventAttendee: React.FC<AllEventAttendeeProps> = ({ uuid }) => {
                                 )}
                             </tbody>
                         </table>
-
-
-                        // <table className="min-w-full bg-gray-100 rounded-lg shadow-md border border-gray-400">
-                        //     <thead>
-                        //         <tr className="bg-klt_primary-500 text-white">
-                        //             {/* Select All Checkbox */}
-                        //             <th className="py-3 px-4 text-start text-nowrap">
-                        //                 <input
-                        //                     type="checkbox"
-                        //                     // onChange={(e) => handleSelectAll(e.target.checked)}
-                        //                     // checked={isAllSelected}
-                        //                 />
-                        //             </th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">#</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Name</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Designation</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Email</th>
-                        //             <th className="py-3 px-4 text-start text-nowrap">Action</th>
-                        //         </tr>
-                        //     </thead>
-                        //     <tbody>
-                        //         {currentAttendees.length > 0 ? (
-                        //             currentAttendees.map((attendee, index) => (
-                        //                 <tr key={attendee.uuid}>
-                        //                     {/* Individual Checkbox */}
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">
-                        //                         <input
-                        //                             type="checkbox"
-                        //                             // checked={selectedAttendees.includes(attendee.uuid)}
-                        //                             // onChange={() => handleSelectAttendee(attendee.uuid)}
-                        //                         />
-                        //                     </td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{index + 1}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">
-                        //                         {`${attendee.first_name} ${attendee.last_name}`}
-                        //                     </td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.job_title}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap">{attendee.email_id}</td>
-                        //                     <td className="py-3 px-4 text-gray-800 text-nowrap flex items-center gap-2">
-                        //                         {/* Actions */}
-                        //                         <button className="text-blue-500 hover:text-blue-700">Edit</button>
-                        //                         <button className="text-red-500 hover:text-red-700">Delete</button>
-                        //                     </td>
-                        //                 </tr>
-                        //             ))
-                        //         ) : (
-                        //             <tr>
-                        //                 <td colSpan={6} className="py-4 text-center text-gray-600">
-                        //                     No attendees found.
-                        //                 </td>
-                        //             </tr>
-                        //         )}
-                        //     </tbody>
-                        // </table>
-
                     )}
                 </div>
 
