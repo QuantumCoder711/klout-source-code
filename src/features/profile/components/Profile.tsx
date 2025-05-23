@@ -238,7 +238,7 @@ const Profile: React.FC = () => {
                             <p className="text-gray-500 text-sm">{user?.mobile_number}</p>
                             <p className="text-gray-500 text-sm">{user?.address + ", " + user?.pincode}</p>
 
-                            <div className="flex items-center mt-4">
+                            <div className="hidden items-center mt-4">
                                 <div className="bg-green-100 text-klt_primary-900 px-3 py-1 rounded-full font-semibold mr-3">
                                     Credits: {wallet_balance !== undefined ? wallet_balance : 0}
                                 </div>

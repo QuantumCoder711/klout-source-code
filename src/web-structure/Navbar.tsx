@@ -141,7 +141,7 @@ const Navbar: React.FC = () => {
 
         {/* Right side - User profile with dropdown */}
         <div className="flex gap-5 items-center">
-          <span className="bg-white text-klt_primary-900 px-3 py-1 rounded-full font-semibold">
+          <span className="bg-white hidden text-klt_primary-900 px-3 py-1 rounded-full font-semibold">
             <img src={Coin} alt="Coin" className="size-6 inline-block mr-1 "/>Credits: {wallet_balance !== undefined ? wallet_balance : 0}
           </span>
           <div
