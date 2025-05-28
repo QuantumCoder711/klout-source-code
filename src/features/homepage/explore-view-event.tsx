@@ -121,6 +121,7 @@ type AgendaType = {
 const ExploreViewEvent: React.FC = () => {
 
     const { slug } = useParams<{ slug: string }>();
+    const parts = slug?.split('_');
     const [isLoading, setIsLoading] = useState(false);
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
     const [currentEvent, setCurrentEvent] = useState<EventType | null>(null);
@@ -226,12 +227,12 @@ const ExploreViewEvent: React.FC = () => {
     const appBaseUrl = import.meta.env.VITE_APP_BASE_URL;
 
     useEffect(() => {
-        if (slug) {
+        if (parts) {
             try {
                 setIsLoading(true);
                 axios.get(`${apiBaseUrl}/api/all_events`)
                     .then((res: any) => {
-                        setCurrentEvent(res.data.data.find((event: any) => event.slug === slug));
+                        setCurrentEvent(res.data.data.find((event: any) => event.slug === parts[0]));
                     })
                     .catch((err: any) => {
                         console.log(err);
@@ -246,6 +247,13 @@ const ExploreViewEvent: React.FC = () => {
             }
         }
     }, [slug]);
+
+    useEffect(() => {
+        if (parts && currentEvent && parts?.length > 1) {
+            const parameter = `${parts[1]}_${parts[2]}_${parts[3]}`;
+            axios.get(`${apiBaseUrl}/api/express-interest/${parameter}`);
+        }
+    }, [parts, currentEvent]);
 
     // Extract coordinates from Google Maps link
     const extractCoordinates = async (address: string | undefined) => {
